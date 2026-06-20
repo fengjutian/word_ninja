@@ -1,0 +1,1 @@
+// Word detail page

@@ -1,0 +1,19 @@
+name: word_ninja
+
+packages:
+  - apps/*
+  - packages/*
+
+command:
+  bootstrap:
+    usePubspecOverrides: true
+
+scripts:
+  analyze: >
+    melos exec -- flutter analyze
+
+  format: >
+    melos exec -- dart format .
+
+  test: >
+    melos exec -- flutter test
