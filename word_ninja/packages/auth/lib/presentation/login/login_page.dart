@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
 import '../providers/auth_provider.dart';
 
@@ -141,9 +142,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
 
                   // 注册入口
                   TextButton(
-                    onPressed: () {
-                      // TODO 跳转注册页
-                    },
+                    onPressed: () => context.push('/register'),
                     child: const Text('还没有账号？立即注册'),
                   ),
                 ],

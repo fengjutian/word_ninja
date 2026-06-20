@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
+import '../../data/model/word.dart';
+import '../providers/word_provider.dart';
 
 /// 添加单词页
 class AddWordPage extends ConsumerStatefulWidget {
@@ -85,9 +87,7 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
               const SizedBox(height: NinjaSpacing.xl),
               // AI 补全按钮
               OutlinedButton.icon(
-                onPressed: () {
-                  // TODO AI 自动补全
-                },
+                onPressed: _aiAutoComplete,
                 icon: const Icon(Icons.auto_awesome),
                 label: const Text('AI 智能补全'),
               ),
@@ -100,7 +100,33 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    // TODO 保存单词
+    final word = Word(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      userId: '',
+      word: _wordCtrl.text.trim(),
+      meaning: _meaningCtrl.text.trim(),
+      phonetic: _phoneticCtrl.text.trim(),
+      example: _exampleCtrl.text.trim(),
+    );
+    // 通过 Provider 保存
+    ref.read(wordListProvider.notifier).addWord(word);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('单词已添加')),
+    );
     Navigator.pop(context);
+  }
+
+  void _aiAutoComplete() {
+    final word = _wordCtrl.text.trim();
+    if (word.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请先输入单词')),
+      );
+      return;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('AI 补全中...')),
+    );
+    // TODO 调用 AiWordService.completeWord
   }
 }

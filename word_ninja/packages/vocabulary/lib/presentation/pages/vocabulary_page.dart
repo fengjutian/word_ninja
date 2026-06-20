@@ -65,9 +65,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
       ),
       body: _buildBody(state),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // TODO 导航到添加单词页
-        },
+        onPressed: () => context.push('/vocabulary/add'),
         backgroundColor: NinjaColors.primary,
         child: const Icon(Icons.add, color: Colors.white),
       ),
@@ -132,9 +130,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
             meaning: word.meaning,
             phonetic: word.phonetic.isNotEmpty ? '/${word.phonetic}/' : null,
             mastery: word.mastery,
-            onTap: () {
-              // TODO 导航到单词详情
-            },
+            onTap: () => context.push('/vocabulary/detail/${word.id}'),
           );
         },
       ),

@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
+import 'package:ai/lib/services/ai_chat_service.dart';
 
 /// AI 导师聊天页 — Sensei Shell
-class TutorChatPage extends StatefulWidget {
+class TutorChatPage extends ConsumerStatefulWidget {
   const TutorChatPage({super.key});
 
   @override
-  State<TutorChatPage> createState() => _TutorChatPageState();
+  ConsumerState<TutorChatPage> createState() => _TutorChatPageState();
 }
 
-class _TutorChatPageState extends State<TutorChatPage> {
+class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   final _msgCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   final _messages = <_ChatMessage>[
@@ -39,18 +41,27 @@ class _TutorChatPageState extends State<TutorChatPage> {
       _msgCtrl.clear();
     });
     _scrollToBottom();
-    // TODO 调用 AI 服务
-    Future.delayed(const Duration(seconds: 2), () {
+
+    // 调用 AI 服务
+    _callAiService(text);
+  }
+
+  Future<void> _callAiService(String text) async {
+    try {
+      final aiService = ref.read(aiChatServiceProvider);
+      final reply = await aiService.chat(message: text, systemPrompt: '你是一个英语忍者导师 Sensei Shell，用友好有趣的方式回答英语学习问题。');
+      if (!mounted) return;
       setState(() {
         _messages.removeLast();
-        _messages.add(_ChatMessage(
-          'Good question! Let me help you with that. 🤓\n\n'
-          '这个语法点需要从基础开始理解...',
-          isUser: false,
-        ));
+        _messages.add(_ChatMessage(reply, isUser: false));
       });
-      _scrollToBottom();
-    });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _messages.removeLast();
+        _messages.add(_ChatMessage('抱歉，暂时无法连接AI。请稍后再试。', isUser: false));
+      });
+    }
   }
 
   void _scrollToBottom() {

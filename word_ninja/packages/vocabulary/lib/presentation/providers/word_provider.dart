@@ -1,9 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/datasource/vocabulary_local_datasource.dart';
-import '../data/datasource/vocabulary_remote_datasource.dart';
 import '../data/model/word.dart';
 import '../data/model/vocabulary_stats.dart';
-import '../data/repository/vocabulary_repository_impl.dart';
 import '../domain/repository/vocabulary_repository.dart';
 
 /// 单词列表状态
@@ -34,29 +31,29 @@ class WordListState {
       );
 }
 
+/// 单词仓库 Provider（需在 app DI 中 override）
+final vocabularyRepositoryProvider = Provider<VocabularyRepository>((ref) {
+  throw UnimplementedError('vocabularyRepositoryProvider must be overridden in app DI');
+});
+
 /// 单词 Provider
 final wordListProvider =
     StateNotifierProvider<WordListNotifier, WordListState>((ref) {
-  final repo = _createRepo();
+  final repo = ref.read(vocabularyRepositoryProvider);
   return WordListNotifier(repo);
 });
 
 /// 单词统计 Provider
 final vocabularyStatsProvider = FutureProvider<VocabularyStats>((ref) async {
-  final repo = _createRepo();
+  final repo = ref.read(vocabularyRepositoryProvider);
   return repo.getStats();
 });
 
 /// 待复习单词 Provider
 final dueReviewProvider = FutureProvider<List<Word>>((ref) async {
-  final repo = _createRepo();
+  final repo = ref.read(vocabularyRepositoryProvider);
   return repo.getDueReviews();
 });
-
-VocabularyRepository _createRepo() {
-  // TODO DI 注入具体实现
-  throw UnimplementedError('Bind VocabularyLocalDataSource & RemoteDataSource');
-}
 
 class WordListNotifier extends StateNotifier<WordListState> {
   final VocabularyRepository _repo;

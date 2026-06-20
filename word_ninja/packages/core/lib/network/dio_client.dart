@@ -123,17 +123,26 @@ class _LogInterceptor extends Interceptor {
 
 class _AuthInterceptor extends Interceptor {
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    // TODO 从 SecureStorage 读取 token 注入
-    // final token = await SecureStorage.instance.read(StorageKeys.accessToken);
-    // if (token != null) options.headers['Authorization'] = 'Bearer $token';
+  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+    final token = await SecureStorage.read(StorageKeys.accessToken);
+    if (token != null && token.isNotEmpty) {
+      options.headers['Authorization'] = 'Bearer $token';
+    }
     handler.next(options);
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     if (err.response?.statusCode == 401) {
-      // TODO 触发 token 刷新或跳转登录
+      // Token 过期，尝试刷新
+      final refreshToken = await SecureStorage.read(StorageKeys.refreshToken);
+      if (refreshToken != null) {
+        try {
+          // TODO 调用 refresh token API
+          await SecureStorage.delete(StorageKeys.accessToken);
+          await SecureStorage.delete(StorageKeys.refreshToken);
+        } catch (_) {}
+      }
     }
     handler.next(err);
   }

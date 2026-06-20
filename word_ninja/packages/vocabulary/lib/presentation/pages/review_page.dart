@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
 import '../../data/model/word.dart';
+import '../providers/word_provider.dart';
 
 /// 艾宾浩斯复习页 — 单词卡片翻转
 class ReviewPage extends ConsumerStatefulWidget {
@@ -50,9 +52,9 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
     _showMeaning = !_showMeaning;
   }
 
-  void _rateWord(int score) {
-    // TODO 记录复习评分
-    if (_currentIndex < widget.words.length - 1) {
+  void _rateWord(int score) async {
+    final word = widget.words[_currentIndex];
+    await ref.read(vocabularyRepositoryProvider).submitReview(word.id, score);
       _pageCtrl.nextPage(
           duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
       _flipCtrl.reset();
