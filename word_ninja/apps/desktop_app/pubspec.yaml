@@ -1,0 +1,36 @@
+name: desktop_app
+description: Word Ninja Desktop App (Windows/macOS/Linux)
+publish_to: none
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.5.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  core:
+    path: ../../packages/core
+  ui_kit:
+    path: ../../packages/ui_kit
+  auth:
+    path: ../../packages/auth
+  vocabulary:
+    path: ../../packages/vocabulary
+  reading:
+    path: ../../packages/reading
+  ai:
+    path: ../../packages/ai
+  ai_tutor:
+    path: ../../packages/ai_tutor
+  profile:
+    path: ../../packages/profile
+  flutter_riverpod: ^2.6.1
+  go_router: ^14.8.1
+  window_manager: ^0.4.3
+  hotkey_manager: ^0.2.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0

@@ -1,1 +1,210 @@
-// Review page
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
+import '../../data/model/word.dart';
+
+/// 艾宾浩斯复习页 — 单词卡片翻转
+class ReviewPage extends ConsumerStatefulWidget {
+  final List<Word> words;
+
+  const ReviewPage({super.key, required this.words});
+
+  @override
+  ConsumerState<ReviewPage> createState() => _ReviewPageState();
+}
+
+class _ReviewPageState extends ConsumerState<ReviewPage>
+    with SingleTickerProviderStateMixin {
+  late PageController _pageCtrl;
+  late AnimationController _flipCtrl;
+  late Animation<double> _flipAnim;
+  bool _showMeaning = false;
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _pageCtrl = PageController();
+    _flipCtrl = AnimationController(
+      duration: const Duration(milliseconds: 400),
+      vsync: this,
+    );
+    _flipAnim = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(parent: _flipCtrl, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _pageCtrl.dispose();
+    _flipCtrl.dispose();
+    super.dispose();
+  }
+
+  void _flipCard() {
+    if (_showMeaning) {
+      _flipCtrl.reverse();
+    } else {
+      _flipCtrl.forward();
+    }
+    _showMeaning = !_showMeaning;
+  }
+
+  void _rateWord(int score) {
+    // TODO 记录复习评分
+    if (_currentIndex < widget.words.length - 1) {
+      _pageCtrl.nextPage(
+          duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+      _flipCtrl.reset();
+      _showMeaning = false;
+      _currentIndex++;
+    } else {
+      Navigator.pop(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.words.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('复习')),
+        body: const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.check_circle, size: 64, color: NinjaColors.success),
+              SizedBox(height: 16),
+              Text('暂无待复习单词', style: NinjaTextStyles.heading3),
+            ],
+          ),
+        ),
+      );
+    }
+
+    final word = widget.words[_currentIndex];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('复习 (${_currentIndex + 1}/${widget.words.length})'),
+      ),
+      body: Column(
+        children: [
+          // 进度条
+          LinearProgressIndicator(
+            value: (_currentIndex + 1) / widget.words.length,
+            backgroundColor: NinjaColors.divider.withValues(alpha: 0.2),
+            valueColor: const AlwaysStoppedAnimation<Color>(NinjaColors.primary),
+          ),
+
+          Expanded(
+            child: GestureDetector(
+              onTap: _flipCard,
+              child: Center(
+                child: AnimatedBuilder(
+                  animation: _flipAnim,
+                  builder: (context, child) {
+                    final angle = _flipAnim.value * 3.14159;
+                    return Transform(
+                      alignment: Alignment.center,
+                      transform: Matrix4.identity()
+                        ..setEntry(3, 2, 0.001)
+                        ..rotateY(angle),
+                      child: angle < 1.57
+                          ? _buildWordFront(word)
+                          : Transform(
+                              alignment: Alignment.center,
+                              transform: Matrix4.identity()..rotateY(3.14159),
+                              child: _buildWordBack(word),
+                            ),
+                    );
+                  },
+                ),
+              ),
+            ),
+          ),
+
+          // 评分按钮
+          if (_showMeaning)
+            Padding(
+              padding: const EdgeInsets.all(NinjaSpacing.xl),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _scoreBtn(Icons.sentiment_very_dissatisfied, '不认识',
+                      NinjaColors.error, () => _rateWord(1)),
+                  _scoreBtn(Icons.sentiment_neutral, '模糊',
+                      NinjaColors.warning, () => _rateWord(3)),
+                  _scoreBtn(Icons.sentiment_satisfied, '认识',
+                      NinjaColors.success, () => _rateWord(5)),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWordFront(Word word) {
+    return Card(
+      margin: const EdgeInsets.all(NinjaSpacing.xl),
+      child: Container(
+        width: double.infinity,
+        height: 280,
+        alignment: Alignment.center,
+        child: Text(word.word, style: NinjaTextStyles.displayLarge),
+      ),
+    );
+  }
+
+  Widget _buildWordBack(Word word) {
+    return Card(
+      margin: const EdgeInsets.all(NinjaSpacing.xl),
+      color: NinjaColors.primaryLight.withValues(alpha: 0.05),
+      child: Container(
+        width: double.infinity,
+        height: 280,
+        padding: const EdgeInsets.all(NinjaSpacing.xl),
+        alignment: Alignment.center,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(word.meaning, style: NinjaTextStyles.heading1),
+            if (word.phonetic.isNotEmpty) ...[
+              const SizedBox(height: NinjaSpacing.sm),
+              Text('/${word.phonetic}/',
+                  style: NinjaTextStyles.bodyLarge),
+            ],
+            if (word.example.isNotEmpty) ...[
+              const SizedBox(height: NinjaSpacing.md),
+              Text(word.example,
+                  style: NinjaTextStyles.bodyMedium,
+                  textAlign: TextAlign.center),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _scoreBtn(IconData icon, String label, Color color, VoidCallback onTap) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 56,
+            height: 56,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: color.withValues(alpha: 0.1),
+              border: Border.all(color: color.withValues(alpha: 0.3)),
+            ),
+            child: Icon(icon, color: color, size: 28),
+          ),
+          const SizedBox(height: NinjaSpacing.xs),
+          Text(label, style: TextStyle(color: color, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+}
