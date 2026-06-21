@@ -37,8 +37,11 @@ case "$COMMAND" in
     ;;
   gen)
     # 运行代码生成（freezed / json_serializable）
-    for pkg in core auth vocabulary ai; do
-      (cd "packages/$pkg" && dart run build_runner build --delete-conflicting-outputs)
+    # 先 pub get 确保依赖就绪
+    for pkg in core auth vocabulary ai ai_tutor reading listening speaking writing; do
+      if [ -d "packages/$pkg" ]; then
+        (cd "packages/$pkg" && dart pub get && dart run build_runner build --delete-conflicting-outputs)
+      fi
     done
     ;;
   bootstrap)

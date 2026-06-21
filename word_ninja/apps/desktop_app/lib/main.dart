@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/logger/logger.dart';
 import 'app/desktop_app.dart';
+import 'app/di.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -10,6 +11,7 @@ void main() async {
   final router = createDesktopRouter();
 
   runApp(ProviderScope(
+    overrides: desktopOverrides(),
     child: MaterialApp.router(
       title: 'Word Ninja Desktop',
       debugShowCheckedModeBanner: false,
