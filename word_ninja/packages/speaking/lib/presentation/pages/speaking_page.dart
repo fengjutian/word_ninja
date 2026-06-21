@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 
 /// 口语训练页
 class SpeakingPage extends StatelessWidget {

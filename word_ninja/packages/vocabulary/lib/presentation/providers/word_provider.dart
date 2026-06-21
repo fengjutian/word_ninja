@@ -1,7 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/model/word.dart';
-import '../data/model/vocabulary_stats.dart';
-import '../domain/repository/vocabulary_repository.dart';
+import '../../data/model/word.dart';
+import '../../data/model/vocabulary_stats.dart';
+import '../../domain/repository/vocabulary_repository.dart';
 
 /// 单词列表状态
 class WordListState {

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core/lib/storage/secure_storage.dart';
-import 'package:core/lib/storage/isar_db.dart';
-import 'package:core/lib/logger/logger.dart';
+import 'package:core/storage/secure_storage.dart';
+import 'package:core/storage/isar_db.dart';
+import 'package:core/logger/logger.dart';
 
 /// App 初始化引导
 class AppBootstrap {

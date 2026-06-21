@@ -1,5 +1,5 @@
-import 'package:core/lib/logger/logger.dart';
-import 'package:core/lib/storage/secure_storage.dart';
+import 'package:core/logger/logger.dart';
+import 'package:core/storage/secure_storage.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repository/auth_repository.dart';
 import '../datasource/auth_remote_datasource.dart';

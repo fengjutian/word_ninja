@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/lib/cards/word_card.dart';
-import 'package:ui_kit/lib/loading/ninja_loading.dart';
-import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
+import 'package:go_router/go_router.dart';
+import 'package:ui_kit/cards/word_card.dart';
+import 'package:ui_kit/loading/ninja_loading.dart';
+import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import '../providers/word_provider.dart';
 
 /// 单词本主页面

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
-import 'package:vocabulary/lib/presentation/pages/vocabulary_page.dart';
-import 'package:ai_tutor/lib/pages/tutor_chat_page.dart';
-import 'package:reading/lib/presentation/pages/reader_page.dart';
+import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:vocabulary/presentation/pages/vocabulary_page.dart';
+import 'package:ai_tutor/pages/tutor_chat_page.dart';
+import 'package:reading/presentation/pages/reader_page.dart';
 
 /// 桌面端路由
 class DesktopRoutes {

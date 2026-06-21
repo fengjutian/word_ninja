@@ -1,19 +1,19 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core/lib/network/dio_client.dart';
-import 'package:core/lib/network/api_client.dart';
-import 'package:core/lib/constants/app_constants.dart';
-import 'package:auth/lib/data/datasource/auth_remote_datasource.dart';
-import 'package:auth/lib/data/repository/auth_repository_impl.dart';
-import 'package:auth/lib/domain/repository/auth_repository.dart';
-import 'package:auth/lib/presentation/providers/auth_provider.dart';
-import 'package:vocabulary/lib/data/datasource/vocabulary_local_datasource.dart';
-import 'package:vocabulary/lib/data/datasource/vocabulary_remote_datasource.dart';
-import 'package:vocabulary/lib/data/repository/vocabulary_repository_impl.dart';
-import 'package:vocabulary/lib/domain/repository/vocabulary_repository.dart';
-import 'package:vocabulary/lib/presentation/providers/word_provider.dart';
-import 'package:sync/lib/sync_service.dart';
-import 'package:ai/lib/services/ai_chat_service.dart';
+import 'package:core/network/dio_client.dart';
+import 'package:core/network/api_client.dart';
+import 'package:core/constants/app_constants.dart';
+import 'package:auth/data/datasource/auth_remote_datasource.dart';
+import 'package:auth/data/repository/auth_repository_impl.dart';
+import 'package:auth/domain/repository/auth_repository.dart';
+import 'package:auth/presentation/providers/auth_provider.dart';
+import 'package:vocabulary/data/datasource/vocabulary_local_datasource.dart';
+import 'package:vocabulary/data/datasource/vocabulary_remote_datasource.dart';
+import 'package:vocabulary/data/repository/vocabulary_repository_impl.dart';
+import 'package:vocabulary/domain/repository/vocabulary_repository.dart';
+import 'package:vocabulary/presentation/providers/word_provider.dart';
+import 'package:sync/sync_service.dart';
+import 'package:ai/services/ai_chat_service.dart';
 
 /// ═══════════════════════════════════════
 ///  Word Ninja 依赖注入（DI）模块

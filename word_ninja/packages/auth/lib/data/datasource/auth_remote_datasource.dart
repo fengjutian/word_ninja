@@ -1,4 +1,4 @@
-import 'package:core/lib/network/api_client.dart';
+import 'package:core/network/api_client.dart';
 
 /// 认证远程数据源
 class AuthRemoteDataSource {

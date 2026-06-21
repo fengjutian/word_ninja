@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
-import 'package:ai/lib/services/ai_chat_service.dart';
+import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ai/ai.dart';
 
 /// AI 导师聊天页 — Sensei Shell
 class TutorChatPage extends ConsumerStatefulWidget {

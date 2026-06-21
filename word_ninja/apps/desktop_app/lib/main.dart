@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core/lib/logger/logger.dart';
+import 'package:core/logger/logger.dart';
 import 'app/desktop_app.dart';
 
 void main() async {

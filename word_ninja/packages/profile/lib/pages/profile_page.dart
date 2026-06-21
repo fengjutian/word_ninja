@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/lib/badges/ninja_level_badge.dart';
-import 'package:ui_kit/lib/cards/exp_progress_bar.dart';
-import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/badges/ninja_level_badge.dart';
+import 'package:ui_kit/cards/exp_progress_bar.dart';
+import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 
 /// 个人中心页
 class ProfilePage extends ConsumerWidget {

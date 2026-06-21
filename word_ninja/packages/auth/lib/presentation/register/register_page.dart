@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import '../providers/auth_provider.dart';
 
 /// 注册页面

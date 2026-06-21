@@ -1,5 +1,5 @@
 import 'package:path_provider/path_provider.dart';
-import 'package:core/lib/constants/app_constants.dart';
+import 'package:core/constants/app_constants.dart';
 import 'isar/isar_service.dart';
 
 /// Isar 本地数据库管理器

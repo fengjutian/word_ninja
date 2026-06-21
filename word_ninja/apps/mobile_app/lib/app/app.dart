@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/lib/ninja_theme/theme_data.dart';
+import 'package:ui_kit/ninja_theme/theme_data.dart';
 
 /// App 根组件
 class WordNinjaApp extends ConsumerWidget {

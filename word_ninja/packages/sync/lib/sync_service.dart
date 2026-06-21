@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:core/lib/logger/logger.dart';
+import 'package:core/logger/logger.dart';
 
 /// 云同步服务
 class SyncService {

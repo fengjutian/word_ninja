@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:ui_kit/lib/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 
 /// 写作训练页
 class WritingPage extends StatelessWidget {

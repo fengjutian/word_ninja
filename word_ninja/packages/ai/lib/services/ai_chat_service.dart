@@ -1,5 +1,5 @@
 import 'package:dio/dio.dart';
-import 'package:core/lib/logger/logger.dart';
+import 'package:core/logger/logger.dart';
 
 /// OpenAI Chat 服务
 class AiChatService {
