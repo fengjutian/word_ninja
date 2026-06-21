@@ -43,6 +43,7 @@ case "$COMMAND" in
     ;;
   bootstrap)
     dart pub global activate melos
+    export PATH="$PATH":"$HOME/.pub-cache/bin"
     melos bootstrap
     ;;
   help|*)
