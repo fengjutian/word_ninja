@@ -61,6 +61,25 @@ class NinjaIcon extends StatelessWidget {
   /// 日历 — 计划
   static const calendar = _NinjaIconRef('calendar');
 
+  /// 每个忍者图标的 Material 回退图标（SVG 加载失败时使用，Web 常见）
+  static IconData? _fallbackIcon(String name) {
+    return switch (name) {
+      'shuriken'    => Icons.star,
+      'scroll'      => Icons.menu_book,
+      'ninja_head'  => Icons.person,
+      'chat_bubble' => Icons.chat,
+      'trophy'      => Icons.emoji_events,
+      'coin'        => Icons.monetization_on,
+      'headphone'   => Icons.headphones,
+      'mic'         => Icons.mic,
+      'mountain'    => Icons.hiking,
+      'sword'       => Icons.fitness_center,
+      'pen'         => Icons.edit,
+      'calendar'    => Icons.calendar_month,
+      _             => null,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
@@ -69,6 +88,13 @@ class NinjaIcon extends StatelessWidget {
       height: size,
       colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
       fit: fit,
+      errorBuilder: (context, error, stackTrace) {
+        final fallback = _fallbackIcon(_assetName);
+        if (fallback != null) {
+          return Icon(fallback, size: size, color: color);
+        }
+        return SizedBox(width: size, height: size);
+      },
     );
   }
 }
