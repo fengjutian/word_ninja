@@ -10,8 +10,8 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   log.i('Word Ninja Desktop started');
 
-  // 🔍 调试模式：开启页面分析辅助线
-  DebugOverlay.enableAll();
+  // 🔍 调试模式：页面分析辅助线（需要时取消注释）
+  // DebugOverlay.enableAll();
 
   final router = createDesktopRouter();
 
