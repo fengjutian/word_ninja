@@ -74,7 +74,7 @@ class _TranslationView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FutureBuilder<Map<String, String>>(
+    return FutureBuilder<Map<String, dynamic>>(
       future: ref.read(aiChatServiceProvider).explainWord(word),
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {

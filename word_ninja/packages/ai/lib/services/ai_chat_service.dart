@@ -46,7 +46,7 @@ class AiChatService {
   }
 
   /// 单词解释
-  Future<Map<String, String>> explainWord(String word) async {
+  Future<Map<String, dynamic>> explainWord(String word) async {
     final prompt = '''
 你是一个英语单词专家。请用 JSON 格式解释单词 "$word"，包含：
 - meaning: 中文释义

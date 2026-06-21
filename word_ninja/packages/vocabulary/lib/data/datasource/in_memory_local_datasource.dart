@@ -10,7 +10,7 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
 
   @override
   Future<List<Word>> getWords({int page = 1, int size = 20}) async {
-    final sorted = List<Word>.from(_words)..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+    final sorted = List<Word>.from(_words)..sort((a, b) => (b.updatedAt ?? DateTime(0)).compareTo(a.updatedAt ?? DateTime(0)));
     final start = (page - 1) * size;
     if (start >= sorted.length) return [];
     return sorted.skip(start).take(size).toList();
