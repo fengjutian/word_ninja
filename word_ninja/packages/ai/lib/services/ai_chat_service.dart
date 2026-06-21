@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:core/logger/logger.dart';
 
@@ -55,13 +56,52 @@ class AiChatService {
 不要包含其他文字，只返回 JSON。
 ''';
     final response = await chat(message: prompt, systemPrompt: '你是一个英语教学助手。');
-    // 简单解析 JSON
+    return parseJsonMap(response, {
+      'meaning': '解析失败',
+      'phonetic': '',
+      'example': '',
+      'collocations': '',
+    });
+  }
+
+  // ─── JSON 解析工具 ───
+
+  /// 从 AI 返回文本中提取 JSON Map
+  static Map<String, dynamic> parseJsonMap(String text, Map<String, dynamic> fallback) {
     try {
-      final cleaned = response.trim().replaceAll(RegExp(r'^```json|```$'), '');
-      // 这里可以用 jsonDecode
-      return {'meaning': '', 'phonetic': '', 'example': '', 'collocations': ''};
-    } catch (_) {
-      return {'meaning': '解析失败', 'phonetic': '', 'example': '', 'collocations': ''};
+      final jsonStr = _extractJson(text);
+      final decoded = jsonDecode(jsonStr);
+      if (decoded is Map<String, dynamic>) return decoded;
+      return fallback;
+    } catch (e) {
+      log.w('AI JSON parse failed: $e');
+      return fallback;
     }
+  }
+
+  /// 从 AI 返回文本中提取 JSON List
+  static List<dynamic> parseJsonList(String text, List<dynamic> fallback) {
+    try {
+      final jsonStr = _extractJson(text);
+      final decoded = jsonDecode(jsonStr);
+      if (decoded is List) return decoded;
+      return fallback;
+    } catch (e) {
+      log.w('AI JSON parse failed: $e');
+      return fallback;
+    }
+  }
+
+  /// 从文本中提取 JSON 部分（处理 markdown 代码块包裹）
+  static String _extractJson(String text) {
+    // 尝试匹配 ```json ... ``` 代码块
+    final blockMatch = RegExp(r'```(?:json)?\s*([\s\S]*?)```').firstMatch(text);
+    if (blockMatch != null) return blockMatch.group(1)!.trim();
+
+    // 尝试匹配 { ... } 或 [ ... ] 最外层
+    final braceMatch = RegExp(r'(\{[\s\S]*\}|\[[\s\S]*\])').firstMatch(text);
+    if (braceMatch != null) return braceMatch.group(1)!.trim();
+
+    return text.trim();
   }
 }

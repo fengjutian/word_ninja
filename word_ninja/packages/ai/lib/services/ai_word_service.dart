@@ -20,20 +20,44 @@ class AiWordService {
 只返回 JSON。
 ''';
     final response = await _chat.chat(message: prompt);
-    // 实际项目中用 jsonDecode
-    return {
+    final parsed = AiChatService.parseJsonMap(response, {
       'word': word,
       'phonetic': '',
       'meaning': '',
       'example': '',
       'difficulty': 1,
       'tags': <String>[],
+    });
+    return {
+      'word': word,
+      'phonetic': parsed['phonetic'] ?? '',
+      'meaning': parsed['meaning'] ?? '',
+      'example': parsed['example'] ?? '',
+      'difficulty': parsed['difficulty'] ?? 1,
+      'tags': (parsed['tags'] as List<dynamic>?)?.cast<String>() ?? <String>[],
     };
   }
 
-  /// 生成单词测试
+  /// 生成单词测试（选择题）
   Future<List<Map<String, dynamic>>> generateQuiz(List<String> words) async {
-    // TODO 生成选择题/填空题
-    return [];
+    if (words.isEmpty) return [];
+    final wordList = words.join(', ');
+    final prompt = '''
+请为以下英语单词生成选择题测验，返回JSON数组格式：
+[
+  {
+    "word": "单词",
+    "question": "题目描述（中文）",
+    "options": ["选项A", "选项B", "选项C", "选项D"],
+    "correct_index": 0,
+    "explanation": "解析（中文）"
+  }
+]
+单词列表：$wordList
+只返回JSON数组。
+''';
+    final response = await _chat.chat(message: prompt);
+    final list = AiChatService.parseJsonList(response, []);
+    return list.cast<Map<String, dynamic>>();
   }
 }

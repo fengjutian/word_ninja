@@ -13,6 +13,8 @@ dependencies:
     path: ../core
   ui_kit:
     path: ../ui_kit
+  ai:
+    path: ../ai
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
   freezed_annotation: ^2.4.4

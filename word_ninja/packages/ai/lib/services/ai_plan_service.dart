@@ -29,6 +29,7 @@ class AiPlanService {
 ]
 ''';
     final response = await _chat.chat(message: prompt);
-    return [];
+    final list = AiChatService.parseJsonList(response, []);
+    return list.cast<Map<String, dynamic>>();
   }
 }
