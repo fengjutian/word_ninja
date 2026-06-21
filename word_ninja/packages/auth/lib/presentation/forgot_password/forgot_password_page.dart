@@ -1,18 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:auth/presentation/providers/auth_provider.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 
 /// 忘记密码页面
-class ForgotPasswordPage extends StatefulWidget {
+class ForgotPasswordPage extends ConsumerStatefulWidget {
   const ForgotPasswordPage({super.key});
 
   @override
-  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+  ConsumerState<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   final _emailCtrl = TextEditingController();
   final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
   bool _sent = false;
+  String? _error;
+
+  static final _emailRegExp = RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
 
   @override
   void dispose() {
@@ -20,10 +27,21 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     super.dispose();
   }
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _sent = true);
-    // TODO 调用后端重置密码 API
+    setState(() {
+      _isLoading = true;
+      _error = null;
+    });
+    try {
+      final authNotifier = ref.read(authProvider.notifier);
+      await authNotifier.forgotPassword(_emailCtrl.text.trim());
+      if (mounted) setState(() => _sent = true);
+    } catch (e) {
+      if (mounted) setState(() => _error = e.toString());
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -52,6 +70,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
+          if (_error != null)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(NinjaSpacing.md),
+              margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+              decoration: BoxDecoration(
+                color: NinjaColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+              ),
+              child: Text(_error!, style: const TextStyle(color: NinjaColors.error)),
+            ),
           TextFormField(
             controller: _emailCtrl,
             keyboardType: TextInputType.emailAddress,
@@ -61,14 +90,21 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
             ),
             validator: (v) {
               if (v == null || v.trim().isEmpty) return '请输入邮箱';
-              if (!v.contains('@')) return '邮箱格式不正确';
+              if (!_emailRegExp.hasMatch(v.trim())) return '请输入有效的邮箱地址';
               return null;
             },
           ),
           const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: _submit,
-            child: const Text('发送重置链接'),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: _isLoading ? null : _submit,
+              child: _isLoading
+                  ? const SizedBox(
+                      width: 20, height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  : const Text('发送重置链接'),
+            ),
           ),
         ],
       ),
@@ -95,7 +131,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         ),
         const SizedBox(height: 32),
         OutlinedButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => context.pop(),
           child: const Text('返回登录'),
         ),
       ],

@@ -20,8 +20,8 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
   int _totalAnswered = 0;
   String? _selectedAnswer;
   bool _showResult = false;
-
   late List<_TestQuestion> _questions;
+  bool _isSaving = false;
 
   @override
   void initState() {
@@ -30,18 +30,20 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
   }
 
   List<_TestQuestion> _generateQuestions(List<Word> words) {
+    if (words.length < 2) return [];
     return words.map((word) {
       final options = <String>{word.meaning};
       final others = words
           .where((w) => w.id != word.id)
           .toList()
-          ..shuffle();
+        ..shuffle();
       for (var i = 0; i < 3 && i < others.length; i++) {
         options.add(others[i].meaning);
       }
       final optionList = options.toList()..shuffle();
       return _TestQuestion(
         word: word.word,
+        wordId: word.id,
         correctAnswer: word.meaning,
         options: optionList,
       );
@@ -50,14 +52,24 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
 
   void _selectAnswer(String answer) {
     if (_showResult) return;
+    final question = _questions[_currentIndex];
+    final isCorrect = answer == question.correctAnswer;
     setState(() {
       _selectedAnswer = answer;
       _showResult = true;
       _totalAnswered++;
-      if (answer == _questions[_currentIndex].correctAnswer) {
-        _correctCount++;
-      }
+      if (isCorrect) _correctCount++;
     });
+    // 提交复习记录
+    _submitReview(question.wordId, isCorrect ? 5 : 1);
+  }
+
+  Future<void> _submitReview(String wordId, int score) async {
+    try {
+      await ref.read(vocabularyRepositoryProvider).submitReview(wordId, score);
+    } catch (_) {
+      // 静默失败，不影响测验体验
+    }
   }
 
   void _nextQuestion() {
@@ -72,7 +84,25 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
     }
   }
 
+  Future<void> _saveResults() async {
+    // 将测试结果持久化
+    setState(() => _isSaving = true);
+    try {
+      final stats = await ref.read(vocabularyRepositoryProvider).getStats();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('已同步 · 总词汇 ${stats.totalWords} · 掌握 ${stats.masteredWords}')),
+        );
+      }
+    } catch (_) {
+      // 静默失败
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
   void _showSummary() {
+    _saveResults();
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -82,7 +112,7 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              '${_correctCount} / ${_totalAnswered}',
+              '$_correctCount / $_totalAnswered',
               style: NinjaTextStyles.displayLarge.copyWith(
                 color: _correctCount >= _totalAnswered * 0.8
                     ? NinjaColors.success
@@ -114,7 +144,16 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
     if (_questions.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('单词测试')),
-        body: const Center(child: Text('没有可测试的单词')),
+        body: const Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.quiz, size: 64, color: NinjaColors.textSecondary),
+              SizedBox(height: 16),
+              Text('需要至少 2 个单词才能开始测试', style: NinjaTextStyles.bodyLarge),
+            ],
+          ),
+        ),
       );
     }
 
@@ -124,6 +163,13 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
     return Scaffold(
       appBar: AppBar(
         title: Text('测试 (${_currentIndex + 1}/${_questions.length})'),
+        actions: [
+          if (_isSaving)
+            const Padding(
+              padding: EdgeInsets.only(right: 12),
+              child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+            ),
+        ],
       ),
       body: Column(
         children: [
@@ -218,11 +264,13 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
 
 class _TestQuestion {
   final String word;
+  final String wordId;
   final String correctAnswer;
   final List<String> options;
 
   const _TestQuestion({
     required this.word,
+    required this.wordId,
     required this.correctAnswer,
     required this.options,
   });

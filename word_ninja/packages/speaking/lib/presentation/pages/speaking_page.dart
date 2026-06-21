@@ -12,26 +12,20 @@ class SpeakingPage extends ConsumerStatefulWidget {
 
 class _SpeakingPageState extends ConsumerState<SpeakingPage> {
   bool _isRecording = false;
-  // 模拟评分数据
-  int _accuracy = 0;
-  int _fluency = 0;
-  int _intonation = 0;
-  int _speed = 0;
 
   void _toggleRecording() {
-    setState(() {
-      if (_isRecording) {
-        _isRecording = false;
-        // 模拟评分结果
-        _accuracy = 60 + (DateTime.now().millisecondsSinceEpoch % 40);
-        _fluency = 55 + (DateTime.now().millisecondsSinceEpoch % 45);
-        _intonation = 50 + (DateTime.now().millisecondsSinceEpoch % 50);
-        _speed = 65 + (DateTime.now().millisecondsSinceEpoch % 35);
-      } else {
-        _isRecording = true;
-        _accuracy = 0; _fluency = 0; _intonation = 0; _speed = 0;
-      }
-    });
+    setState(() => _isRecording = !_isRecording);
+    if (_isRecording) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('麦克风录音功能需要设备权限和 STT 服务支持。\n当前为演示模式。'), duration: Duration(seconds: 3)),
+      );
+    }
+    // 模拟录音 2 秒后自动停止
+    if (_isRecording) {
+      Future.delayed(const Duration(seconds: 3), () {
+        if (mounted) setState(() => _isRecording = false);
+      });
+    }
   }
 
   void _openScene(String scene) {
@@ -42,17 +36,30 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.chat_bubble_outline, size: 64, color: NinjaColors.primary.withValues(alpha: 0.3)),
+              const Icon(Icons.chat_bubble_outline, size: 64, color: NinjaColors.textSecondary),
               const SizedBox(height: NinjaSpacing.lg),
               Text('$scene 场景', style: NinjaTextStyles.heading2),
               const SizedBox(height: NinjaSpacing.md),
-              Text('AI 语音对话功能即将上线\n请在设置中配置 TTS/STT 服务', 
-                  style: NinjaTextStyles.bodyMedium, textAlign: TextAlign.center),
+              Text(
+                scene == '旅游' ? '练习机场、酒店、餐厅等旅游场景下的英语对话。'
+                    : scene == '面试' ? '模拟英文面试场景，练习自我介绍和常见面试问题。'
+                    : scene == '商务会议' ? '练习商务谈判、演讲和会议中的专业英语表达。'
+                    : '与 AI 进行日常英语对话，提升口语流利度。',
+                style: NinjaTextStyles.bodyMedium,
+                textAlign: TextAlign.center,
+              ),
               const SizedBox(height: NinjaSpacing.xl),
-              FilledButton.icon(
-                onPressed: () {},
-                icon: const Icon(Icons.play_arrow),
-                label: const Text('开始对话'),
+              Semantics(
+                label: '开始AI语音对话',
+                child: FilledButton.icon(
+                  onPressed: () {
+                    ScaffoldMessenger.of(_).showSnackBar(
+                      const SnackBar(content: Text('语音对话功能需要 STT/TTS 服务，请在设置中配置。'), duration: Duration(seconds: 2)),
+                    );
+                  },
+                  icon: const Icon(Icons.play_arrow),
+                  label: const Text('开始对话'),
+                ),
               ),
             ],
           ),
@@ -68,52 +75,76 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
       body: ListView(
         padding: const EdgeInsets.all(NinjaSpacing.lg),
         children: [
-          Text('AI陪练场景', style: NinjaTextStyles.heading2),
+          Semantics(header: true, child: Text('AI陪练场景', style: NinjaTextStyles.heading2)),
           const SizedBox(height: NinjaSpacing.md),
           _SceneCard('旅游', Icons.flight, '机场、酒店、问路', () => _openScene('旅游')),
           _SceneCard('面试', Icons.work, '英文面试对话', () => _openScene('面试')),
           _SceneCard('商务会议', Icons.meeting_room, '商务谈判、演讲', () => _openScene('商务会议')),
           _SceneCard('日常聊天', Icons.chat, '朋友间的日常对话', () => _openScene('日常聊天')),
           const SizedBox(height: NinjaSpacing.xl),
-          Text('发音练习', style: NinjaTextStyles.heading2),
+          Semantics(header: true, child: Text('发音练习', style: NinjaTextStyles.heading2)),
           const SizedBox(height: NinjaSpacing.md),
           Card(
             child: Padding(
               padding: const EdgeInsets.all(NinjaSpacing.lg),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _ScoreItem('准确度', _accuracy),
-                      _ScoreItem('流利度', _fluency),
-                      _ScoreItem('语调', _intonation),
-                      _ScoreItem('语速', _speed),
-                    ],
+                  const Text('朗读以下句子，AI 将评估你的发音：', style: NinjaTextStyles.bodyMedium),
+                  const SizedBox(height: NinjaSpacing.md),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(NinjaSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: NinjaColors.background,
+                      borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                    ),
+                    child: const Text(
+                      '"The quick brown fox jumps over the lazy dog."',
+                      style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   const SizedBox(height: NinjaSpacing.lg),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton.icon(
-                      onPressed: _toggleRecording,
-                      icon: Icon(_isRecording ? Icons.stop : Icons.mic),
-                      label: Text(_isRecording ? '停止录音' : '开始录音'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _isRecording ? NinjaColors.error : null,
+                  Semantics(
+                    label: _isRecording ? '停止录音' : '开始录音',
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: _toggleRecording,
+                        icon: Icon(_isRecording ? Icons.stop : Icons.mic),
+                        label: Text(_isRecording ? '停止录音' : '开始录音'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isRecording ? NinjaColors.error : null,
+                        ),
                       ),
                     ),
                   ),
                   if (_isRecording) ...[
                     const SizedBox(height: NinjaSpacing.md),
-                    Text('🔴 录音中...', style: NinjaTextStyles.bodyMedium.copyWith(color: NinjaColors.error)),
-                  ],
-                  if (!_isRecording && _accuracy > 0) ...[
-                    const SizedBox(height: NinjaSpacing.md),
-                    Text('综合评分：${((_accuracy + _fluency + _intonation + _speed) / 4).round()}',
-                        style: NinjaTextStyles.heading2.copyWith(color: NinjaColors.success)),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(width: 12, height: 12, decoration: const BoxDecoration(shape: BoxShape.circle, color: NinjaColors.error)),
+                        const SizedBox(width: 8),
+                        const Text('录音中...', style: TextStyle(color: NinjaColors.error, fontWeight: FontWeight.w500)),
+                      ],
+                    ),
                   ],
                 ],
               ),
+            ),
+          ),
+          const SizedBox(height: NinjaSpacing.lg),
+          Card(
+            color: NinjaColors.info.withValues(alpha: 0.05),
+            child: const Padding(
+              padding: EdgeInsets.all(NinjaSpacing.lg),
+              child: Row(children: [
+                Icon(Icons.info_outline, color: NinjaColors.info),
+                SizedBox(width: NinjaSpacing.md),
+                Expanded(child: Text('语音识别和评测需要设备麦克风权限和 STT 服务支持。当前版本提供演示体验。',
+                    style: TextStyle(fontSize: 13, color: NinjaColors.textSecondary))),
+              ]),
             ),
           ),
         ],
@@ -141,40 +172,6 @@ class _SceneCard extends StatelessWidget {
         trailing: const Icon(Icons.arrow_forward_ios, size: 16),
         onTap: onTap,
       ),
-    );
-  }
-}
-
-class _ScoreItem extends StatelessWidget {
-  final String label;
-  final int score;
-
-  const _ScoreItem(this.label, this.score);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        SizedBox(
-          width: 50, height: 50,
-          child: Stack(
-            alignment: Alignment.center,
-            children: [
-              CircularProgressIndicator(
-                value: score / 100,
-                strokeWidth: 3,
-                backgroundColor: NinjaColors.divider.withValues(alpha: 0.2),
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  score >= 80 ? NinjaColors.success : score >= 50 ? NinjaColors.warning : NinjaColors.error,
-                ),
-              ),
-              Text('$score', style: NinjaTextStyles.caption.copyWith(fontWeight: FontWeight.w700)),
-            ],
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(label, style: NinjaTextStyles.caption),
-      ],
     );
   }
 }

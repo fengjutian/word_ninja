@@ -18,6 +18,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
 
+  static final _emailRegExp = RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
+
   @override
   void dispose() {
     _emailCtrl.dispose();
@@ -95,7 +97,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return '请输入邮箱';
-                      if (!v.contains('@')) return '邮箱格式不正确';
+                      if (!_emailRegExp.hasMatch(v.trim())) return '请输入有效的邮箱地址';
                       return null;
                     },
                   ),
@@ -118,28 +120,41 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return '请输入密码';
-                      if (v.length < 6) return '密码至少6位';
+                      if (v.length < 8) return '密码至少8位';
                       return null;
                     },
                   ),
                   const SizedBox(height: NinjaSpacing.xl),
 
                   // 登录按钮
-                  ElevatedButton(
-                    onPressed: state.status == AuthStatus.loading ? null : _submit,
-                    child: state.status == AuthStatus.loading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text('登 录'),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: state.status == AuthStatus.loading ? null : _submit,
+                      child: state.status == AuthStatus.loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('登 录'),
+                    ),
                   ),
                   const SizedBox(height: NinjaSpacing.lg),
 
+                  // 辅助链接
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      TextButton(
+                        onPressed: () => context.push('/forgot-password'),
+                        child: const Text('忘记密码？'),
+                      ),
+                    ],
+                  ),
                   // 注册入口
                   TextButton(
                     onPressed: () => context.push('/register'),

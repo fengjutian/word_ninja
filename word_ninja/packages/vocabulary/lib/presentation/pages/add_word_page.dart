@@ -19,6 +19,8 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
   final _meaningCtrl = TextEditingController();
   final _phoneticCtrl = TextEditingController();
   final _exampleCtrl = TextEditingController();
+  bool _isAiLoading = false;
+  bool _isSaving = false;
 
   @override
   void dispose() {
@@ -36,9 +38,13 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
         title: const Text('添加单词'),
         actions: [
           TextButton(
-            onPressed: _submit,
-            child: const Text('保存',
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+            onPressed: _isSaving ? null : _submit,
+            child: _isSaving
+                ? const SizedBox(
+                    width: 20, height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                : const Text('保存',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
@@ -88,9 +94,13 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
               const SizedBox(height: NinjaSpacing.xl),
               // AI 补全按钮
               OutlinedButton.icon(
-                onPressed: _aiAutoComplete,
-                icon: const Icon(Icons.auto_awesome),
-                label: const Text('AI 智能补全'),
+                onPressed: _isAiLoading ? null : _aiAutoComplete,
+                icon: _isAiLoading
+                    ? const SizedBox(
+                        width: 18, height: 18,
+                        child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.auto_awesome),
+                label: Text(_isAiLoading ? 'AI 补全中...' : 'AI 智能补全'),
               ),
             ],
           ),
@@ -99,22 +109,34 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
     );
   }
 
-  void _submit() {
+  void _submit() async {
     if (!_formKey.currentState!.validate()) return;
-    final word = Word(
-      id: DateTime.now().millisecondsSinceEpoch.toString(),
-      userId: '',
-      word: _wordCtrl.text.trim(),
-      meaning: _meaningCtrl.text.trim(),
-      phonetic: _phoneticCtrl.text.trim(),
-      example: _exampleCtrl.text.trim(),
-    );
-    // 通过 Provider 保存
-    ref.read(wordListProvider.notifier).addWord(word);
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('单词已添加')),
-    );
-    Navigator.pop(context);
+    setState(() => _isSaving = true);
+    try {
+      final word = Word(
+        id: '', // 由后端生成
+        userId: '',
+        word: _wordCtrl.text.trim(),
+        meaning: _meaningCtrl.text.trim(),
+        phonetic: _phoneticCtrl.text.trim(),
+        example: _exampleCtrl.text.trim(),
+      );
+      await ref.read(wordListProvider.notifier).addWord(word);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('单词已添加')),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('添加失败: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
   }
 
   void _aiAutoComplete() async {
@@ -125,32 +147,38 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
       );
       return;
     }
-    // 显示加载提示
-    final scaffoldMessenger = ScaffoldMessenger.of(context);
-    scaffoldMessenger.showSnackBar(
-      const SnackBar(content: Text('AI 正在补全中...'), duration: Duration(seconds: 1)),
-    );
+    setState(() => _isAiLoading = true);
     try {
       final service = ref.read(aiWordServiceProvider);
       final result = await service.completeWord(word);
+      if (!mounted) return;
       setState(() {
-        if (_meaningCtrl.text.trim().isEmpty && result['meaning'] != null && (result['meaning'] as String).isNotEmpty) {
-          _meaningCtrl.text = result['meaning'];
+        final meaning = result['meaning'] as String?;
+        final phonetic = result['phonetic'] as String?;
+        final example = result['example'] as String?;
+        if (_meaningCtrl.text.trim().isEmpty && meaning != null && meaning.isNotEmpty) {
+          _meaningCtrl.text = meaning;
         }
-        if (_phoneticCtrl.text.trim().isEmpty && result['phonetic'] != null && (result['phonetic'] as String).isNotEmpty) {
-          _phoneticCtrl.text = result['phonetic'];
+        if (_phoneticCtrl.text.trim().isEmpty && phonetic != null && phonetic.isNotEmpty) {
+          _phoneticCtrl.text = phonetic;
         }
-        if (_exampleCtrl.text.trim().isEmpty && result['example'] != null && (result['example'] as String).isNotEmpty) {
-          _exampleCtrl.text = result['example'];
+        if (_exampleCtrl.text.trim().isEmpty && example != null && example.isNotEmpty) {
+          _exampleCtrl.text = example;
         }
       });
-      scaffoldMessenger.showSnackBar(
-        const SnackBar(content: Text('AI 补全完成'), duration: Duration(seconds: 1)),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('AI 补全完成'), duration: Duration(seconds: 2)),
+        );
+      }
     } catch (e) {
-      scaffoldMessenger.showSnackBar(
-        SnackBar(content: Text('AI 补全失败: $e')),
-      );
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('AI 补全失败: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isAiLoading = false);
     }
   }
 }

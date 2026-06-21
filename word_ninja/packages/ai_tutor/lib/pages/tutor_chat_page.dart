@@ -16,10 +16,12 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   final _scrollCtrl = ScrollController();
   final _messages = <_ChatMessage>[
     _ChatMessage(
-      'こんにちは！我是 Sensei Shell，你的英语忍者导师。\n有什么问题尽管问我！',
+      '你好！我是 Sensei Shell，你的英语忍者导师。\n有什么问题尽管问我！',
       isUser: false,
     ),
   ];
+  bool _isLoading = false;
+  String? _lastError;
 
   @override
   void dispose() {
@@ -30,46 +32,73 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
 
   void _sendMessage() {
     final text = _msgCtrl.text.trim();
-    if (text.isEmpty) return;
+    if (text.isEmpty || _isLoading) return;
     setState(() {
       _messages.add(_ChatMessage(text, isUser: true));
-      _messages.add(_ChatMessage(
-        '思考中... 🧠',
-        isUser: false,
-        isLoading: true,
-      ));
+      _messages.add(_ChatMessage('思考中...', isUser: false, isLoading: true));
       _msgCtrl.clear();
+      _lastError = null;
+      _isLoading = true;
     });
     _scrollToBottom();
-
-    // 调用 AI 服务
     _callAiService(text);
   }
 
   Future<void> _callAiService(String text) async {
     try {
       final aiService = ref.read(aiChatServiceProvider);
-      final reply = await aiService.chat(message: text, systemPrompt: '你是一个英语忍者导师 Sensei Shell，用友好有趣的方式回答英语学习问题。');
+      // 构建聊天历史
+      final history = _messages
+          .where((m) => !m.isLoading)
+          .map((m) => {'role': m.isUser ? 'user' : 'assistant', 'content': m.text})
+          .toList();
+      final reply = await aiService.chat(
+        message: text,
+        systemPrompt: '你是英语忍者导师 Sensei Shell，用友好有趣的方式回答英语学习问题。用中文回复。',
+        history: history,
+      );
       if (!mounted) return;
       setState(() {
         _messages.removeLast();
         _messages.add(_ChatMessage(reply, isUser: false));
+        _isLoading = false;
       });
     } catch (e) {
       if (!mounted) return;
       setState(() {
         _messages.removeLast();
-        _messages.add(_ChatMessage('抱歉，暂时无法连接AI。请稍后再试。', isUser: false));
+        _messages.add(_ChatMessage('抱歉，暂时无法连接AI。请稍后再试。', isUser: false, isError: true));
+        _lastError = e.toString();
+        _isLoading = false;
       });
     }
   }
 
+  void _retry() {
+    if (_lastError == null) return;
+    // 移除最后的错误消息和加载消息
+    setState(() {
+      if (_messages.length >= 2) {
+        _messages.removeLast(); // 错误消息
+        final lastUserMsg = _messages.lastWhere((m) => m.isUser, orElse: () => _messages.last);
+        _messages.add(_ChatMessage('思考中...', isUser: false, isLoading: true));
+        _isLoading = true;
+        _lastError = null;
+      }
+    });
+    _callAiService(_msgCtrl.text.trim().isNotEmpty ? _msgCtrl.text.trim() : '请重试');
+  }
+
   void _scrollToBottom() {
-    Future.microtask(() => _scrollCtrl.animateTo(
+    Future.microtask(() {
+      if (_scrollCtrl.hasClients) {
+        _scrollCtrl.animateTo(
           _scrollCtrl.position.maxScrollExtent,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
-        ));
+        );
+      }
+    });
   }
 
   @override
@@ -79,8 +108,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
         title: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
+              width: 36, height: 36,
               decoration: const BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
@@ -92,13 +120,21 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
               ),
             ),
             const SizedBox(width: 8),
-            const Column(
+            Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Sensei Shell', style: TextStyle(fontSize: 16)),
-                Text('在线', style: TextStyle(fontSize: 12, color: Colors.white70)),
+                const Text('Sensei Shell', style: TextStyle(fontSize: 16)),
+                Text(_isLoading ? '输入中...' : '在线',
+                    style: TextStyle(fontSize: 12, color: _isLoading ? Colors.orange.shade200 : Colors.white70)),
               ],
             ),
+            const Spacer(),
+            if (_lastError != null)
+              IconButton(
+                icon: const Icon(Icons.refresh, size: 18, color: Colors.white70),
+                tooltip: '重试',
+                onPressed: _retry,
+              ),
           ],
         ),
       ),
@@ -111,7 +147,10 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
               itemCount: _messages.length,
               itemBuilder: (ctx, i) {
                 final msg = _messages[i];
-                return _MessageBubble(msg);
+                return Semantics(
+                  label: msg.isUser ? '你: ${msg.text}' : 'Sensei: ${msg.text}',
+                  child: _MessageBubble(msg),
+                );
               },
             ),
           ),
@@ -132,7 +171,12 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.mic, color: NinjaColors.primary),
-                    onPressed: () {},
+                    tooltip: '语音输入（即将上线）',
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('语音输入功能即将上线'), duration: Duration(seconds: 1)),
+                      );
+                    },
                   ),
                   Expanded(
                     child: TextField(
@@ -142,20 +186,20 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(24),
                         ),
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 10,
-                        ),
+                        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       ),
                       onSubmitted: (_) => _sendMessage(),
                     ),
                   ),
                   const SizedBox(width: NinjaSpacing.sm),
-                  CircleAvatar(
-                    backgroundColor: NinjaColors.primary,
-                    child: IconButton(
-                      icon: const Icon(Icons.send, color: Colors.white, size: 18),
-                      onPressed: _sendMessage,
+                  Semantics(
+                    label: '发送消息',
+                    child: CircleAvatar(
+                      backgroundColor: _isLoading ? NinjaColors.textSecondary : NinjaColors.primary,
+                      child: IconButton(
+                        icon: Icon(Icons.send, color: Colors.white, size: 18),
+                        onPressed: _isLoading ? null : _sendMessage,
+                      ),
                     ),
                   ),
                 ],
@@ -172,47 +216,51 @@ class _ChatMessage {
   final String text;
   final bool isUser;
   final bool isLoading;
+  final bool isError;
 
-  const _ChatMessage(this.text, {required this.isUser, this.isLoading = false});
+  const _ChatMessage(this.text, {required this.isUser, this.isLoading = false, this.isError = false});
 }
 
 class _MessageBubble extends StatelessWidget {
   final _ChatMessage message;
-
   const _MessageBubble(this.message);
 
   @override
   Widget build(BuildContext context) {
+    final bgColor = message.isError
+        ? NinjaColors.error.withValues(alpha: 0.1)
+        : message.isUser
+            ? NinjaColors.primary
+            : NinjaColors.background;
+    final textColor = message.isError
+        ? NinjaColors.error
+        : message.isUser
+            ? Colors.white
+            : NinjaColors.textPrimary;
+
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
-        ),
+        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
         margin: const EdgeInsets.only(bottom: NinjaSpacing.sm),
         padding: const EdgeInsets.all(NinjaSpacing.md),
         decoration: BoxDecoration(
-          color: message.isUser
-              ? NinjaColors.primary
-              : NinjaColors.background,
+          color: bgColor,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(16),
             topRight: const Radius.circular(16),
-            bottomLeft: message.isUser
-                ? const Radius.circular(16)
-                : const Radius.circular(4),
-            bottomRight: message.isUser
-                ? const Radius.circular(4)
-                : const Radius.circular(16),
+            bottomLeft: message.isUser ? const Radius.circular(16) : const Radius.circular(4),
+            bottomRight: message.isUser ? const Radius.circular(4) : const Radius.circular(16),
           ),
+          border: message.isError ? Border.all(color: NinjaColors.error.withValues(alpha: 0.3)) : null,
         ),
-        child: Text(
-          message.text,
-          style: TextStyle(
-            color: message.isUser ? Colors.white : NinjaColors.textPrimary,
-            fontSize: 15,
-          ),
-        ),
+        child: message.isLoading
+            ? Row(mainAxisSize: MainAxisSize.min, children: [
+                const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                const SizedBox(width: 8),
+                Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
+              ])
+            : Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
       ),
     );
   }

@@ -95,6 +95,10 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = const AuthState(status: AuthStatus.unauthenticated);
   }
 
+  Future<void> forgotPassword(String email) async {
+    await _repo.forgotPassword(email);
+  }
+
   void clearError() {
     state = state.copyWith(error: null);
   }

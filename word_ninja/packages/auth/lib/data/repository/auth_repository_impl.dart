@@ -64,4 +64,10 @@ class AuthRepositoryImpl implements AuthRepository {
     final token = await SecureStorage.read('access_token');
     return token != null && token.isNotEmpty;
   }
+
+  @override
+  Future<void> forgotPassword(String email) async {
+    await _remote.forgotPassword(email);
+    log.i('Password reset requested for: $email');
+  }
 }

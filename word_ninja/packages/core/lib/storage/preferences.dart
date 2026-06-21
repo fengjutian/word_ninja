@@ -29,6 +29,13 @@ class Preferences {
   static Future<bool> setString(String key, String value) =>
       _prefs.setString(key, value);
 
+  // ─── String list ───
+  static List<String> getStringList(String key, {List<String> defaultValue = const []}) =>
+      _prefs.getStringList(key) ?? defaultValue;
+
+  static Future<bool> setStringList(String key, List<String> value) =>
+      _prefs.setStringList(key, value);
+
   // ─── double ───
   static double getDouble(String key, {double defaultValue = 0.0}) =>
       _prefs.getDouble(key) ?? defaultValue;

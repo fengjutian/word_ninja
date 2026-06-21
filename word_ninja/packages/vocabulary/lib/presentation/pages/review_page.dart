@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -22,6 +23,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
   late Animation<double> _flipAnim;
   bool _showMeaning = false;
   int _currentIndex = 0;
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -53,16 +55,35 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
   }
 
   void _rateWord(int score) async {
+    if (_isSubmitting) return;
     final word = widget.words[_currentIndex];
-    await ref.read(vocabularyRepositoryProvider).submitReview(word.id, score);
-    if (_currentIndex < widget.words.length - 1) {
-      _pageCtrl.nextPage(
-          duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
-      _flipCtrl.reset();
-      _showMeaning = false;
-      _currentIndex++;
-    } else {
-      Navigator.pop(context);
+    setState(() => _isSubmitting = true);
+    try {
+      await ref.read(vocabularyRepositoryProvider).submitReview(word.id, score);
+      if (!mounted) return;
+      if (_currentIndex < widget.words.length - 1) {
+        final nextIdx = _currentIndex + 1;
+        _currentIndex = nextIdx;
+        _pageCtrl.nextPage(
+            duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
+        _flipCtrl.reset();
+        _showMeaning = false;
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('🎉 复习完成！')),
+          );
+          context.pop();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('提交失败: $e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -106,17 +127,17 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
                 child: AnimatedBuilder(
                   animation: _flipAnim,
                   builder: (context, child) {
-                    final angle = _flipAnim.value * 3.14159;
+                    final angle = _flipAnim.value * pi;
                     return Transform(
                       alignment: Alignment.center,
                       transform: Matrix4.identity()
                         ..setEntry(3, 2, 0.001)
                         ..rotateY(angle),
-                      child: angle < 1.57
+                      child: angle < pi / 2
                           ? _buildWordFront(word)
                           : Transform(
                               alignment: Alignment.center,
-                              transform: Matrix4.identity()..rotateY(3.14159),
+                              transform: Matrix4.identity()..rotateY(pi),
                               child: _buildWordBack(word),
                             ),
                     );
@@ -130,17 +151,22 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
           if (_showMeaning)
             Padding(
               padding: const EdgeInsets.all(NinjaSpacing.xl),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  _scoreBtn(Icons.sentiment_very_dissatisfied, '不认识',
-                      NinjaColors.error, () => _rateWord(1)),
-                  _scoreBtn(Icons.sentiment_neutral, '模糊',
-                      NinjaColors.warning, () => _rateWord(3)),
-                  _scoreBtn(Icons.sentiment_satisfied, '认识',
-                      NinjaColors.success, () => _rateWord(5)),
-                ],
-              ),
+              child: _isSubmitting
+                  ? const Padding(
+                      padding: EdgeInsets.all(16),
+                      child: CircularProgressIndicator(),
+                    )
+                  : Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        _scoreBtn(Icons.sentiment_very_dissatisfied, '不认识',
+                            NinjaColors.error, () => _rateWord(1)),
+                        _scoreBtn(Icons.sentiment_neutral, '模糊',
+                            NinjaColors.warning, () => _rateWord(3)),
+                        _scoreBtn(Icons.sentiment_satisfied, '认识',
+                            NinjaColors.success, () => _rateWord(5)),
+                      ],
+                    ),
             ),
         ],
       ),

@@ -18,6 +18,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   final _confirmCtrl = TextEditingController();
   final _nicknameCtrl = TextEditingController();
   bool _obscurePassword = true;
+  bool _agreeToS = false;
+
+  static final _emailRegExp = RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
 
   @override
   void dispose() {
@@ -30,6 +33,12 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    if (!_agreeToS) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('请先同意用户协议')),
+      );
+      return;
+    }
     await ref.read(authProvider.notifier).register(
           _emailCtrl.text.trim(),
           _passwordCtrl.text,
@@ -93,7 +102,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return '请输入邮箱';
-                      if (!v.contains('@')) return '邮箱格式不正确';
+                      if (!_emailRegExp.hasMatch(v.trim())) return '请输入有效的邮箱地址';
                       return null;
                     },
                   ),
@@ -115,7 +124,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     ),
                     validator: (v) {
                       if (v == null || v.isEmpty) return '请输入密码';
-                      if (v.length < 6) return '密码至少6位';
+                      if (v.length < 8) return '密码至少8位，建议包含字母和数字';
                       return null;
                     },
                   ),
@@ -133,20 +142,39 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: NinjaSpacing.xl),
+                  const SizedBox(height: NinjaSpacing.lg),
 
-                  ElevatedButton(
-                    onPressed: state.status == AuthStatus.loading ? null : _submit,
-                    child: state.status == AuthStatus.loading
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
-                        : const Text('注 册'),
+                  // 同意协议
+                  Row(
+                    children: [
+                      Checkbox(
+                        value: _agreeToS,
+                        onChanged: (v) => setState(() => _agreeToS = v ?? false),
+                        activeColor: NinjaColors.primary,
+                      ),
+                      const Expanded(
+                        child: Text('我已阅读并同意《用户协议》和《隐私政策》',
+                            style: TextStyle(fontSize: 12)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: NinjaSpacing.md),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: state.status == AuthStatus.loading ? null : _submit,
+                      child: state.status == AuthStatus.loading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('注 册'),
+                    ),
                   ),
                 ],
               ),

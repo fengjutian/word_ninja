@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -16,6 +17,8 @@ class VocabularyPage extends ConsumerStatefulWidget {
 
 class _VocabularyPageState extends ConsumerState<VocabularyPage> {
   final _searchCtrl = TextEditingController();
+  final _scrollCtrl = ScrollController();
+  Timer? _debounceTimer;
   bool _isSearching = false;
 
   @override
@@ -23,12 +26,28 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
     super.initState();
     Future.microtask(() =>
         ref.read(wordListProvider.notifier).loadWords(refresh: true));
+    _scrollCtrl.addListener(_onScroll);
   }
 
   @override
   void dispose() {
     _searchCtrl.dispose();
+    _scrollCtrl.dispose();
+    _debounceTimer?.cancel();
     super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollCtrl.position.pixels >= _scrollCtrl.position.maxScrollExtent - 100) {
+      ref.read(wordListProvider.notifier).loadWords();
+    }
+  }
+
+  void _onSearchChanged(String value) {
+    _debounceTimer?.cancel();
+    _debounceTimer = Timer(const Duration(milliseconds: 300), () {
+      ref.read(wordListProvider.notifier).search(value);
+    });
   }
 
   @override
@@ -47,8 +66,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
                   hintStyle: TextStyle(color: Colors.white60),
                 ),
                 style: const TextStyle(color: Colors.white),
-                onChanged: (v) =>
-                    ref.read(wordListProvider.notifier).search(v),
+                onChanged: _onSearchChanged,
               )
             : const Text('单词修炼'),
         actions: [
@@ -58,6 +76,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
               _isSearching = !_isSearching;
               if (!_isSearching) {
                 _searchCtrl.clear();
+                _debounceTimer?.cancel();
                 ref.read(wordListProvider.notifier).loadWords(refresh: true);
               }
             }),
@@ -117,12 +136,15 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
       onRefresh: () =>
           ref.read(wordListProvider.notifier).loadWords(refresh: true),
       child: ListView.builder(
+        controller: _scrollCtrl,
         padding: const EdgeInsets.only(top: NinjaSpacing.sm, bottom: 80),
         itemCount: state.words.length + (state.hasMore ? 1 : 0),
         itemBuilder: (context, index) {
           if (index >= state.words.length) {
-            ref.read(wordListProvider.notifier).loadWords();
-            return const NinjaLoading(message: '加载更多...');
+            return const Padding(
+              padding: EdgeInsets.all(16),
+              child: Center(child: CircularProgressIndicator()),
+            );
           }
 
           final word = state.words[index];

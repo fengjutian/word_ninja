@@ -18,6 +18,7 @@ class _WritingPageState extends ConsumerState<WritingPage> {
   bool _isCorrecting = false;
   bool _isScoring = false;
   String? _generatedComposition;
+  String? _error;
   Map<String, dynamic>? _correctionResult;
   Map<String, dynamic>? _ieltsResult;
 
@@ -31,40 +32,48 @@ class _WritingPageState extends ConsumerState<WritingPage> {
   Future<void> _generateComposition() async {
     final topic = _topicCtrl.text.trim();
     if (topic.isEmpty) return;
-    setState(() => _isGenerating = true);
+    setState(() { _isGenerating = true; _error = null; });
     try {
       final service = ref.read(aiWritingServiceProvider);
       final result = await service.generateComposition(topic);
-      setState(() => _generatedComposition = result);
+      if (mounted) setState(() => _generatedComposition = result);
+    } catch (e) {
+      if (mounted) setState(() => _error = '生成失败: $e');
     } finally {
-      setState(() => _isGenerating = false);
+      if (mounted) setState(() => _isGenerating = false);
     }
   }
 
   Future<void> _correctEssay() async {
     final text = _essayCtrl.text.trim();
     if (text.isEmpty) return;
-    setState(() => _isCorrecting = true);
+    setState(() { _isCorrecting = true; _error = null; });
     try {
       final service = ref.read(aiWritingServiceProvider);
       final result = await service.correct(text);
-      setState(() => _correctionResult = result);
-      _showCorrectionDialog(result);
+      if (mounted) {
+        setState(() => _correctionResult = result);
+        _showCorrectionDialog(result);
+      }
+    } catch (e) {
+      if (mounted) setState(() => _error = '批改失败: $e');
     } finally {
-      setState(() => _isCorrecting = false);
+      if (mounted) setState(() => _isCorrecting = false);
     }
   }
 
   Future<void> _ieltsScore() async {
     final text = _essayCtrl.text.trim();
     if (text.isEmpty) return;
-    setState(() => _isScoring = true);
+    setState(() { _isScoring = true; _error = null; });
     try {
       final service = ref.read(aiWritingServiceProvider);
       final result = await service.ieltsScore(text);
-      setState(() => _ieltsResult = result);
+      if (mounted) setState(() => _ieltsResult = result);
+    } catch (e) {
+      if (mounted) setState(() => _error = '评分失败: $e');
     } finally {
-      setState(() => _isScoring = false);
+      if (mounted) setState(() => _isScoring = false);
     }
   }
 
@@ -84,7 +93,7 @@ class _WritingPageState extends ConsumerState<WritingPage> {
           children: [
             Text('批改结果', style: NinjaTextStyles.heading2),
             const SizedBox(height: NinjaSpacing.md),
-            Text('评分：${result['score']} 分',
+            Text('评分：${result['score'] ?? '?'} 分',
                 style: NinjaTextStyles.heading3.copyWith(color: NinjaColors.accentGold)),
             const SizedBox(height: NinjaSpacing.md),
             if (errors.isNotEmpty) ...[
@@ -113,6 +122,16 @@ class _WritingPageState extends ConsumerState<WritingPage> {
       body: ListView(
         padding: const EdgeInsets.all(NinjaSpacing.lg),
         children: [
+          if (_error != null)
+            Container(
+              padding: const EdgeInsets.all(NinjaSpacing.md),
+              margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+              decoration: BoxDecoration(
+                color: NinjaColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+              ),
+              child: Text(_error!, style: const TextStyle(color: NinjaColors.error)),
+            ),
           Text('AI作文生成', style: NinjaTextStyles.heading2),
           const SizedBox(height: NinjaSpacing.md),
           Card(
@@ -211,14 +230,14 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                   children: [
                     Text('IELTS 评分结果', style: NinjaTextStyles.heading2),
                     const SizedBox(height: NinjaSpacing.md),
-                    Text('Overall: ${(_ieltsResult!['overall_band'] as num?)?.toStringAsFixed(1) ?? '0.0'}',
+                    Text('Overall: ${((_ieltsResult!['overall_band'] as num?)?.toStringAsFixed(1) ?? '0.0')}',
                         style: NinjaTextStyles.displayMedium.copyWith(color: NinjaColors.accentGold)),
                     const SizedBox(height: NinjaSpacing.md),
-                    _IeltsBar('任务完成度', _ieltsResult!['task_achievement'] ?? 0),
-                    _IeltsBar('连贯与衔接', _ieltsResult!['coherence'] ?? 0),
-                    _IeltsBar('词汇资源', _ieltsResult!['lexical_resource'] ?? 0),
-                    _IeltsBar('语法准确性', _ieltsResult!['grammatical_range'] ?? 0),
-                    if (_ieltsResult!['comment'] != null && _ieltsResult!['comment'].toString().isNotEmpty) ...[
+                    _IeltsBar('任务完成度', _ieltsResult!['task_achievement']),
+                    _IeltsBar('连贯与衔接', _ieltsResult!['coherence']),
+                    _IeltsBar('词汇资源', _ieltsResult!['lexical_resource']),
+                    _IeltsBar('语法准确性', _ieltsResult!['grammatical_range']),
+                    if (_ieltsResult!['comment']?.toString().isNotEmpty == true) ...[
                       const SizedBox(height: NinjaSpacing.md),
                       Text('评语：${_ieltsResult!['comment']}', style: NinjaTextStyles.bodyMedium),
                     ],

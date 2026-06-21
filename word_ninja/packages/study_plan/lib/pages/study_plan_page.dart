@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai/providers/ai_providers.dart';
+import 'package:auth/presentation/providers/auth_provider.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 
 /// 学习计划页
@@ -15,6 +16,7 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
   final _goalCtrl = TextEditingController();
   int _dailyMinutes = 30;
   bool _isGenerating = false;
+  String? _error;
   List<Map<String, dynamic>> _plan = [];
   Map<String, bool> _taskCompletion = {};
 
@@ -24,16 +26,18 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
     super.dispose();
   }
 
+  int get _currentLevel => ref.read(authProvider).user?.level ?? 1;
+
   Future<void> _generatePlan() async {
     final goal = _goalCtrl.text.trim();
     if (goal.isEmpty) return;
-    setState(() => _isGenerating = true);
+    setState(() { _isGenerating = true; _error = null; });
     try {
       final service = ref.read(aiPlanServiceProvider);
       final plan = await service.generatePlan(
         goal: goal,
         dailyMinutes: _dailyMinutes,
-        currentLevel: 18, // TODO 从用户状态读取
+        currentLevel: _currentLevel,
       );
       final completion = <String, bool>{};
       for (final day in plan) {
@@ -43,12 +47,16 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
           completion[key] = false;
         }
       }
-      setState(() {
-        _plan = plan;
-        _taskCompletion = completion;
-      });
+      if (mounted) {
+        setState(() {
+          _plan = plan;
+          _taskCompletion = completion;
+        });
+      }
+    } catch (e) {
+      if (mounted) setState(() => _error = '生成失败: $e');
     } finally {
-      setState(() => _isGenerating = false);
+      if (mounted) setState(() => _isGenerating = false);
     }
   }
 
@@ -65,7 +73,11 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text('设定目标', style: NinjaTextStyles.heading2),
+                  Row(children: [
+                    const Text('设定目标', style: NinjaTextStyles.heading2),
+                    const Spacer(),
+                    Text('Lv.$_currentLevel', style: NinjaTextStyles.caption.copyWith(color: NinjaColors.primary)),
+                  ]),
                   const SizedBox(height: NinjaSpacing.md),
                   TextField(
                     controller: _goalCtrl,
@@ -86,6 +98,16 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
                     onChanged: (v) => setState(() => _dailyMinutes = v.round()),
                   ),
                   const SizedBox(height: NinjaSpacing.md),
+                  if (_error != null)
+                    Container(
+                      padding: const EdgeInsets.all(NinjaSpacing.md),
+                      margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+                      decoration: BoxDecoration(
+                        color: NinjaColors.error.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                      ),
+                      child: Text(_error!, style: const TextStyle(color: NinjaColors.error)),
+                    ),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -110,7 +132,7 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
                 )),
           ] else ...[
             const SizedBox(height: NinjaSpacing.lg),
-            const Text('今日任务', style: NinjaTextStyles.heading2),
+            const Text('今日推荐任务', style: NinjaTextStyles.heading2),
             const SizedBox(height: NinjaSpacing.md),
             _TaskTile('📖 学习 20 个新单词', 'vocabulary', true, (_) {}),
             _TaskTile('📄 阅读 1 篇文章', 'reading', false, (_) {}),
@@ -154,7 +176,7 @@ class _DayCard extends StatelessWidget {
               children: [
                 Text('Day ${day['day']}', style: NinjaTextStyles.heading3.copyWith(color: NinjaColors.primary)),
                 const Spacer(),
-                Text('$completed/${tasks.length}', style: NinjaTextStyles.caption),
+                Text('$completed/$tasks.length', style: NinjaTextStyles.caption),
               ],
             ),
           ),

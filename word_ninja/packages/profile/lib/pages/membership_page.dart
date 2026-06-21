@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:auth/presentation/providers/auth_provider.dart';
 
 /// 会员页面
-class MembershipPage extends StatelessWidget {
+class MembershipPage extends ConsumerWidget {
   const MembershipPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authProvider);
+    final isPro = authState.user?.isPro ?? false;
+
     return Scaffold(
       appBar: AppBar(title: const Text('会员中心')),
       body: ListView(
@@ -20,6 +26,13 @@ class MembershipPage extends StatelessWidget {
           const Center(
             child: Text('Word Ninja Pro', style: NinjaTextStyles.displayMedium),
           ),
+          if (isPro)
+            const Center(
+              child: Chip(
+                label: Text('已开通', style: TextStyle(color: Colors.white, fontSize: 12)),
+                backgroundColor: NinjaColors.success,
+              ),
+            ),
           const SizedBox(height: NinjaSpacing.xxl),
 
           _BenefitTile(Icons.auto_awesome, '无限AI对话', '不受限制地使用AI导师'),
@@ -42,8 +55,18 @@ class MembershipPage extends StatelessWidget {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: () {},
-                      child: const Text('开通会员'),
+                      onPressed: isPro
+                          ? null
+                          : () {
+                              // 跳转到支付页面或显示购买流程
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text('支付功能即将上线！请前往 Web 端完成购买'),
+                                  duration: Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                      child: Text(isPro ? '已开通 Pro 会员' : '开通会员'),
                     ),
                   ),
                 ],

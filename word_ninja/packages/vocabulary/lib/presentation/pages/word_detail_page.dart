@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import '../../data/model/word.dart';
+import '../providers/word_provider.dart';
 
 /// 单词详情页
 class WordDetailPage extends ConsumerWidget {
@@ -17,11 +19,13 @@ class WordDetailPage extends ConsumerWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.edit_outlined),
-            onPressed: () {},
+            tooltip: '编辑单词',
+            onPressed: () => context.push('/vocabulary/edit/${word.id}'),
           ),
           IconButton(
             icon: const Icon(Icons.delete_outline),
-            onPressed: () {},
+            tooltip: '删除单词',
+            onPressed: () => _confirmDelete(context, ref),
           ),
         ],
       ),
@@ -96,23 +100,46 @@ class WordDetailPage extends ConsumerWidget {
     );
   }
 
+  void _confirmDelete(BuildContext context, WidgetRef ref) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('删除单词'),
+        content: Text('确定要删除 "${word.word}" 吗？此操作不可撤销。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              try {
+                await ref.read(wordListProvider.notifier).deleteWord(word.id);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('单词已删除')),
+                  );
+                  context.pop();
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('删除失败: $e')),
+                  );
+                }
+              }
+            },
+            style: TextButton.styleFrom(foregroundColor: NinjaColors.error),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildMasteryBadge(int mastery) {
-    final color = mastery >= 85
-        ? NinjaColors.success
-        : mastery >= 60
-            ? NinjaColors.info
-            : mastery >= 30
-                ? NinjaColors.warning
-                : NinjaColors.error;
-
-    final label = mastery >= 85
-        ? '已掌握'
-        : mastery >= 60
-            ? '熟悉'
-            : mastery >= 30
-                ? '学习中'
-                : '陌生';
-
+    final (color, label) = _masteryInfo(mastery);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       decoration: BoxDecoration(
@@ -121,10 +148,14 @@ class WordDetailPage extends ConsumerWidget {
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
       child: Text('$label · $mastery%',
-          style: TextStyle(
-            color: color,
-            fontWeight: FontWeight.w600,
-          )),
+          style: TextStyle(color: color, fontWeight: FontWeight.w600)),
     );
+  }
+
+  (Color, String) _masteryInfo(int mastery) {
+    if (mastery >= 85) return (NinjaColors.success, '已掌握');
+    if (mastery >= 60) return (NinjaColors.info, '熟悉');
+    if (mastery >= 30) return (NinjaColors.warning, '学习中');
+    return (NinjaColors.error, '陌生');
   }
 }

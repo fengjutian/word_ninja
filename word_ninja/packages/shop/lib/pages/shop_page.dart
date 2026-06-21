@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
-import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
+import 'package:core/storage/preferences.dart';
+
+/// 排行榜时间范围
+enum _RankRange { today, week, month }
 
 /// 金币余额 Provider
 final coinBalanceProvider = StateProvider<int>((ref) => 1250);
@@ -21,7 +24,7 @@ class ShopPage extends ConsumerWidget {
     final items = [
       _CategorySectionData(
         title: '角色皮肤',
-        icon: NinjaIcon.ninjaHead(size: 18, color: NinjaColors.primary),
+        icon: const Icon(Icons.people, size: 18, color: NinjaColors.primary),
         items: [
           _ShopItemData('暗影忍者', 500),
           _ShopItemData('忍者大师', 800),
@@ -30,7 +33,7 @@ class ShopPage extends ConsumerWidget {
       ),
       _CategorySectionData(
         title: '背景主题',
-        icon: NinjaIcon.mountain(size: 18, color: NinjaColors.secondary),
+        icon: const Icon(Icons.palette, size: 18, color: NinjaColors.secondary),
         items: [
           _ShopItemData('月光庭院', 300),
           _ShopItemData('樱花雨', 400),
@@ -39,7 +42,7 @@ class ShopPage extends ConsumerWidget {
       ),
       _CategorySectionData(
         title: '徽章',
-        icon: NinjaIcon.trophy(size: 18, color: NinjaColors.accentGold),
+        icon: const Icon(Icons.emoji_events, size: 18, color: NinjaColors.accentGold),
         items: [
           _ShopItemData('金色传说', 1000),
           _ShopItemData('百胜勇士', 500),
@@ -56,7 +59,7 @@ class ShopPage extends ConsumerWidget {
               padding: const EdgeInsets.only(right: 16),
               child: Row(
                 children: [
-                  NinjaIcon.coin(size: 20, color: NinjaColors.accentGold),
+                  const Icon(Icons.monetization_on, size: 20, color: NinjaColors.accentGold),
                   const SizedBox(width: 4),
                   Text('$coins',
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
@@ -92,9 +95,14 @@ class ShopPage extends ConsumerWidget {
       );
       return;
     }
+    // 更新 Riverpod 状态
     ref.read(coinBalanceProvider.notifier).state = coins - price;
     final newOwned = Set<String>.from(owned)..add(name);
     ref.read(ownedItemsProvider.notifier).state = newOwned;
+    // 持久化到本地
+    Preferences.setInt('shop_coins', coins - price);
+    Preferences.setStringList('shop_owned', newOwned.toList());
+
     ScaffoldMessenger.of(ctx).showSnackBar(
       SnackBar(
         content: Text('成功购买「$name」！'),
@@ -166,7 +174,7 @@ class _ShopItem extends StatelessWidget {
             color: NinjaColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
           ),
-          child: Center(child: NinjaIcon.shuriken(size: 22, color: NinjaColors.primary)),
+          child: const Center(child: Icon(Icons.star, color: NinjaColors.primary, size: 22)),
         ),
         title: Text(name, style: NinjaTextStyles.titleSmall),
         subtitle: owned ? null : Text('$price 金币', style: NinjaTextStyles.caption.copyWith(color: NinjaColors.accentGold)),
@@ -185,10 +193,8 @@ class _ShopItem extends StatelessWidget {
               )
             : SizedBox(
                 height: 32,
-                child: ElevatedButton.icon(
+                child: ElevatedButton(
                   onPressed: onBuy,
-                  icon: NinjaIcon.coin(size: 14, color: Colors.white),
-                  label: Text('$price', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: NinjaColors.accentGold,
                     foregroundColor: Colors.white,
@@ -196,6 +202,7 @@ class _ShopItem extends StatelessWidget {
                     minimumSize: Size.zero,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
+                  child: Text('$price', style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w600)),
                 ),
               ),
       ),

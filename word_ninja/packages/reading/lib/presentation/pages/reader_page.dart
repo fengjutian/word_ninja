@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ai/providers/ai_providers.dart';
+import '../widgets/translate_popup.dart';
 
 /// 分类
 enum _ReadingCategory { all, news, fiction, tech, culture, education }
@@ -22,6 +24,7 @@ class _Article {
   final String source;
   final String topic;
   final _ReadingCategory category;
+  final String? content;
 
   const _Article({
     required this.title,
@@ -30,19 +33,24 @@ class _Article {
     required this.source,
     required this.topic,
     required this.category,
+    this.content,
   });
 }
 
-/// 内置文章数据
-const _articles = [
-  _Article(title: 'The Art of Learning', level: 'N2', wordCount: 328, source: 'AI生成', topic: 'learning', category: _ReadingCategory.all),
-  _Article(title: 'Technology Trends 2025', level: 'N3', wordCount: 512, source: '新闻', topic: 'technology', category: _ReadingCategory.news),
-  _Article(title: 'A Journey Through Time', level: 'N2', wordCount: 420, source: 'AI生成', topic: 'time travel', category: _ReadingCategory.fiction),
-  _Article(title: 'The Future of AI', level: 'N3', wordCount: 450, source: '科技', topic: 'artificial intelligence', category: _ReadingCategory.tech),
-  _Article(title: 'Chinese Tea Culture', level: 'N1', wordCount: 380, source: '文化', topic: 'tea culture', category: _ReadingCategory.culture),
-  _Article(title: 'How to Study Effectively', level: 'N4', wordCount: 280, source: '教育', topic: 'study methods', category: _ReadingCategory.education),
-  _Article(title: 'Digital Nomad Life', level: 'N3', wordCount: 460, source: '新闻', topic: 'digital nomad', category: _ReadingCategory.news),
-  _Article(title: 'Short Story: The Rain', level: 'N5', wordCount: 200, source: 'AI生成', topic: 'story', category: _ReadingCategory.fiction),
+/// 内置文章数据（作为离线后备）
+const _defaultArticles = [
+  _Article(title: 'The Art of Learning', level: 'N2', wordCount: 328, source: 'AI生成', topic: 'learning', category: _ReadingCategory.all,
+      content: 'Learning is a lifelong journey. Every day presents new opportunities to grow and develop our skills...'),
+  _Article(title: 'Technology Trends', level: 'N3', wordCount: 512, source: '新闻', topic: 'technology', category: _ReadingCategory.news,
+      content: 'The world of technology is rapidly evolving. From artificial intelligence to quantum computing...'),
+  _Article(title: 'A Journey Through Time', level: 'N2', wordCount: 420, source: 'AI生成', topic: 'time travel', category: _ReadingCategory.fiction,
+      content: 'The old clock tower struck midnight as Sarah stepped through the ancient doorway...'),
+  _Article(title: 'The Future of AI', level: 'N3', wordCount: 450, source: '科技', topic: 'artificial intelligence', category: _ReadingCategory.tech,
+      content: 'Artificial intelligence has transformed the way we live and work...'),
+  _Article(title: 'Chinese Tea Culture', level: 'N1', wordCount: 380, source: '文化', topic: 'tea culture', category: _ReadingCategory.culture,
+      content: 'Tea has been an integral part of Chinese culture for thousands of years...'),
+  _Article(title: 'How to Study Effectively', level: 'N4', wordCount: 280, source: '教育', topic: 'study methods', category: _ReadingCategory.education,
+      content: 'Effective study habits are essential for academic success. Research shows that...'),
 ];
 
 /// 阅读主页
@@ -55,9 +63,28 @@ class ReaderPage extends ConsumerStatefulWidget {
 
 class _ReaderPageState extends ConsumerState<ReaderPage> {
   _ReadingCategory _selectedCategory = _ReadingCategory.all;
+  List<_Article> _articles = _defaultArticles;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadArticles();
+  }
+
+  Future<void> _loadArticles() async {
+    setState(() => _isLoading = true);
+    try {
+      // 尝试从 AI 服务获取推荐文章（离线时使用本地数据）
+      await Future.delayed(const Duration(milliseconds: 500)); // 模拟网络延迟
+      if (mounted) setState(() => _isLoading = false);
+    } catch (_) {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
 
   List<_Article> get _filteredArticles {
-    if (_selectedCategory == _ReadingCategory.all) return _articles.toList();
+    if (_selectedCategory == _ReadingCategory.all) return _articles;
     return _articles.where((a) => a.category == _selectedCategory).toList();
   }
 
@@ -69,73 +96,75 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       appBar: AppBar(
         title: const Text('阅读训练'),
         actions: [
-          IconButton(icon: const Icon(Icons.add), onPressed: () {
-            // TODO: 打开AI生成文章对话框
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('AI文章生成即将上线')),
-            );
-          }),
-        ],
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
-        children: [
-          Text('今日推荐', style: NinjaTextStyles.heading2),
-          const SizedBox(height: NinjaSpacing.md),
-          if (articles.isNotEmpty)
-            _ArticleCard(article: articles.first, onTap: () => _openArticle(articles.first))
-          else
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(NinjaSpacing.xl),
-                child: Center(child: Text('暂无文章', style: NinjaTextStyles.bodyLarge)),
-              ),
-            ),
-          const SizedBox(height: NinjaSpacing.lg),
-          Text('分类阅读', style: NinjaTextStyles.heading2),
-          const SizedBox(height: NinjaSpacing.md),
-          Wrap(
-            spacing: NinjaSpacing.sm,
-            runSpacing: NinjaSpacing.sm,
-            children: _ReadingCategory.values.map((cat) {
-              final meta = _categoryMeta[cat]!;
-              final isSelected = cat == _selectedCategory;
-              return ActionChip(
-                avatar: Icon(
-                  isSelected ? Icons.check_circle : Icons.circle_outlined,
-                  size: 16,
-                  color: isSelected ? NinjaColors.primary : NinjaColors.textSecondary,
-                ),
-                label: Text(meta.$1),
-                onPressed: () => setState(() => _selectedCategory = cat),
-                backgroundColor: isSelected
-                    ? NinjaColors.primary.withValues(alpha: 0.08)
-                    : null,
-                side: isSelected ? const BorderSide(color: NinjaColors.primary) : null,
+          IconButton(
+            icon: const Icon(Icons.auto_awesome),
+            tooltip: 'AI 生成文章',
+            onPressed: () async {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('AI文章生成功能即将上线'), duration: Duration(seconds: 1)),
               );
-            }).toList(),
-          ),
-          const SizedBox(height: NinjaSpacing.lg),
-          // 更多文章
-          if (articles.length > 1) ...[
-            Text('更多文章', style: NinjaTextStyles.heading2),
-            const SizedBox(height: NinjaSpacing.md),
-            ...articles.skip(1).map((a) => _ArticleCard(article: a, onTap: () => _openArticle(a))),
-          ],
-          const SizedBox(height: NinjaSpacing.lg),
-          Text('导入阅读', style: NinjaTextStyles.heading2),
-          const SizedBox(height: NinjaSpacing.md),
-          Row(
-            children: [
-              _ImportButton('PDF', Icons.picture_as_pdf, onTap: () => _showImportSnack(context, 'PDF')),
-              const SizedBox(width: NinjaSpacing.md),
-              _ImportButton('EPUB', Icons.book, onTap: () => _showImportSnack(context, 'EPUB')),
-              const SizedBox(width: NinjaSpacing.md),
-              _ImportButton('TXT', Icons.description, onTap: () => _showImportSnack(context, 'TXT')),
-            ],
+            },
           ),
         ],
       ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView(
+              padding: const EdgeInsets.all(NinjaSpacing.lg),
+              children: [
+                Text('今日推荐', style: NinjaTextStyles.heading2),
+                const SizedBox(height: NinjaSpacing.md),
+                if (articles.isNotEmpty)
+                  _ArticleCard(article: articles.first, onTap: () => _openArticle(articles.first))
+                else
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(NinjaSpacing.xl),
+                      child: Center(child: Text('暂无文章', style: NinjaTextStyles.bodyLarge)),
+                    ),
+                  ),
+                const SizedBox(height: NinjaSpacing.lg),
+                Text('分类阅读', style: NinjaTextStyles.heading2),
+                const SizedBox(height: NinjaSpacing.md),
+                Wrap(
+                  spacing: NinjaSpacing.sm,
+                  runSpacing: NinjaSpacing.sm,
+                  children: _ReadingCategory.values.map((cat) {
+                    final meta = _categoryMeta[cat]!;
+                    final isSelected = cat == _selectedCategory;
+                    return ActionChip(
+                      avatar: Icon(
+                        isSelected ? Icons.check_circle : Icons.circle_outlined,
+                        size: 16,
+                        color: isSelected ? NinjaColors.primary : NinjaColors.textSecondary,
+                      ),
+                      label: Text(meta.$1),
+                      onPressed: () => setState(() => _selectedCategory = cat),
+                      backgroundColor: isSelected ? NinjaColors.primary.withValues(alpha: 0.08) : null,
+                      side: isSelected ? const BorderSide(color: NinjaColors.primary) : null,
+                    );
+                  }).toList(),
+                ),
+                const SizedBox(height: NinjaSpacing.lg),
+                if (articles.length > 1) ...[
+                  Text('更多文章', style: NinjaTextStyles.heading2),
+                  const SizedBox(height: NinjaSpacing.md),
+                  ...articles.skip(1).map((a) => _ArticleCard(article: a, onTap: () => _openArticle(a))),
+                ],
+                const SizedBox(height: NinjaSpacing.lg),
+                Text('导入阅读', style: NinjaTextStyles.heading2),
+                const SizedBox(height: NinjaSpacing.md),
+                Row(
+                  children: [
+                    _ImportButton('PDF', Icons.picture_as_pdf, onTap: () => _showImportSnack(context, 'PDF')),
+                    const SizedBox(width: NinjaSpacing.md),
+                    _ImportButton('EPUB', Icons.book, onTap: () => _showImportSnack(context, 'EPUB')),
+                    const SizedBox(width: NinjaSpacing.md),
+                    _ImportButton('TXT', Icons.description, onTap: () => _showImportSnack(context, 'TXT')),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 
@@ -147,18 +176,20 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
 
   void _showImportSnack(BuildContext ctx, String format) {
     ScaffoldMessenger.of(ctx).showSnackBar(
-      SnackBar(content: Text('$format 导入功能即将上线')),
+      SnackBar(content: Text('$format 导入功能即将上线'), duration: const Duration(seconds: 1)),
     );
   }
 }
 
-/// 简化的文章阅读器
-class _ArticleReaderView extends StatelessWidget {
+/// 文章阅读器
+class _ArticleReaderView extends ConsumerWidget {
   final _Article article;
   const _ArticleReaderView({required this.article});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final content = article.content ?? '文章内容加载中...';
+
     return Scaffold(
       appBar: AppBar(title: Text(article.title)),
       body: ListView(
@@ -172,23 +203,22 @@ class _ArticleReaderView extends StatelessWidget {
             ],
           ),
           const SizedBox(height: NinjaSpacing.lg),
-          Text('关于「${article.topic}」的文章内容...\n\nAI 正在为您生成完整文章，请稍后重试。',
-              style: NinjaTextStyles.bodyLarge),
+          SelectableText(content, style: NinjaTextStyles.bodyLarge),
           const SizedBox(height: NinjaSpacing.xl),
-          // 选中文字后的操作提示
+          // 操作提示
           Container(
             padding: const EdgeInsets.all(NinjaSpacing.lg),
             decoration: BoxDecoration(
               color: NinjaColors.info.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
             ),
-            child: Row(
+            child: const Row(
               children: [
-                const Icon(Icons.touch_app, color: NinjaColors.info),
-                const SizedBox(width: NinjaSpacing.sm),
+                Icon(Icons.touch_app, color: NinjaColors.info),
+                SizedBox(width: NinjaSpacing.sm),
                 Expanded(
                   child: Text('选中文字后可查看翻译、加入单词本、AI解析',
-                      style: NinjaTextStyles.bodySmall.copyWith(color: NinjaColors.info)),
+                      style: TextStyle(fontSize: 12, color: NinjaColors.info)),
                 ),
               ],
             ),

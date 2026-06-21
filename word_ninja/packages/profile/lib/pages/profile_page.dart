@@ -18,10 +18,11 @@ class ProfilePage extends ConsumerWidget {
     final user = authState.user;
     final level = user?.level ?? 1;
     final exp = user?.exp ?? 0;
-    final rank = user?.rank ?? '学徒龟';
     final nickname = user?.nickname ?? '忍者';
+    final rank = user?.rank ?? '学徒龟';
 
-    final maxExp = (1500 * 1.15).round();
+    // 使用 User 实体自带的经验值计算
+    final maxExp = user?.expToNextLevel ?? 1000;
     final effectiveMaxExp = maxExp > exp ? maxExp : exp + 100;
 
     return Scaffold(
