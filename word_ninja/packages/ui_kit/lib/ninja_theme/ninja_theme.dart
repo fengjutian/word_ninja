@@ -16,30 +16,33 @@ class NinjaColors {
   static const Color primaryDark = Color(0xFFAB000D);
 
   // 辅助色
-  static const Color secondary = Color(0xFF1E88E5);      // 忍术蓝
+  static const Color secondary = Color(0xFF1976D2);      // 忍术蓝
   static const Color accentGold = Color(0xFFFFB300);     // 金币金
   static const Color accentPurple = Color(0xFF7B1FA2);   // 神秘紫
 
-  // 等级色
-  static const Color levelBeginner = Color(0xFF43A047);  // 学徒绿
+  // 等级色（与功能色/主色区分，形成完整渐变）
+  static const Color levelBeginner = Color(0xFF388E3C);  // 学徒绿
   static const Color levelIntermediate = Color(0xFFFB8C00); // 中忍橙
-  static const Color levelAdvanced = Color(0xFFE53935);  // 上忍红
-  static const Color levelMaster = Color(0xFF7B1FA2);    // 影级紫
+  static const Color levelAdvanced = Color(0xFFC62828);  // 上忍红（略深于primary）
+  static const Color levelMaster = Color(0xFF6A1B9A);    // 影级紫
   static const Color levelLegend = Color(0xFFFFB300);    // 传说金
 
   // 功能色
   static const Color success = Color(0xFF43A047);
-  static const Color warning = Color(0xFFFFA000);
-  static const Color error = Color(0xFFE53935);
-  static const Color info = Color(0xFF1E88E5);
+  static const Color warning = Color(0xFFFF8F00);
+  static const Color error = Color(0xFFD32F2F);
+  static const Color info = Color(0xFF039BE5);
 
   // 中性色
   static const Color background = Color(0xFFF5F5F5);
   static const Color surface = Color(0xFFFFFFFF);
   static const Color surfaceDark = Color(0xFF1E1E2E);
+  static const Color surfaceContainerDark = Color(0xFF2A2A3E);
   static const Color textPrimary = Color(0xFF212121);
   static const Color textSecondary = Color(0xFF757575);
+  static const Color textOnDark = Color(0xFFE0E0E0);
   static const Color divider = Color(0xFFBDBDBD);
+  static const Color dividerDark = Color(0xFF424242);
 }
 
 // ─── 文字样式 ───
@@ -119,20 +122,44 @@ class NinjaTextStyles {
     color: NinjaColors.textSecondary,
   );
 
-  /// 经验值数字（带阴影）
-  static const TextStyle expText = TextStyle(
+  /// 中等标题
+  static const TextStyle titleMedium = TextStyle(
     fontFamily: _fontFamily,
-    fontSize: 22,
-    fontWeight: FontWeight.w900,
-    color: NinjaColors.accentGold,
-    shadows: [
-      Shadow(
-        color: Colors.black26,
-        blurRadius: 4,
-        offset: Offset(2, 2),
-      ),
-    ],
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+    color: NinjaColors.textPrimary,
   );
+
+  /// 小标题
+  static const TextStyle titleSmall = TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w600,
+    color: NinjaColors.textPrimary,
+  );
+
+  /// 中等标签
+  static const TextStyle labelMedium = TextStyle(
+    fontFamily: _fontFamily,
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+    color: NinjaColors.textPrimary,
+  );
+
+  /// 经验值数字（带发光效果 — 亮色模式阴影/暗色模式发光）
+  static TextStyle get expText => TextStyle(
+        fontFamily: _fontFamily,
+        fontSize: 22,
+        fontWeight: FontWeight.w900,
+        color: NinjaColors.accentGold,
+        shadows: [
+          Shadow(
+            color: NinjaColors.accentGold.withValues(alpha: 0.4),
+            blurRadius: 8,
+            offset: Offset(0, 0),
+          ),
+        ],
+      );
 }
 
 // ─── 间距系统 ───

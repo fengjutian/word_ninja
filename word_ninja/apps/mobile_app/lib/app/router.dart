@@ -21,7 +21,8 @@ import 'package:leaderboard/pages/leaderboard_page.dart';
 import 'package:profile/pages/profile_page.dart';
 import 'package:profile/pages/settings_page.dart';
 import 'package:profile/pages/membership_page.dart';
-import 'theme.dart';
+import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
 
 /// 路由路径常量
 class AppRoutes {
@@ -46,6 +47,58 @@ class AppRoutes {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String membership = '/membership';
+}
+
+// ─── 过渡动画辅助函数 ───
+
+/// 从右滑入（标准页面导航）
+Page<T> _slideInFromRight<T>({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: key,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 300),
+    transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
+      final offset = Tween<Offset>(
+        begin: const Offset(0.35, 0),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOutCubic,
+      ));
+      return SlideTransition(position: offset, child: child);
+    },
+  );
+}
+
+/// 从下滑入（Tab 切换）
+Page<T> _slideInFromBottom<T>({
+  required LocalKey key,
+  required Widget child,
+}) {
+  return CustomTransitionPage<T>(
+    key: key,
+    child: child,
+    transitionDuration: const Duration(milliseconds: 350),
+    transitionsBuilder: (ctx, animation, secondaryAnimation, child) {
+      final offset = Tween<Offset>(
+        begin: const Offset(0, 0.08),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(
+        parent: animation,
+        curve: Curves.easeOut,
+      ));
+      return SlideTransition(
+        position: offset,
+        child: FadeTransition(
+          opacity: animation,
+          child: child,
+        ),
+      );
+    },
+  );
 }
 
 /// 创建 GoRouter 实例
@@ -74,7 +127,8 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: AppRoutes.forgotPassword,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const ForgotPasswordPage(),
         ),
       ),
@@ -85,35 +139,35 @@ GoRouter createRouter() {
         routes: [
           GoRoute(
             path: AppRoutes.home,
-            pageBuilder: (ctx, state) => NoTransitionPage(
+            pageBuilder: (ctx, state) => _slideInFromBottom(
               key: state.pageKey,
               child: const _HomeTab(),
             ),
           ),
           GoRoute(
             path: AppRoutes.vocabulary,
-            pageBuilder: (ctx, state) => NoTransitionPage(
+            pageBuilder: (ctx, state) => _slideInFromBottom(
               key: state.pageKey,
               child: const VocabularyPage(),
             ),
           ),
           GoRoute(
             path: AppRoutes.aiTutor,
-            pageBuilder: (ctx, state) => NoTransitionPage(
+            pageBuilder: (ctx, state) => _slideInFromBottom(
               key: state.pageKey,
               child: const TutorChatPage(),
             ),
           ),
           GoRoute(
             path: AppRoutes.reading,
-            pageBuilder: (ctx, state) => NoTransitionPage(
+            pageBuilder: (ctx, state) => _slideInFromBottom(
               key: state.pageKey,
               child: const ReaderPage(),
             ),
           ),
           GoRoute(
             path: AppRoutes.profile,
-            pageBuilder: (ctx, state) => NoTransitionPage(
+            pageBuilder: (ctx, state) => _slideInFromBottom(
               key: state.pageKey,
               child: const ProfilePage(),
             ),
@@ -124,80 +178,95 @@ GoRouter createRouter() {
       // ─── 全屏子页面 ───
       GoRoute(
         path: AppRoutes.wordDetail,
-        builder: (ctx, state) {
+        pageBuilder: (ctx, state) {
           final id = state.pathParameters['id'] ?? '';
-          return WordDetailPage(word: Word(id: id, userId: '', word: '', meaning: ''));
+          return _slideInFromRight(
+            key: state.pageKey,
+            child: WordDetailPage(word: Word(id: id, userId: '', word: '', meaning: '')),
+          );
         },
       ),
       GoRoute(
         path: AppRoutes.addWord,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const AddWordPage(),
         ),
       ),
       GoRoute(
         path: AppRoutes.review,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: ReviewPage(words: []),
         ),
       ),
       GoRoute(
         path: AppRoutes.wordTest,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: WordTestPage(words: []),
         ),
       ),
       GoRoute(
         path: AppRoutes.listening,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const ListeningPage(),
         ),
       ),
       GoRoute(
         path: AppRoutes.speaking,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const SpeakingPage(),
         ),
       ),
       GoRoute(
         path: AppRoutes.writing,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const WritingPage(),
         ),
       ),
       GoRoute(
         path: AppRoutes.studyPlan,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const StudyPlanPage(),
         ),
       ),
       GoRoute(
         path: AppRoutes.achievement,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const AchievementPage(),
         ),
       ),
       GoRoute(
         path: AppRoutes.shop,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const ShopPage(),
         ),
       ),
       GoRoute(
         path: AppRoutes.leaderboard,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const LeaderboardPage(),
         ),
       ),
       GoRoute(
         path: AppRoutes.settings,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const SettingsPage(),
         ),
       ),
       GoRoute(
         path: AppRoutes.membership,
-        pageBuilder: (ctx, state) => NoTransitionPage(
+        pageBuilder: (ctx, state) => _slideInFromRight(
+          key: state.pageKey,
           child: const MembershipPage(),
         ),
       ),
@@ -213,75 +282,68 @@ class _HomeTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('🐢 Word Ninja'),
+        title: const Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Word Ninja'),
+          ],
+        ),
         actions: [
           IconButton(
             icon: const Icon(Icons.emoji_events),
+            tooltip: '成就',
             onPressed: () => context.push(AppRoutes.achievement),
           ),
           IconButton(
             icon: const Icon(Icons.leaderboard),
+            tooltip: '排行榜',
             onPressed: () => context.push(AppRoutes.leaderboard),
           ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(NinjaSpacing.lg),
         children: [
-          // 等级卡片
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                children: [
-                  const Row(
-                    children: [
-                      Text('等级', style: TextStyle(fontSize: 14, color: Colors.grey)),
-                      Spacer(),
-                      Text('Lv.18 · 下忍', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                    ],
-                  ),
-                  const SizedBox(height: 12),
-                  const Text('1250 / 1500', style: TextStyle(fontSize: 24, fontWeight: FontWeight.w900, color: Color(0xFFFFB300))),
-                  const SizedBox(height: 8),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(6),
-                    child: LinearProgressIndicator(
-                      value: 1250 / 1500,
-                      minHeight: 10,
-                      backgroundColor: Colors.grey[200],
-                      valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFFFFB300)),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
+          // 等级卡片 — 带有渐变背景
+          _LevelCard(),
+          const SizedBox(height: NinjaSpacing.lg),
 
           // 今日任务
-          const Text('今日任务', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
-          _TaskItem('📖 学习 20 个单词', AppRoutes.vocabulary, false),
-          _TaskItem('📄 阅读 1 篇文章', AppRoutes.reading, false),
-          _TaskItem('💬 AI 对话 10 分钟', AppRoutes.aiTutor, false),
+          SectionHeader(title: '今日任务', icon: const Icon(Icons.task_alt, size: 18, color: NinjaColors.primary)),
+          const SizedBox(height: NinjaSpacing.sm),
+          _TaskItem(
+            icon: NinjaIcon.scroll(size: 20),
+            title: '学习 20 个单词',
+            route: AppRoutes.vocabulary,
+          ),
+          _TaskItem(
+            icon: NinjaIcon.scroll(size: 20),
+            title: '阅读 1 篇文章',
+            route: AppRoutes.reading,
+          ),
+          _TaskItem(
+            icon: NinjaIcon.chatBubble(size: 20),
+            title: 'AI 对话 10 分钟',
+            route: AppRoutes.aiTutor,
+          ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: NinjaSpacing.lg),
+
           // 快捷入口
-          const Text('忍者修炼', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700)),
-          const SizedBox(height: 8),
+          SectionHeader(title: '忍者修炼', icon: NinjaIcon.sword(size: 20)),
+          const SizedBox(height: NinjaSpacing.sm),
           Wrap(
-            spacing: 8,
-            runSpacing: 8,
+            spacing: NinjaSpacing.sm,
+            runSpacing: NinjaSpacing.sm,
             children: [
-              _QuickChip('单词', Icons.menu_book, AppRoutes.vocabulary),
-              _QuickChip('阅读', Icons.auto_stories, AppRoutes.reading),
-              _QuickChip('听力', Icons.hearing, AppRoutes.listening),
-              _QuickChip('口语', Icons.record_voice_over, AppRoutes.speaking),
-              _QuickChip('写作', Icons.edit, AppRoutes.writing),
-              _QuickChip('AI导师', Icons.psychology, AppRoutes.aiTutor),
-              _QuickChip('计划', Icons.calendar_today, AppRoutes.studyPlan),
-              _QuickChip('商店', Icons.shopping_bag, AppRoutes.shop),
+              _QuickChip('单词', NinjaIcon.scroll(size: 16), AppRoutes.vocabulary),
+              _QuickChip('阅读', NinjaIcon.scroll(size: 16), AppRoutes.reading),
+              _QuickChip('听力', NinjaIcon.headphone(size: 16), AppRoutes.listening),
+              _QuickChip('口语', NinjaIcon.mic(size: 16), AppRoutes.speaking),
+              _QuickChip('写作', const Icon(Icons.edit, size: 16), AppRoutes.writing),
+              _QuickChip('AI导师', NinjaIcon.chatBubble(size: 16), AppRoutes.aiTutor),
+              _QuickChip('计划', const Icon(Icons.calendar_today, size: 16), AppRoutes.studyPlan),
+              _QuickChip('商店', NinjaIcon.coin(size: 16), AppRoutes.shop),
             ],
           ),
         ],
@@ -290,30 +352,234 @@ class _HomeTab extends StatelessWidget {
   }
 }
 
-class _TaskItem extends StatelessWidget {
-  final String title;
-  final String route;
-  final bool done;
-
-  const _TaskItem(this.title, this.route, this.done);
+/// 等级卡片 — 带渐变背景、动画经验条
+class _LevelCard extends StatelessWidget {
+  // 模拟数据，后续接入真实数据
+  static const _level = 18;
+  static const _rank = '下忍';
+  static const _currentExp = 1250;
+  static const _maxExp = 1500;
 
   @override
   Widget build(BuildContext context) {
+    final progress = _currentExp / _maxExp;
     return Card(
-      margin: const EdgeInsets.only(bottom: 4),
-      child: ListTile(
-        leading: Icon(done ? Icons.check_circle : Icons.radio_button_unchecked,
-            color: done ? Colors.green : Colors.grey),
-        title: Text(title, style: TextStyle(decoration: done ? TextDecoration.lineThrough : null)),
-        onTap: () => context.push(route),
+      margin: EdgeInsets.zero,
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              NinjaColors.primary.withValues(alpha: 0.08),
+              NinjaColors.accentGold.withValues(alpha: 0.05),
+              NinjaColors.surface,
+            ],
+          ),
+        ),
+        padding: const EdgeInsets.all(NinjaSpacing.xl),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                // 等级标识
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: const RadialGradient(
+                      colors: [
+                        NinjaColors.levelIntermediate,
+                        NinjaColors.levelIntermediate,
+                      ],
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: NinjaColors.levelIntermediate.withValues(alpha: 0.4),
+                        blurRadius: 8,
+                        spreadRadius: 1,
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Text(
+                      '$_level',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.w900,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: NinjaSpacing.md),
+                // 等级信息
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Lv.$_level · $_rank',
+                        style: NinjaTextStyles.titleMedium,
+                      ),
+                      const SizedBox(height: NinjaSpacing.xxs),
+                      Text(
+                        '距离升级还需 ${_maxExp - _currentExp} EXP',
+                        style: NinjaTextStyles.caption,
+                      ),
+                    ],
+                  ),
+                ),
+                NinjaIcon.mountain(size: 32, color: NinjaColors.accentGold.withValues(alpha: 0.3)),
+              ],
+            ),
+            const SizedBox(height: NinjaSpacing.md),
+            // 经验条
+            ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: LinearProgressIndicator(
+                value: progress,
+                minHeight: 10,
+                backgroundColor: NinjaColors.divider.withValues(alpha: 0.3),
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  NinjaColors.accentGold,
+                ),
+              ),
+            ),
+            const SizedBox(height: NinjaSpacing.sm),
+            // EXP 数字
+            Align(
+              alignment: Alignment.centerRight,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  NinjaIcon.coin(size: 14, color: NinjaColors.accentGold),
+                  const SizedBox(width: NinjaSpacing.xxs),
+                  Text(
+                    '$_currentExp / $_maxExp',
+                    style: NinjaTextStyles.caption.copyWith(
+                      color: NinjaColors.accentGold,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
+/// 分段标题组件
+class SectionHeader extends StatelessWidget {
+  final String title;
+  final Widget icon;
+
+  const SectionHeader({
+    super.key,
+    required this.title,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        icon is Icon
+            ? Icon((icon as Icon).icon, size: 18, color: NinjaColors.primary)
+            : icon,
+        const SizedBox(width: NinjaSpacing.sm),
+        Text(title, style: NinjaTextStyles.heading3),
+      ],
+    );
+  }
+}
+
+/// 任务项 — 带点击缩放动画
+class _TaskItem extends StatefulWidget {
+  final Widget icon;
+  final String title;
+  final String route;
+
+  const _TaskItem({
+    required this.icon,
+    required this.title,
+    required this.route,
+  });
+
+  @override
+  State<_TaskItem> createState() => _TaskItemState();
+}
+
+class _TaskItemState extends State<_TaskItem> with SingleTickerProviderStateMixin {
+  late AnimationController _animController;
+  late Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _animController = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+    _scaleAnim = Tween<double>(begin: 1.0, end: 0.97).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeInOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _animController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: (_) => _animController.forward(),
+      onTapUp: (_) {
+        _animController.reverse();
+        context.push(widget.route);
+      },
+      onTapCancel: () => _animController.reverse(),
+      child: AnimatedBuilder(
+        animation: _scaleAnim,
+        builder: (ctx, child) => Transform.scale(
+          scale: _scaleAnim.value,
+          child: child,
+        ),
+        child: Card(
+          margin: const EdgeInsets.only(bottom: NinjaSpacing.xs),
+          child: ListTile(
+            leading: Container(
+              width: 36,
+              height: 36,
+              decoration: BoxDecoration(
+                color: NinjaColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(NinjaSpacing.sm),
+              ),
+              child: Center(child: widget.icon is Icon
+                  ? Icon((widget.icon as Icon).icon, size: 18, color: NinjaColors.primary)
+                  : widget.icon),
+            ),
+            title: Text(widget.title, style: NinjaTextStyles.bodyMedium),
+            trailing: const Icon(Icons.chevron_right, size: 18, color: NinjaColors.textSecondary),
+            onTap: () => context.push(widget.route),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 快捷入口 Chip
 class _QuickChip extends StatelessWidget {
   final String label;
-  final IconData icon;
+  final Widget icon;
   final String route;
 
   const _QuickChip(this.label, this.icon, this.route);
@@ -321,9 +587,13 @@ class _QuickChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ActionChip(
-      avatar: Icon(icon, size: 16),
-      label: Text(label),
+      avatar: icon is Icon
+          ? Icon((icon as Icon).icon, size: 16, color: NinjaColors.primary)
+          : icon,
+      label: Text(label, style: NinjaTextStyles.bodySmall),
       onPressed: () => context.push(route),
+      backgroundColor: NinjaColors.primary.withValues(alpha: 0.08),
+      side: BorderSide.none,
     );
   }
 }

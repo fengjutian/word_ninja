@@ -9,15 +9,7 @@ class AppThemeConfig {
   static ThemeData get dark => NinjaTheme.dark;
 }
 
-/// 底部导航栏项定义
-const List<_NavItem> _navItems = [
-  _NavItem('修炼', Icons.home_outlined, Icons.home, AppRoutes.home),
-  _NavItem('单词', Icons.menu_book_outlined, Icons.menu_book, AppRoutes.vocabulary),
-  _NavItem('AI导师', Icons.psychology_outlined, Icons.psychology, AppRoutes.aiTutor),
-  _NavItem('阅读', Icons.auto_stories_outlined, Icons.auto_stories, AppRoutes.reading),
-  _NavItem('我的', Icons.person_outline, Icons.person, AppRoutes.profile),
-];
-
+/// 导航项配置
 class _NavItem {
   final String label;
   final IconData icon;
@@ -25,6 +17,15 @@ class _NavItem {
   final String route;
   const _NavItem(this.label, this.icon, this.activeIcon, this.route);
 }
+
+/// 底部导航栏项（Material Icons — SVG 图标在 NavigationBar 中须包裹为 Widget，暂用 Material 图标保证最佳兼容）
+const List<_NavItem> _navItems = [
+  _NavItem('修炼', Icons.home_outlined, Icons.home, AppRoutes.home),
+  _NavItem('单词', Icons.menu_book_outlined, Icons.menu_book, AppRoutes.vocabulary),
+  _NavItem('AI导师', Icons.psychology_outlined, Icons.psychology, AppRoutes.aiTutor),
+  _NavItem('阅读', Icons.auto_stories_outlined, Icons.auto_stories, AppRoutes.reading),
+  _NavItem('我的', Icons.person_outline, Icons.person, AppRoutes.profile),
+];
 
 /// 主页面框架（含底部导航）
 class MainShell extends StatelessWidget {
@@ -34,22 +35,20 @@ class MainShell extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // 通过当前路径匹配选中的 tab
     final location = GoRouterState.of(context).uri.toString();
     final index = _navItems.indexWhere((item) => location.startsWith(item.route));
 
     return Scaffold(
       body: child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: index >= 0 ? index : 0,
-        onTap: (i) => context.go(_navItems[i].route),
-        type: BottomNavigationBarType.fixed,
-        selectedItemColor: NinjaColors.primary,
-        unselectedItemColor: NinjaColors.textSecondary,
-        items: _navItems
-            .map((item) => BottomNavigationBarItem(
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: index >= 0 ? index : 0,
+        onDestinationSelected: (i) => context.go(_navItems[i].route),
+        animationDuration: const Duration(milliseconds: 300),
+        indicatorColor: NinjaColors.primary.withValues(alpha: 0.15),
+        destinations: _navItems
+            .map((item) => NavigationDestination(
                   icon: Icon(item.icon),
-                  activeIcon: Icon(item.activeIcon),
+                  selectedIcon: Icon(item.activeIcon),
                   label: item.label,
                 ))
             .toList(),

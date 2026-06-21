@@ -24,6 +24,7 @@ class NinjaLevelBadge extends StatelessWidget {
   }
 
   Color get _color {
+    if (level >= 100) return NinjaColors.levelLegend;
     if (level >= 80) return NinjaColors.levelMaster;
     if (level >= 40) return NinjaColors.levelAdvanced;
     if (level >= 20) return NinjaColors.levelIntermediate;
