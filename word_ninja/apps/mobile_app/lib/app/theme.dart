@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/ninja_theme/theme_data.dart';
 import 'router.dart';
 
 /// 应用主题配置

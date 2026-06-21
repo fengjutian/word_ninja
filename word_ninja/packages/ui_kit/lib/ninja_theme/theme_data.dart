@@ -22,7 +22,7 @@ class NinjaTheme {
           headlineLarge: NinjaTextStyles.heading1,
           headlineMedium: NinjaTextStyles.heading2,
           headlineSmall: NinjaTextStyles.heading3,
-          titleLarge: NinjaTextStyles.heading2,
+          titleLarge: NinjaTextStyles.heading3,
           titleMedium: NinjaTextStyles.titleMedium,
           titleSmall: NinjaTextStyles.titleSmall,
           bodyLarge: NinjaTextStyles.bodyLarge,
@@ -134,7 +134,9 @@ class NinjaTheme {
                 fontWeight: FontWeight.w600,
               );
             }
-            return NinjaTextStyles.caption;
+            return NinjaTextStyles.labelMedium.copyWith(
+              color: NinjaColors.textSecondary,
+            );
           }),
           iconTheme: WidgetStateProperty.resolveWith((states) {
             if (states.contains(WidgetState.selected)) {
@@ -173,7 +175,7 @@ class NinjaTheme {
           headlineLarge: NinjaTextStyles.heading1.copyWith(color: NinjaColors.textOnDark),
           headlineMedium: NinjaTextStyles.heading2.copyWith(color: NinjaColors.textOnDark),
           headlineSmall: NinjaTextStyles.heading3.copyWith(color: NinjaColors.textOnDark),
-          titleLarge: NinjaTextStyles.heading2.copyWith(color: NinjaColors.textOnDark),
+          titleLarge: NinjaTextStyles.heading3.copyWith(color: NinjaColors.textOnDark),
           titleMedium: NinjaTextStyles.titleMedium.copyWith(color: NinjaColors.textOnDark),
           titleSmall: NinjaTextStyles.titleSmall.copyWith(color: NinjaColors.textOnDark),
           bodyLarge: NinjaTextStyles.bodyLarge.copyWith(color: NinjaColors.textOnDark),

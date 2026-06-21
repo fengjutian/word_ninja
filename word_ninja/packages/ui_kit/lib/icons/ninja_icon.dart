@@ -57,7 +57,7 @@ class NinjaIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
-      'assets/icons/$_assetPath.svg',
+      'packages/ui_kit/assets/icons/$_assetPath.svg',
       width: size,
       height: size,
       colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,
