@@ -16,3 +16,11 @@ Thumbs.db
 *.swp
 *.swo
 *~
+
+# Go
+server/server
+server/*.exe
+server/vendor/
+server/*.test
+server/*.out
+server/tmp/

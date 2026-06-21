@@ -1,6 +1,7 @@
 package sync
 
 import (
+	"log/slog"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
@@ -17,8 +18,11 @@ type SyncRequest struct {
 }
 
 type SyncResponse struct {
-	Success bool   `json:"success"`
-	Message string `json:"message"`
+	Success   bool     `json:"success"`
+	Message   string   `json:"message"`
+	Synced    int      `json:"synced"`
+	Total     int      `json:"total"`
+	FailedIDs []string `json:"failed_ids,omitempty"`
 }
 
 // Sync 数据同步（客户端 → 服务端）
@@ -31,16 +35,22 @@ func (h *Handler) Sync(c *gin.Context) {
 	}
 
 	synced := 0
+	failedIDs := make([]string, 0)
 	for _, w := range req.Words {
 		_, err := vocabulary.CreateWord(h.DB, userID, w)
 		if err != nil {
-			continue // 跳过已存在的
+			slog.Warn("sync word failed", "word", w.Word, "error", err)
+			failedIDs = append(failedIDs, w.Word)
+			continue
 		}
 		synced++
 	}
 
 	c.JSON(http.StatusOK, SyncResponse{
-		Success: true,
-		Message: "同步成功",
+		Success:   true,
+		Message:   "同步完成",
+		Synced:    synced,
+		Total:     len(req.Words),
+		FailedIDs: failedIDs,
 	})
 }

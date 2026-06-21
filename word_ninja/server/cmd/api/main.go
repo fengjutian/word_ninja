@@ -16,7 +16,6 @@ import (
 	"github.com/word-ninja/server/internal/sync"
 	"github.com/word-ninja/server/internal/vocabulary"
 	"github.com/word-ninja/server/pkg/database"
-	"github.com/word-ninja/server/pkg/jwt"
 	"github.com/word-ninja/server/pkg/logger"
 	"github.com/word-ninja/server/pkg/middleware"
 	"github.com/word-ninja/server/pkg/redis"
@@ -29,19 +28,23 @@ func main() {
 	// ─── 数据库 ───
 	db, err := database.Connect(cfg.DatabaseURL)
 	if err != nil {
-		slog.Error("database connect failed, running without DB", "error", err)
-	} else {
-		if err := database.AutoMigrate(db,
-			&auth.User{},
-			&vocabulary.Word{},
-			&vocabulary.Review{},
-		); err != nil {
-			slog.Error("auto-migrate failed", "error", err)
-		}
+		slog.Error("database connect failed, exiting", "error", err)
+		os.Exit(1)
+	}
+	if err := database.AutoMigrate(db,
+		&auth.User{},
+		&vocabulary.Word{},
+		&vocabulary.Review{},
+		&vocabulary.Achievement{},
+		&vocabulary.StudyPlan{},
+		&vocabulary.ChatMessage{},
+		&vocabulary.Membership{},
+	); err != nil {
+		slog.Error("auto-migrate failed", "error", err)
 	}
 
 	// ─── Redis ───
-	_, err = redis.Connect(cfg.RedisURL)
+	rdb, err := redis.Connect(cfg.RedisURL)
 	if err != nil {
 		slog.Warn("redis connect failed, running without cache", "error", err)
 	}
@@ -60,6 +63,9 @@ func main() {
 	r := gin.Default()
 	r.Use(middleware.CORS())
 
+	// 全局限流
+	r.Use(middleware.RateLimit(cfg.RateLimitRPM))
+
 	api := r.Group("/api/v1")
 	{
 		// Auth（无需认证）
@@ -67,6 +73,7 @@ func main() {
 		{
 			authGroup.POST("/register", authHandler.Register)
 			authGroup.POST("/login", authHandler.Login)
+			authGroup.POST("/refresh", authHandler.RefreshToken)
 		}
 
 		// 需要认证的路由
@@ -75,15 +82,24 @@ func main() {
 		{
 			// 用户
 			authorized.GET("/auth/me", authHandler.Me)
+			authorized.PUT("/users/me", authHandler.UpdateMe)
+			authorized.GET("/users/me/stats", authHandler.Stats)
+			authorized.GET("/users/me/achievements", authHandler.Achievements)
 
 			// 单词
 			authorized.GET("/words", vocabHandler.List)
 			authorized.POST("/words", vocabHandler.Create)
+			authorized.GET("/words/:id", vocabHandler.Get)
+			authorized.PUT("/words/:id", vocabHandler.Update)
+			authorized.DELETE("/words/:id", vocabHandler.Delete)
 			authorized.POST("/words/reviews", vocabHandler.Review)
 			authorized.GET("/words/reviews/due", vocabHandler.DueReviews)
 
 			// AI
 			authorized.POST("/ai/chat", aiHandler.Chat)
+			authorized.POST("/ai/explain", aiHandler.Explain)
+			authorized.POST("/ai/plan", aiHandler.Plan)
+			authorized.POST("/ai/correct", aiHandler.Correct)
 
 			// 同步
 			authorized.POST("/sync", syncHandler.Sync)
@@ -120,11 +136,13 @@ func main() {
 	if err := srv.Shutdown(ctx); err != nil {
 		slog.Error("forced shutdown", "error", err)
 	}
-	slog.Info("server stopped")
-}
 
-// 示例 JWT 工具（用于外部生成测试 token）
-func generateTestToken(secret string) {
-	token, _, _ := jwt.GenerateToken(secret, "test-user-id", "test@example.com")
-	println("Test token:", token)
+	// 关闭数据库和 Redis 连接
+	database.Close(db)
+	if rdb != nil {
+		rdb.Close()
+		slog.Info("redis closed")
+	}
+
+	slog.Info("server stopped")
 }

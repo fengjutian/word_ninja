@@ -29,3 +29,20 @@ func AutoMigrate(db *gorm.DB, models ...interface{}) error {
 	slog.Info("database migrated")
 	return nil
 }
+
+// Close 关闭数据库连接池
+func Close(db *gorm.DB) {
+	if db == nil {
+		return
+	}
+	sqlDB, err := db.DB()
+	if err != nil {
+		slog.Warn("get underlying sql.DB failed", "error", err)
+		return
+	}
+	if err := sqlDB.Close(); err != nil {
+		slog.Warn("close database failed", "error", err)
+		return
+	}
+	slog.Info("database closed")
+}

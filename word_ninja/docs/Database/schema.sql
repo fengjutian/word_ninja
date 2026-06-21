@@ -25,7 +25,7 @@ CREATE TABLE words (
     difficulty INTEGER DEFAULT 1,
     mastery INTEGER DEFAULT 0,
     source VARCHAR(20) DEFAULT 'manual',
-    tags TEXT[] DEFAULT '{}',
+    tags TEXT DEFAULT '',
     created_at TIMESTAMPTZ DEFAULT NOW(),
     updated_at TIMESTAMPTZ DEFAULT NOW()
 );
@@ -34,6 +34,7 @@ CREATE TABLE words (
 CREATE TABLE word_reviews (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     word_id UUID REFERENCES words(id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
     review_time TIMESTAMPTZ NOT NULL,
     score INTEGER DEFAULT 0,
     created_at TIMESTAMPTZ DEFAULT NOW()
