@@ -340,9 +340,9 @@ class _HomeTab extends StatelessWidget {
               _QuickChip('阅读', NinjaIcon.scroll(size: 16, color: NinjaColors.primary), AppRoutes.reading),
               _QuickChip('听力', NinjaIcon.headphone(size: 16, color: NinjaColors.primary), AppRoutes.listening),
               _QuickChip('口语', NinjaIcon.mic(size: 16, color: NinjaColors.primary), AppRoutes.speaking),
-              _QuickChip('写作', const Icon(Icons.edit, size: 16), AppRoutes.writing),
+              _QuickChip('写作', NinjaIcon.pen(size: 16, color: NinjaColors.primary), AppRoutes.writing),
               _QuickChip('AI导师', NinjaIcon.chatBubble(size: 16, color: NinjaColors.primary), AppRoutes.aiTutor),
-              _QuickChip('计划', const Icon(Icons.calendar_today, size: 16), AppRoutes.studyPlan),
+              _QuickChip('计划', NinjaIcon.calendar(size: 16, color: NinjaColors.primary), AppRoutes.studyPlan),
               _QuickChip('商店', NinjaIcon.coin(size: 16, color: NinjaColors.primary), AppRoutes.shop),
             ],
           ),
@@ -489,9 +489,7 @@ class SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        icon is Icon
-            ? Icon((icon as Icon).icon, size: 18, color: NinjaColors.primary)
-            : icon,
+        icon,
         const SizedBox(width: NinjaSpacing.sm),
         Text(title, style: NinjaTextStyles.heading3),
       ],
@@ -562,9 +560,7 @@ class _TaskItemState extends State<_TaskItem> with SingleTickerProviderStateMixi
                 color: NinjaColors.primary.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(NinjaSpacing.sm),
               ),
-              child: Center(child: widget.icon is Icon
-                  ? Icon((widget.icon as Icon).icon, size: 18, color: NinjaColors.primary)
-                  : widget.icon),
+              child: Center(child: widget.icon),
             ),
             title: Text(widget.title, style: NinjaTextStyles.bodyMedium),
             trailing: const Icon(Icons.chevron_right, size: 18, color: NinjaColors.textSecondary),
@@ -587,9 +583,7 @@ class _QuickChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ActionChip(
-      avatar: icon is Icon
-          ? Icon((icon as Icon).icon, size: 16, color: NinjaColors.primary)
-          : icon,
+      avatar: icon,
       label: Text(label, style: NinjaTextStyles.bodySmall),
       onPressed: () => context.push(route),
       backgroundColor: NinjaColors.primary.withValues(alpha: 0.08),

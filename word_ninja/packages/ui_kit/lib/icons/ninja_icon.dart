@@ -55,6 +55,12 @@ class NinjaIcon extends StatelessWidget {
   /// 剑 — 修炼/训练
   static const sword = _NinjaIconRef('sword');
 
+  /// 钢笔 — 写作
+  static const pen = _NinjaIconRef('pen');
+
+  /// 日历 — 计划
+  static const calendar = _NinjaIconRef('calendar');
+
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
