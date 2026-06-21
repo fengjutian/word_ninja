@@ -3,19 +3,20 @@ import 'package:flutter_svg/flutter_svg.dart';
 
 /// 忍者应用自定义 SVG 图标系统
 ///
+/// SVG 资产由消费方应用提供（打包在应用 assets/icons/ 目录下）。
 /// 使用方法：
 /// ```dart
 /// NinjaIcon.shuriken(size: 24, color: NinjaColors.primary)
 /// NinjaIcon.scroll(size: 20)
 /// ```
 class NinjaIcon extends StatelessWidget {
-  final String _assetPath;
+  final String _assetName;
   final double size;
   final Color? color;
   final BoxFit fit;
 
   const NinjaIcon._(
-    this._assetPath, {
+    this._assetName, {
     super.key,
     this.size = 24,
     this.color,
@@ -57,7 +58,7 @@ class NinjaIcon extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
-      'packages/ui_kit/assets/icons/$_assetPath.svg',
+      'assets/icons/$_assetName.svg',
       width: size,
       height: size,
       colorFilter: color != null ? ColorFilter.mode(color!, BlendMode.srcIn) : null,

@@ -312,17 +312,17 @@ class _HomeTab extends StatelessWidget {
           SectionHeader(title: '今日任务', icon: const Icon(Icons.task_alt, size: 18, color: NinjaColors.primary)),
           const SizedBox(height: NinjaSpacing.sm),
           _TaskItem(
-            icon: NinjaIcon.scroll(size: 20),
+            icon: NinjaIcon.scroll(size: 20, color: NinjaColors.primary),
             title: '学习 20 个单词',
             route: AppRoutes.vocabulary,
           ),
           _TaskItem(
-            icon: NinjaIcon.scroll(size: 20),
+            icon: NinjaIcon.scroll(size: 20, color: NinjaColors.primary),
             title: '阅读 1 篇文章',
             route: AppRoutes.reading,
           ),
           _TaskItem(
-            icon: NinjaIcon.chatBubble(size: 20),
+            icon: NinjaIcon.chatBubble(size: 20, color: NinjaColors.primary),
             title: 'AI 对话 10 分钟',
             route: AppRoutes.aiTutor,
           ),
@@ -330,20 +330,20 @@ class _HomeTab extends StatelessWidget {
           const SizedBox(height: NinjaSpacing.lg),
 
           // 快捷入口
-          SectionHeader(title: '忍者修炼', icon: NinjaIcon.sword(size: 20)),
+          SectionHeader(title: '忍者修炼', icon: NinjaIcon.sword(size: 20, color: NinjaColors.primary)),
           const SizedBox(height: NinjaSpacing.sm),
           Wrap(
             spacing: NinjaSpacing.sm,
             runSpacing: NinjaSpacing.sm,
             children: [
-              _QuickChip('单词', NinjaIcon.scroll(size: 16), AppRoutes.vocabulary),
-              _QuickChip('阅读', NinjaIcon.scroll(size: 16), AppRoutes.reading),
-              _QuickChip('听力', NinjaIcon.headphone(size: 16), AppRoutes.listening),
-              _QuickChip('口语', NinjaIcon.mic(size: 16), AppRoutes.speaking),
+              _QuickChip('单词', NinjaIcon.scroll(size: 16, color: NinjaColors.primary), AppRoutes.vocabulary),
+              _QuickChip('阅读', NinjaIcon.scroll(size: 16, color: NinjaColors.primary), AppRoutes.reading),
+              _QuickChip('听力', NinjaIcon.headphone(size: 16, color: NinjaColors.primary), AppRoutes.listening),
+              _QuickChip('口语', NinjaIcon.mic(size: 16, color: NinjaColors.primary), AppRoutes.speaking),
               _QuickChip('写作', const Icon(Icons.edit, size: 16), AppRoutes.writing),
-              _QuickChip('AI导师', NinjaIcon.chatBubble(size: 16), AppRoutes.aiTutor),
+              _QuickChip('AI导师', NinjaIcon.chatBubble(size: 16, color: NinjaColors.primary), AppRoutes.aiTutor),
               _QuickChip('计划', const Icon(Icons.calendar_today, size: 16), AppRoutes.studyPlan),
-              _QuickChip('商店', NinjaIcon.coin(size: 16), AppRoutes.shop),
+              _QuickChip('商店', NinjaIcon.coin(size: 16, color: NinjaColors.primary), AppRoutes.shop),
             ],
           ),
         ],
