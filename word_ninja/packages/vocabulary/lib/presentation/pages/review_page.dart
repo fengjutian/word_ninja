@@ -55,6 +55,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
   void _rateWord(int score) async {
     final word = widget.words[_currentIndex];
     await ref.read(vocabularyRepositoryProvider).submitReview(word.id, score);
+    if (_currentIndex < widget.words.length - 1) {
       _pageCtrl.nextPage(
           duration: const Duration(milliseconds: 300), curve: Curves.easeIn);
       _flipCtrl.reset();

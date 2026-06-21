@@ -22,18 +22,18 @@ List<Override> desktopOverrides() {
   ];
 }
 
-/// 远程数据源存根（桌面版暂不接入 API）
+/// 远程数据源存根（桌面版暂不接入 API，所有操作返回空/占位值）
 class _StubRemoteDataSource implements VocabularyRemoteDataSource {
   @override
   Future<List<Word>> fetchWords({int page = 1, int size = 20}) async => [];
 
   @override
   Future<Word> createWord(Map<String, dynamic> data) async =>
-      throw UnimplementedError('Remote API not available');
+      Word(id: 'stub', userId: '', word: data['word'] ?? '', meaning: data['meaning'] ?? '');
 
   @override
   Future<Word> updateWord(String id, Map<String, dynamic> data) async =>
-      throw UnimplementedError('Remote API not available');
+      Word(id: id, userId: '', word: data['word'] ?? '', meaning: data['meaning'] ?? '');
 
   @override
   Future<void> deleteWord(String id) async { }

@@ -1,10 +1,10 @@
 import 'package:dio/dio.dart';
-import 'package:logger/logger.dart';
+import 'package:core/logger/logger.dart';
+import 'package:core/storage/secure_storage.dart';
 
 /// Word Ninja 网络层核心 Dio 客户端
 class DioClient {
   late final Dio _dio;
-  final Logger _logger = Logger();
 
   DioClient({
     required String baseUrl,
@@ -24,7 +24,7 @@ class DioClient {
     );
 
     _dio.interceptors.addAll([
-      _LogInterceptor(_logger),
+      _LogInterceptor(),
       _AuthInterceptor(),
       _RetryInterceptor(),
     ]);
@@ -99,24 +99,21 @@ class DioClient {
 // ─── 拦截器 ───
 
 class _LogInterceptor extends Interceptor {
-  final Logger _logger;
-  _LogInterceptor(this._logger);
-
   @override
   void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
-    _logger.d('[HTTP ➡] ${options.method} ${options.uri}');
+    log.d('[HTTP ➡] ${options.method} ${options.uri}');
     handler.next(options);
   }
 
   @override
   void onResponse(Response response, ResponseInterceptorHandler handler) {
-    _logger.d('[HTTP ⬅] ${response.statusCode} ${response.requestOptions.uri}');
+    log.d('[HTTP ⬅] ${response.statusCode} ${response.requestOptions.uri}');
     handler.next(response);
   }
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    _logger.e('[HTTP ✗] ${err.response?.statusCode} ${err.requestOptions.uri} — ${err.message}');
+    log.e('[HTTP ✗] ${err.response?.statusCode} ${err.requestOptions.uri} — ${err.message}');
     handler.next(err);
   }
 }

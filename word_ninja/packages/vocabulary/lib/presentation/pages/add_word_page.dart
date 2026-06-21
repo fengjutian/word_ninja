@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:ai/providers/ai_providers.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import '../../data/model/word.dart';
 import '../providers/word_provider.dart';
@@ -116,7 +117,7 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
     Navigator.pop(context);
   }
 
-  void _aiAutoComplete() {
+  void _aiAutoComplete() async {
     final word = _wordCtrl.text.trim();
     if (word.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -124,9 +125,32 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
       );
       return;
     }
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('AI 补全中...')),
+    // 显示加载提示
+    final scaffoldMessenger = ScaffoldMessenger.of(context);
+    scaffoldMessenger.showSnackBar(
+      const SnackBar(content: Text('AI 正在补全中...'), duration: Duration(seconds: 1)),
     );
-    // TODO 调用 AiWordService.completeWord
+    try {
+      final service = ref.read(aiWordServiceProvider);
+      final result = await service.completeWord(word);
+      setState(() {
+        if (_meaningCtrl.text.trim().isEmpty && result['meaning'] != null && (result['meaning'] as String).isNotEmpty) {
+          _meaningCtrl.text = result['meaning'];
+        }
+        if (_phoneticCtrl.text.trim().isEmpty && result['phonetic'] != null && (result['phonetic'] as String).isNotEmpty) {
+          _phoneticCtrl.text = result['phonetic'];
+        }
+        if (_exampleCtrl.text.trim().isEmpty && result['example'] != null && (result['example'] as String).isNotEmpty) {
+          _exampleCtrl.text = result['example'];
+        }
+      });
+      scaffoldMessenger.showSnackBar(
+        const SnackBar(content: Text('AI 补全完成'), duration: Duration(seconds: 1)),
+      );
+    } catch (e) {
+      scaffoldMessenger.showSnackBar(
+        SnackBar(content: Text('AI 补全失败: $e')),
+      );
+    }
   }
 }
