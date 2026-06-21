@@ -8,7 +8,7 @@ import 'package:vocabulary/lib/presentation/pages/word_detail_page.dart';
 import 'package:vocabulary/lib/presentation/pages/add_word_page.dart';
 import 'package:vocabulary/lib/presentation/pages/review_page.dart';
 import 'package:vocabulary/lib/presentation/pages/word_test_page.dart';
-import 'package:vocabulary/lib/presentation/providers/word_provider.dart';
+import 'package:vocabulary/lib/data/model/word.dart';
 import 'package:reading/lib/presentation/pages/reader_page.dart';
 import 'package:listening/lib/presentation/pages/listening_page.dart';
 import 'package:speaking/lib/presentation/pages/speaking_page.dart';
