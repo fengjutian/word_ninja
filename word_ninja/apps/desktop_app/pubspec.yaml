@@ -21,8 +21,6 @@ dependencies:
     path: ../../packages/reading
   ai:
     path: ../../packages/ai
-  ai_tutor:
-    path: ../../packages/ai_tutor
   profile:
     path: ../../packages/profile
   flutter_riverpod: ^2.6.1

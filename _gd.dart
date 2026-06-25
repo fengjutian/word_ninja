@@ -1,3 +1,7 @@
+import 'dart:io';  
+void main() {  
+  File(r'D:\github\word_ninja\word_ninja\apps\desktop_app\lib\app\desktop_app.dart')  
+    .writeAsStringSync('''  
 import 'package:flutter/foundation.dart';  
 import 'package:flutter/material.dart'; 
 import 'package:go_router/go_router.dart'; 
@@ -109,4 +113,6 @@ class _DesktopHome extends StatelessWidget {
   Widget build(BuildContext context) {  
     return const Center(child: Text('Word Ninja Desktop', style: TextStyle(fontSize: 24)));  
   }  
+} 
+''');  
 } 

@@ -5,11 +5,9 @@
 list(APPEND FLUTTER_PLUGIN_LIST
   file_selector_windows
   flutter_secure_storage_windows
-  flutter_tts
   hotkey_manager_windows
   isar_flutter_libs
   screen_retriever_windows
-  speech_to_text_windows
   window_manager
 )
 
