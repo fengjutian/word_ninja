@@ -42,7 +42,7 @@ class NinjaTheme {
         ),
 
         // ─── 卡片 ───
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 2,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
@@ -195,7 +195,7 @@ class NinjaTheme {
         ),
 
         // ─── 卡片 ───
-        cardTheme: CardTheme(
+        cardTheme: CardThemeData(
           elevation: 2,
           color: NinjaColors.surfaceContainerDark,
           shadowColor: Colors.black45,

@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';  
 import 'package:flutter/material.dart'; 
 import 'package:go_router/go_router.dart'; 
-import 'package:ui_kit/ninja_theme/ninja_theme.dart'; 
+import 'package:ui_kit/ninja_theme/theme_data.dart'; 
 import 'package:vocabulary/presentation/pages/vocabulary_page.dart'; 
 import 'package:reading/presentation/pages/reader_page.dart'; 
 import '../debug_overlay.dart'; 
@@ -49,11 +49,11 @@ GoRouter createDesktopRouter() {
     initialLocation: DesktopRoutes.home,  
     routes: [  
       ShellRoute(  
-        builder: (ctx, state, child) = child),  
+        builder: (ctx, state, child) => DesktopShell(child: child),  
         routes: [  
-          GoRoute(path: DesktopRoutes.home, builder: (ctx, state) = _DesktopHome()),  
-          GoRoute(path: DesktopRoutes.vocabulary, builder: (ctx, state) = VocabularyPage()),  
-          GoRoute(path: DesktopRoutes.reading, builder: (ctx, state) = ReaderPage()), 
+          GoRoute(path: DesktopRoutes.home, builder: (ctx, state) => const _DesktopHome()),  
+          GoRoute(path: DesktopRoutes.vocabulary, builder: (ctx, state) => const VocabularyPage()),  
+          GoRoute(path: DesktopRoutes.reading, builder: (ctx, state) => const ReaderPage()), 
         ],  
       ),  
     ],  
@@ -70,7 +70,7 @@ class DesktopShell extends StatelessWidget {
     return Row(children: [  
       NavigationRail(  
         selectedIndex: _calcIndex(context),  
-        onDestinationSelected: (i) =, i), 
+        onDestinationSelected: (i) => _navigate(context, i), 
         labelType: NavigationRailLabelType.all,  
         leading: const Padding(  
           padding: EdgeInsets.symmetric(vertical: 8),  

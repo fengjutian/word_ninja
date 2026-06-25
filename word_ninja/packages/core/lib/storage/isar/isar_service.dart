@@ -1,3 +1,9 @@
+import 'schemas/user_schema.dart';
+import 'schemas/word_schema.dart';
+import 'schemas/review_schema.dart';
+import 'schemas/achievement_schema.dart';
+import 'schemas/plan_schema.dart';
+
 import 'package:isar/isar.dart';
 
 /// Isar 数据库服务 — 负责打开和关闭数据库
