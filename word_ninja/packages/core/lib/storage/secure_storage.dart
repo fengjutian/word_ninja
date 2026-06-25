@@ -1,21 +1,40 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-/// 安全存储（Token/密码）
+/// Secure storage using SharedPreferences
 class SecureStorage {
-  static const _storage = FlutterSecureStorage();
+  static SharedPreferences? _prefs;
 
-  static Future<void> write(String key, String value) =>
-      _storage.write(key: key, value: value);
+  static bool _initialized = false;
 
-  static Future<String?> read(String key) => _storage.read(key: key);
+  static Future<void> _ensureInit() async {
+    if (!_initialized) {
+      _prefs = await SharedPreferences.getInstance();
+      _initialized = true;
+    }
+  }
 
-  static Future<void> delete(String key) => _storage.delete(key: key);
+  static Future<void> write(String key, String value) async {
+    await _ensureInit();
+    await _prefs!.setString(key, value);
+  }
 
-  static Future<void> clear() => _storage.deleteAll();
+  static Future<String?> read(String key) async {
+    await _ensureInit();
+    return _prefs!.getString(key);
+  }
+
+  static Future<void> delete(String key) async {
+    await _ensureInit();
+    await _prefs!.remove(key);
+  }
+
+  static Future<void> clear() async {
+    await _ensureInit();
+    await _prefs!.clear();
+  }
 }
 
-/// SharedPreferences 封装（偏好设置）
+/// SharedPreferences wrapper
 class Preferences {
   static late SharedPreferences _prefs;
 
@@ -36,15 +55,15 @@ class Preferences {
       _prefs.setInt(key, value);
 
   static String getString(String key, {String defaultValue = ''}) =>
-      _prefs.getString(key) ?? defaultValue;
+      _prefs!.getString(key) ?? defaultValue;
 
   static Future<void> setString(String key, String value) =>
-      _prefs.setString(key, value);
+      _prefs!.setString(key, value);
 
-  static Future<void> remove(String key) => _prefs.remove(key);
+  static Future<void> remove(String key) => _prefs!.remove(key);
 }
 
-/// 存储 Key 常量
+/// Storage key constants
 class StorageKeys {
   static const accessToken = 'access_token';
   static const refreshToken = 'refresh_token';
