@@ -108,9 +108,8 @@ class _DesktopHome extends StatelessWidget {
   const _DesktopHome();  
   @override  
   Widget build(BuildContext context) {  
-    return const Material(  
-      type: MaterialType.transparency,  
-      child: Center(child: Text('Word Ninja Desktop', style: TextStyle(fontSize: 24))),  
+    return const Scaffold(  
+      body: Center(child: Text('Word Ninja Desktop', style: TextStyle(fontSize: 24))),  
     );  
   }  
 } 
