@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
@@ -97,7 +98,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
         title: const Text('阅读训练'),
         actions: [
           IconButton(
-            icon: const Icon(Icons.auto_awesome),
+            icon: const Icon(PhosphorIcons.regular.sparkle),
             tooltip: 'AI 生成文章',
             onPressed: () async {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -134,7 +135,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
                     final isSelected = cat == _selectedCategory;
                     return ActionChip(
                       avatar: Icon(
-                        isSelected ? Icons.check_circle : Icons.circle_outlined,
+                        isSelected ? PhosphorIcons.regular.checkCircle : PhosphorIcons.regular.circle,
                         size: 16,
                         color: isSelected ? NinjaColors.primary : NinjaColors.textSecondary,
                       ),
@@ -156,11 +157,11 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
                 const SizedBox(height: NinjaSpacing.md),
                 Row(
                   children: [
-                    _ImportButton('PDF', Icons.picture_as_pdf, onTap: () => _showImportSnack(context, 'PDF')),
+                    _ImportButton('PDF', PhosphorIcons.regular.filePdf, onTap: () => _showImportSnack(context, 'PDF')),
                     const SizedBox(width: NinjaSpacing.md),
-                    _ImportButton('EPUB', Icons.book, onTap: () => _showImportSnack(context, 'EPUB')),
+                    _ImportButton('EPUB', PhosphorIcons.regular.book, onTap: () => _showImportSnack(context, 'EPUB')),
                     const SizedBox(width: NinjaSpacing.md),
-                    _ImportButton('TXT', Icons.description, onTap: () => _showImportSnack(context, 'TXT')),
+                    _ImportButton('TXT', PhosphorIcons.regular.fileText, onTap: () => _showImportSnack(context, 'TXT')),
                   ],
                 ),
               ],
@@ -214,7 +215,7 @@ class _ArticleReaderView extends ConsumerWidget {
             ),
             child: const Row(
               children: [
-                Icon(Icons.touch_app, color: NinjaColors.info),
+                Icon(PhosphorIcons.regular.handTap, color: NinjaColors.info),
                 SizedBox(width: NinjaSpacing.sm),
                 Expanded(
                   child: Text('选中文字后可查看翻译、加入单词本、AI解析',
@@ -257,7 +258,7 @@ class _ArticleCard extends StatelessWidget {
             ],
           ),
         ),
-        trailing: const Icon(Icons.chevron_right),
+        trailing: const Icon(PhosphorIcons.regular.caretRight),
         onTap: onTap,
       ),
     );

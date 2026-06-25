@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import '../ninja_theme/ninja_theme.dart';
 
@@ -80,7 +81,7 @@ class WordCard extends StatelessWidget {
                 ),
               ),
               // 箭头
-              const Icon(Icons.chevron_right, color: NinjaColors.textSecondary),
+              const Icon(PhosphorIcons.regular.caretRight, color: NinjaColors.textSecondary),
             ],
           ),
         ),

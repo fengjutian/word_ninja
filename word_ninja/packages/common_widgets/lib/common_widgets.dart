@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 
@@ -59,7 +60,7 @@ class ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: NinjaColors.error),
+            const Icon(PhosphorIcons.regular.warningCircle, size: 48, color: NinjaColors.error),
             const SizedBox(height: NinjaSpacing.md),
             Text(message, style: NinjaTextStyles.bodyMedium, textAlign: TextAlign.center),
             if (onRetry != null) ...[

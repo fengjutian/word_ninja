@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
@@ -83,7 +84,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     controller: _nicknameCtrl,
                     decoration: const InputDecoration(
                       labelText: '忍者名号',
-                      prefixIcon: Icon(Icons.person_outline),
+                      prefixIcon: Icon(PhosphorIcons.regular.user),
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return '请输入昵称';
@@ -98,7 +99,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       labelText: '邮箱',
-                      prefixIcon: Icon(Icons.email_outlined),
+                      prefixIcon: Icon(PhosphorIcons.regular.envelope),
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return '请输入邮箱';
@@ -113,11 +114,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: '密码',
-                      prefixIcon: const Icon(Icons.lock_outlined),
+                      prefixIcon: const Icon(PhosphorIcons.regular.lock),
                       suffixIcon: IconButton(
                         icon: Icon(_obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility),
+                            ? PhosphorIcons.regular.eyeSlash
+                            : PhosphorIcons.regular.eye),
                         onPressed: () =>
                             setState(() => _obscurePassword = !_obscurePassword),
                       ),
@@ -135,7 +136,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: '确认密码',
-                      prefixIcon: Icon(Icons.lock_outlined),
+                      prefixIcon: Icon(PhosphorIcons.regular.lock),
                     ),
                     validator: (v) {
                       if (v != _passwordCtrl.text) return '两次密码不一致';

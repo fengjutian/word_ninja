@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -64,7 +65,7 @@ class ProfilePage extends ConsumerWidget {
 
           // 功能列表
           _MenuItem(
-            const Icon(Icons.settings, size: 20, color: NinjaColors.primary),
+            const Icon(PhosphorIcons.regular.gear, size: 20, color: NinjaColors.primary),
             '设置',
             () => context.push('/settings'),
           ),
@@ -74,7 +75,7 @@ class ProfilePage extends ConsumerWidget {
             () => context.push('/membership'),
           ),
           _MenuItem(
-            const Icon(Icons.sync, size: 20, color: NinjaColors.primary),
+            const Icon(PhosphorIcons.regular.arrowsClockwise, size: 20, color: NinjaColors.primary),
             '数据同步',
             () async {
               final syncService = ref.read(syncProvider);
@@ -87,12 +88,12 @@ class ProfilePage extends ConsumerWidget {
             },
           ),
           _MenuItem(
-            const Icon(Icons.emoji_events, size: 20, color: NinjaColors.primary),
+            const Icon(PhosphorIcons.regular.trophy, size: 20, color: NinjaColors.primary),
             '成就中心',
             () => context.push('/achievement'),
           ),
           _MenuItem(
-            const Icon(Icons.info, size: 20, color: NinjaColors.primary),
+            const Icon(PhosphorIcons.regular.info, size: 20, color: NinjaColors.primary),
             '关于 Word Ninja',
             () => _showAboutDialog(context),
           ),
@@ -186,7 +187,7 @@ class _MenuItem extends StatelessWidget {
           child: Center(child: icon),
         ),
         title: Text(title, style: NinjaTextStyles.bodyMedium),
-        trailing: const Icon(Icons.chevron_right, size: 18, color: NinjaColors.textSecondary),
+        trailing: const Icon(PhosphorIcons.regular.caretRight, size: 18, color: NinjaColors.textSecondary),
         onTap: onTap,
       ),
     );

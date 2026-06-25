@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -39,7 +40,7 @@ class WordNinjaApp extends ConsumerWidget {
                 : Colors.grey.shade400,
             onPressed: DebugOverlay.toggleAll,
             child: Icon(
-              DebugOverlay.isActive ? Icons.visibility : Icons.visibility_off,
+              DebugOverlay.isActive ? PhosphorIcons.regular.eye : PhosphorIcons.regular.eyeSlash,
               size: 20,
             ),
           ),

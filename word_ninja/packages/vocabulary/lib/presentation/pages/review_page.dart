@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -96,7 +97,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.check_circle, size: 64, color: NinjaColors.success),
+              Icon(PhosphorIcons.regular.checkCircle, size: 64, color: NinjaColors.success),
               SizedBox(height: 16),
               Text('暂无待复习单词', style: NinjaTextStyles.heading3),
             ],
@@ -159,11 +160,11 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _scoreBtn(Icons.sentiment_very_dissatisfied, '不认识',
+                        _scoreBtn(PhosphorIcons.regular.smileySad, '不认识',
                             NinjaColors.error, () => _rateWord(1)),
-                        _scoreBtn(Icons.sentiment_neutral, '模糊',
+                        _scoreBtn(PhosphorIcons.regular.smileyMeh, '模糊',
                             NinjaColors.warning, () => _rateWord(3)),
-                        _scoreBtn(Icons.sentiment_satisfied, '认识',
+                        _scoreBtn(PhosphorIcons.regular.smiley, '认识',
                             NinjaColors.success, () => _rateWord(5)),
                       ],
                     ),

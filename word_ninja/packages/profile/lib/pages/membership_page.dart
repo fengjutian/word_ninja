@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -20,7 +21,7 @@ class MembershipPage extends ConsumerWidget {
         children: [
           const SizedBox(height: NinjaSpacing.xl),
           const Center(
-            child: Icon(Icons.star, size: 64, color: NinjaColors.accentGold),
+            child: Icon(PhosphorIcons.regular.star, size: 64, color: NinjaColors.accentGold),
           ),
           const SizedBox(height: NinjaSpacing.md),
           const Center(
@@ -35,11 +36,11 @@ class MembershipPage extends ConsumerWidget {
             ),
           const SizedBox(height: NinjaSpacing.xxl),
 
-          _BenefitTile(Icons.auto_awesome, '无限AI对话', '不受限制地使用AI导师'),
-          _BenefitTile(Icons.cloud_sync, '云同步', '多端数据实时同步'),
-          _BenefitTile(Icons.record_voice_over, '口语评分', 'AI发音评测'),
-          _BenefitTile(Icons.assessment, '详细统计', '学习数据深度分析'),
-          _BenefitTile(Icons.remove_red_eye, '无广告', '纯净学习体验'),
+          _BenefitTile(PhosphorIcons.regular.sparkle, '无限AI对话', '不受限制地使用AI导师'),
+          _BenefitTile(PhosphorIcons.regular.cloudArrowUp, '云同步', '多端数据实时同步'),
+          _BenefitTile(PhosphorIcons.regular.microphoneStage, '口语评分', 'AI发音评测'),
+          _BenefitTile(PhosphorIcons.regular.chartBar, '详细统计', '学习数据深度分析'),
+          _BenefitTile(PhosphorIcons.regular.eye, '无广告', '纯净学习体验'),
 
           const SizedBox(height: NinjaSpacing.xxl),
           Card(

@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -62,7 +63,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 48),
-          const Icon(Icons.lock_reset, size: 64, color: NinjaColors.primary),
+          const Icon(PhosphorIcons.regular.lockKey, size: 64, color: NinjaColors.primary),
           const SizedBox(height: 24),
           const Text(
             '输入注册邮箱，我们将发送重置链接',
@@ -86,7 +87,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
             keyboardType: TextInputType.emailAddress,
             decoration: const InputDecoration(
               labelText: '邮箱',
-              prefixIcon: Icon(Icons.email_outlined),
+              prefixIcon: Icon(PhosphorIcons.regular.envelope),
             ),
             validator: (v) {
               if (v == null || v.trim().isEmpty) return '请输入邮箱';
@@ -116,7 +117,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 48),
-        const Icon(Icons.check_circle, size: 64, color: NinjaColors.success),
+        const Icon(PhosphorIcons.regular.checkCircle, size: 64, color: NinjaColors.success),
         const SizedBox(height: 24),
         const Text(
           '重置链接已发送',

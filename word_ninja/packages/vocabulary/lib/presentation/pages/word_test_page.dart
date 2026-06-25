@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
@@ -148,7 +149,7 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(Icons.quiz, size: 64, color: NinjaColors.textSecondary),
+              Icon(PhosphorIcons.regular.brain, size: 64, color: NinjaColors.textSecondary),
               SizedBox(height: 16),
               Text('需要至少 2 个单词才能开始测试', style: NinjaTextStyles.bodyLarge),
             ],
@@ -232,9 +233,9 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
                               child: Text(option, style: NinjaTextStyles.bodyLarge),
                             ),
                             if (_showResult && isCorrect)
-                              const Icon(Icons.check_circle, color: NinjaColors.success),
+                              const Icon(PhosphorIcons.regular.checkCircle, color: NinjaColors.success),
                             if (_showResult && isSelected && !isCorrect)
-                              const Icon(Icons.cancel, color: NinjaColors.error),
+                              const Icon(PhosphorIcons.regular.xCircle, color: NinjaColors.error),
                           ],
                         ),
                       ),

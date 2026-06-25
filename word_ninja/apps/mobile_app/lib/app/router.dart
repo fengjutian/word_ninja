@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:auth/presentation/login/login_page.dart';
@@ -281,6 +282,7 @@ class _HomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: NinjaColors.background,
       appBar: AppBar(
         title: const Row(
           mainAxisSize: MainAxisSize.min,
@@ -290,12 +292,12 @@ class _HomeTab extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.emoji_events),
+            icon: const Icon(PhosphorIcons.regular.trophy),
             tooltip: '成就',
             onPressed: () => context.push(AppRoutes.achievement),
           ),
           IconButton(
-            icon: const Icon(Icons.leaderboard),
+            icon: const Icon(PhosphorIcons.regular.medal),
             tooltip: '排行榜',
             onPressed: () => context.push(AppRoutes.leaderboard),
           ),
@@ -309,7 +311,7 @@ class _HomeTab extends StatelessWidget {
           const SizedBox(height: NinjaSpacing.lg),
 
           // 今日任务
-          SectionHeader(title: '今日任务', icon: const Icon(Icons.task_alt, size: 18, color: NinjaColors.primary)),
+          SectionHeader(title: '今日任务', icon: const Icon(PhosphorIcons.regular.checkSquare, size: 18, color: NinjaColors.primary)),
           const SizedBox(height: NinjaSpacing.sm),
           _TaskItem(
             icon: NinjaIcon.scroll(size: 20, color: NinjaColors.primary),
@@ -365,6 +367,9 @@ class _LevelCard extends StatelessWidget {
     final progress = _currentExp / _maxExp;
     return Card(
       margin: EdgeInsets.zero,
+      color: NinjaColors.surface,
+      surfaceTintColor: Colors.transparent,
+      clipBehavior: Clip.antiAlias,
       child: Container(
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
@@ -552,6 +557,8 @@ class _TaskItemState extends State<_TaskItem> with SingleTickerProviderStateMixi
         ),
         child: Card(
           margin: const EdgeInsets.only(bottom: NinjaSpacing.xs),
+          color: NinjaColors.surface,
+          surfaceTintColor: Colors.transparent,
           child: ListTile(
             leading: Container(
               width: 36,
@@ -563,7 +570,7 @@ class _TaskItemState extends State<_TaskItem> with SingleTickerProviderStateMixi
               child: Center(child: widget.icon),
             ),
             title: Text(widget.title, style: NinjaTextStyles.bodyMedium),
-            trailing: const Icon(Icons.chevron_right, size: 18, color: NinjaColors.textSecondary),
+            trailing: const Icon(PhosphorIcons.regular.caretRight, size: 18, color: NinjaColors.textSecondary),
             onTap: () => context.push(widget.route),
           ),
         ),

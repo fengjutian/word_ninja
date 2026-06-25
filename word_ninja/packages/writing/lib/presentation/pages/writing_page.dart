@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai/providers/ai_providers.dart';
@@ -155,7 +156,7 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                       icon: _isGenerating
                           ? const SizedBox.square(
                               dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Icon(Icons.auto_awesome),
+                          : const Icon(PhosphorIcons.regular.sparkle),
                       label: Text(_isGenerating ? '生成中...' : '生成范文'),
                     ),
                   ),
@@ -199,7 +200,7 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                           icon: _isCorrecting
                               ? const SizedBox.square(
                                   dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                              : const Icon(Icons.rate_review),
+                              : const Icon(PhosphorIcons.regular.chatCircleText),
                           label: Text(_isCorrecting ? '批改中...' : 'AI批改'),
                         ),
                       ),
@@ -210,7 +211,7 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                           icon: _isScoring
                               ? const SizedBox.square(
                                   dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                              : const Icon(Icons.school),
+                              : const Icon(PhosphorIcons.regular.graduationCap),
                           label: Text(_isScoring ? '评分中...' : 'IELTS评分'),
                           style: ElevatedButton.styleFrom(backgroundColor: NinjaColors.accentGold),
                         ),

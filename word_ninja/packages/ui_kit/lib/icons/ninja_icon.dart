@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -65,18 +66,18 @@ class NinjaIcon extends StatelessWidget {
   /// 每个忍者图标的 Material 回退图标（SVG 加载失败时使用）
   static IconData? _fallbackIcon(String name) {
     return switch (name) {
-      'shuriken'    => Icons.star,
-      'scroll'      => Icons.menu_book,
-      'ninja_head'  => Icons.person,
-      'chat_bubble' => Icons.chat,
-      'trophy'      => Icons.emoji_events,
-      'coin'        => Icons.monetization_on,
-      'headphone'   => Icons.headphones,
-      'mic'         => Icons.mic,
-      'mountain'    => Icons.hiking,
-      'sword'       => Icons.fitness_center,
-      'pen'         => Icons.edit,
-      'calendar'    => Icons.calendar_month,
+      'shuriken'    => PhosphorIcons.regular.star,
+      'scroll'      => PhosphorIcons.regular.bookOpen,
+      'ninja_head'  => PhosphorIcons.regular.user,
+      'chat_bubble' => PhosphorIcons.regular.chats,
+      'trophy'      => PhosphorIcons.regular.trophy,
+      'coin'        => PhosphorIcons.regular.coin,
+      'headphone'   => PhosphorIcons.regular.headphones,
+      'mic'         => PhosphorIcons.regular.microphone,
+      'mountain'    => PhosphorIcons.regular.mountains,
+      'sword'       => PhosphorIcons.regular.barbell,
+      'pen'         => PhosphorIcons.regular.pencilSimple,
+      'calendar'    => PhosphorIcons.regular.calendar,
       _             => null,
     };
   }

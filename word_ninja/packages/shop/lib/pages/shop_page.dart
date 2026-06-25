@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
@@ -24,7 +25,7 @@ class ShopPage extends ConsumerWidget {
     final items = [
       _CategorySectionData(
         title: '角色皮肤',
-        icon: const Icon(Icons.people, size: 18, color: NinjaColors.primary),
+        icon: const Icon(PhosphorIcons.regular.users, size: 18, color: NinjaColors.primary),
         items: [
           _ShopItemData('暗影忍者', 500),
           _ShopItemData('忍者大师', 800),
@@ -33,7 +34,7 @@ class ShopPage extends ConsumerWidget {
       ),
       _CategorySectionData(
         title: '背景主题',
-        icon: const Icon(Icons.palette, size: 18, color: NinjaColors.secondary),
+        icon: const Icon(PhosphorIcons.regular.palette, size: 18, color: NinjaColors.secondary),
         items: [
           _ShopItemData('月光庭院', 300),
           _ShopItemData('樱花雨', 400),
@@ -42,7 +43,7 @@ class ShopPage extends ConsumerWidget {
       ),
       _CategorySectionData(
         title: '徽章',
-        icon: const Icon(Icons.emoji_events, size: 18, color: NinjaColors.accentGold),
+        icon: const Icon(PhosphorIcons.regular.trophy, size: 18, color: NinjaColors.accentGold),
         items: [
           _ShopItemData('金色传说', 1000),
           _ShopItemData('百胜勇士', 500),
@@ -59,7 +60,7 @@ class ShopPage extends ConsumerWidget {
               padding: const EdgeInsets.only(right: 16),
               child: Row(
                 children: [
-                  const Icon(Icons.monetization_on, size: 20, color: NinjaColors.accentGold),
+                  const Icon(PhosphorIcons.regular.coin, size: 20, color: NinjaColors.accentGold),
                   const SizedBox(width: 4),
                   Text('$coins',
                       style: const TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
@@ -174,7 +175,7 @@ class _ShopItem extends StatelessWidget {
             color: NinjaColors.primary.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
           ),
-          child: const Center(child: Icon(Icons.star, color: NinjaColors.primary, size: 22)),
+          child: const Center(child: Icon(PhosphorIcons.regular.star, color: NinjaColors.primary, size: 22)),
         ),
         title: Text(name, style: NinjaTextStyles.titleSmall),
         subtitle: owned ? null : Text('$price 金币', style: NinjaTextStyles.caption.copyWith(color: NinjaColors.accentGold)),
@@ -186,7 +187,7 @@ class _ShopItem extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  const Icon(Icons.check, size: 14, color: NinjaColors.success),
+                  const Icon(PhosphorIcons.regular.check, size: 14, color: NinjaColors.success),
                   const SizedBox(width: 4),
                   Text('已拥有', style: TextStyle(fontSize: 11, color: NinjaColors.success, fontWeight: FontWeight.w600)),
                 ]),

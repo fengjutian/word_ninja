@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/foundation.dart';  
 import 'package:flutter/material.dart'; 
 import 'package:go_router/go_router.dart'; 
@@ -31,7 +32,7 @@ class WordNinjaDesktopApp extends StatelessWidget {
         heroTag: '__debug_toggle__',  
         backgroundColor: DebugOverlay.isActive ? Colors.lightGreen : Colors.grey.shade400,  
         onPressed: DebugOverlay.toggleAll,  
-        child: Icon(DebugOverlay.isActive ? Icons.visibility : Icons.visibility_off, size: 20),  
+        child: Icon(DebugOverlay.isActive ? PhosphorIcons.regular.eye : PhosphorIcons.regular.eyeSlash, size: 20),  
       )),  
     ]);  
   }  
@@ -77,9 +78,9 @@ class DesktopShell extends StatelessWidget {
           child: Text('??', style: TextStyle(fontSize: 24)),  
         ), 
         destinations: const [  
-          NavigationRailDestination(icon: Icon(Icons.home_outlined), selectedIcon: Icon(Icons.home), label: Text('Home')),  
-          NavigationRailDestination(icon: Icon(Icons.menu_book_outlined), selectedIcon: Icon(Icons.menu_book), label: Text('Vocab')),  
-          NavigationRailDestination(icon: Icon(Icons.auto_stories_outlined), selectedIcon: Icon(Icons.auto_stories), label: Text('Reading')),  
+          NavigationRailDestination(icon: Icon(PhosphorIcons.regular.house), selectedIcon: Icon(PhosphorIcons.regular.house), label: Text('Home')),  
+          NavigationRailDestination(icon: Icon(PhosphorIcons.regular.bookOpen), selectedIcon: Icon(PhosphorIcons.regular.bookOpen), label: Text('Vocab')),  
+          NavigationRailDestination(icon: Icon(PhosphorIcons.regular.books), selectedIcon: Icon(PhosphorIcons.regular.books), label: Text('Reading')),  
         ], 
       ),  
       const VerticalDivider(width: 1),  

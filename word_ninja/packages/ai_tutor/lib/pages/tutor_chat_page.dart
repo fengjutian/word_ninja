@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
@@ -131,7 +132,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
             const Spacer(),
             if (_lastError != null)
               IconButton(
-                icon: const Icon(Icons.refresh, size: 18, color: Colors.white70),
+                icon: const Icon(PhosphorIcons.regular.arrowsClockwise, size: 18, color: Colors.white70),
                 tooltip: '重试',
                 onPressed: _retry,
               ),
@@ -170,7 +171,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.mic, color: NinjaColors.primary),
+                    icon: const Icon(PhosphorIcons.regular.microphone, color: NinjaColors.primary),
                     tooltip: '语音输入（即将上线）',
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -197,7 +198,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                     child: CircleAvatar(
                       backgroundColor: _isLoading ? NinjaColors.textSecondary : NinjaColors.primary,
                       child: IconButton(
-                        icon: Icon(Icons.send, color: Colors.white, size: 18),
+                        icon: Icon(PhosphorIcons.regular.paperPlaneTilt, color: Colors.white, size: 18),
                         onPressed: _isLoading ? null : _sendMessage,
                       ),
                     ),

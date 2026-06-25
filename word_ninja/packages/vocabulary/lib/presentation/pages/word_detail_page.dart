@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -18,12 +19,12 @@ class WordDetailPage extends ConsumerWidget {
         title: Text(word.word),
         actions: [
           IconButton(
-            icon: const Icon(Icons.edit_outlined),
+            icon: const Icon(PhosphorIcons.regular.pencilSimple),
             tooltip: '编辑单词',
             onPressed: () => context.push('/vocabulary/edit/${word.id}'),
           ),
           IconButton(
-            icon: const Icon(Icons.delete_outline),
+            icon: const Icon(PhosphorIcons.regular.trash),
             tooltip: '删除单词',
             onPressed: () => _confirmDelete(context, ref),
           ),

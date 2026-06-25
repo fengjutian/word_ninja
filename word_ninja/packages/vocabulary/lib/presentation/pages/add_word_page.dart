@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai/providers/ai_providers.dart';
@@ -99,7 +100,7 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
                     ? const SizedBox(
                         width: 18, height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Icon(Icons.auto_awesome),
+                    : const Icon(PhosphorIcons.regular.sparkle),
                 label: Text(_isAiLoading ? 'AI 补全中...' : 'AI 智能补全'),
               ),
             ],

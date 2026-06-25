@@ -1,3 +1,4 @@
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -71,7 +72,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
             : const Text('单词修炼'),
         actions: [
           IconButton(
-            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            icon: Icon(_isSearching ? PhosphorIcons.regular.x : PhosphorIcons.regular.magnifyingGlass),
             onPressed: () => setState(() {
               _isSearching = !_isSearching;
               if (!_isSearching) {
@@ -87,7 +88,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/vocabulary/add'),
         backgroundColor: NinjaColors.primary,
-        child: const Icon(Icons.add, color: Colors.white),
+        child: const Icon(PhosphorIcons.regular.plus, color: Colors.white),
       ),
     );
   }
@@ -102,7 +103,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline, size: 48, color: NinjaColors.error),
+            const Icon(PhosphorIcons.regular.warningCircle, size: 48, color: NinjaColors.error),
             const SizedBox(height: NinjaSpacing.md),
             Text(state.error!, style: NinjaTextStyles.bodyMedium),
             const SizedBox(height: NinjaSpacing.lg),
@@ -121,7 +122,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.menu_book, size: 64, color: NinjaColors.textSecondary),
+            const Icon(PhosphorIcons.regular.bookOpen, size: 64, color: NinjaColors.textSecondary),
             const SizedBox(height: NinjaSpacing.md),
             Text('还没有单词', style: NinjaTextStyles.heading3),
             const SizedBox(height: NinjaSpacing.sm),
