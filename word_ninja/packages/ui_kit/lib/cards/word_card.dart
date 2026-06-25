@@ -81,7 +81,7 @@ class WordCard extends StatelessWidget {
                 ),
               ),
               // 箭头
-              const Icon(PhosphorIcons.regular.caretRight, color: NinjaColors.textSecondary),
+              const Icon(PhosphorIconsRegular.caretRight, color: NinjaColors.textSecondary),
             ],
           ),
         ),

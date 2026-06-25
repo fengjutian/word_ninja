@@ -60,7 +60,7 @@ class ErrorView extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(PhosphorIcons.regular.warningCircle, size: 48, color: NinjaColors.error),
+            const Icon(PhosphorIconsRegular.warningCircle, size: 48, color: NinjaColors.error),
             const SizedBox(height: NinjaSpacing.md),
             Text(message, style: NinjaTextStyles.bodyMedium, textAlign: TextAlign.center),
             if (onRetry != null) ...[

@@ -97,7 +97,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(PhosphorIcons.regular.checkCircle, size: 64, color: NinjaColors.success),
+              Icon(PhosphorIconsRegular.checkCircle, size: 64, color: NinjaColors.success),
               SizedBox(height: 16),
               Text('暂无待复习单词', style: NinjaTextStyles.heading3),
             ],
@@ -160,11 +160,11 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _scoreBtn(PhosphorIcons.regular.smileySad, '不认识',
+                        _scoreBtn(PhosphorIconsRegular.smileySad, '不认识',
                             NinjaColors.error, () => _rateWord(1)),
-                        _scoreBtn(PhosphorIcons.regular.smileyMeh, '模糊',
+                        _scoreBtn(PhosphorIconsRegular.smileyMeh, '模糊',
                             NinjaColors.warning, () => _rateWord(3)),
-                        _scoreBtn(PhosphorIcons.regular.smiley, '认识',
+                        _scoreBtn(PhosphorIconsRegular.smiley, '认识',
                             NinjaColors.success, () => _rateWord(5)),
                       ],
                     ),

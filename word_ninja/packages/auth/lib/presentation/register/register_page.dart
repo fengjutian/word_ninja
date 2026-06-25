@@ -84,7 +84,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     controller: _nicknameCtrl,
                     decoration: const InputDecoration(
                       labelText: '忍者名号',
-                      prefixIcon: Icon(PhosphorIcons.regular.user),
+                      prefixIcon: Icon(PhosphorIconsRegular.user),
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return '请输入昵称';
@@ -99,7 +99,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       labelText: '邮箱',
-                      prefixIcon: Icon(PhosphorIcons.regular.envelope),
+                      prefixIcon: Icon(PhosphorIconsRegular.envelope),
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return '请输入邮箱';
@@ -114,11 +114,11 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: '密码',
-                      prefixIcon: const Icon(PhosphorIcons.regular.lock),
+                      prefixIcon: const Icon(PhosphorIconsRegular.lock),
                       suffixIcon: IconButton(
                         icon: Icon(_obscurePassword
-                            ? PhosphorIcons.regular.eyeSlash
-                            : PhosphorIcons.regular.eye),
+                            ? PhosphorIconsRegular.eyeSlash
+                            : PhosphorIconsRegular.eye),
                         onPressed: () =>
                             setState(() => _obscurePassword = !_obscurePassword),
                       ),
@@ -136,7 +136,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                     obscureText: true,
                     decoration: const InputDecoration(
                       labelText: '确认密码',
-                      prefixIcon: Icon(PhosphorIcons.regular.lock),
+                      prefixIcon: Icon(PhosphorIconsRegular.lock),
                     ),
                     validator: (v) {
                       if (v != _passwordCtrl.text) return '两次密码不一致';

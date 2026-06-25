@@ -12,7 +12,10 @@ dependencies:
   core:
     path: ../core
   flutter_svg: ^2.0.16
-  phosphor_flutter: ^2.1.0
+  phosphor_flutter:
+    git:
+      url: https://github.com/subarnaPdl/phosphor_icons.git
+      ref: main
   lottie: ^3.1.3
   shimmer: ^3.0.0
   cached_network_image: ^3.4.1

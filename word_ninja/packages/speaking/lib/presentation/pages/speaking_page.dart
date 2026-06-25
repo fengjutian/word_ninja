@@ -37,7 +37,7 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(PhosphorIcons.regular.chatCircle, size: 64, color: NinjaColors.textSecondary),
+              const Icon(PhosphorIconsRegular.chatCircle, size: 64, color: NinjaColors.textSecondary),
               const SizedBox(height: NinjaSpacing.lg),
               Text('$scene 场景', style: NinjaTextStyles.heading2),
               const SizedBox(height: NinjaSpacing.md),
@@ -58,7 +58,7 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
                       const SnackBar(content: Text('语音对话功能需要 STT/TTS 服务，请在设置中配置。'), duration: Duration(seconds: 2)),
                     );
                   },
-                  icon: const Icon(PhosphorIcons.regular.play),
+                  icon: const Icon(PhosphorIconsRegular.play),
                   label: const Text('开始对话'),
                 ),
               ),
@@ -78,10 +78,10 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
         children: [
           Semantics(header: true, child: Text('AI陪练场景', style: NinjaTextStyles.heading2)),
           const SizedBox(height: NinjaSpacing.md),
-          _SceneCard('旅游', PhosphorIcons.regular.airplane, '机场、酒店、问路', () => _openScene('旅游')),
-          _SceneCard('面试', PhosphorIcons.regular.briefcase, '英文面试对话', () => _openScene('面试')),
-          _SceneCard('商务会议', PhosphorIcons.regular.usersThree, '商务谈判、演讲', () => _openScene('商务会议')),
-          _SceneCard('日常聊天', PhosphorIcons.regular.chats, '朋友间的日常对话', () => _openScene('日常聊天')),
+          _SceneCard('旅游', PhosphorIconsRegular.airplane, '机场、酒店、问路', () => _openScene('旅游')),
+          _SceneCard('面试', PhosphorIconsRegular.briefcase, '英文面试对话', () => _openScene('面试')),
+          _SceneCard('商务会议', PhosphorIconsRegular.usersThree, '商务谈判、演讲', () => _openScene('商务会议')),
+          _SceneCard('日常聊天', PhosphorIconsRegular.chats, '朋友间的日常对话', () => _openScene('日常聊天')),
           const SizedBox(height: NinjaSpacing.xl),
           Semantics(header: true, child: Text('发音练习', style: NinjaTextStyles.heading2)),
           const SizedBox(height: NinjaSpacing.md),
@@ -112,7 +112,7 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
                       width: double.infinity,
                       child: ElevatedButton.icon(
                         onPressed: _toggleRecording,
-                        icon: Icon(_isRecording ? PhosphorIcons.regular.stop : PhosphorIcons.regular.microphone),
+                        icon: Icon(_isRecording ? PhosphorIconsRegular.stop : PhosphorIconsRegular.microphone),
                         label: Text(_isRecording ? '停止录音' : '开始录音'),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _isRecording ? NinjaColors.error : null,
@@ -141,7 +141,7 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
             child: const Padding(
               padding: EdgeInsets.all(NinjaSpacing.lg),
               child: Row(children: [
-                Icon(PhosphorIcons.regular.info, color: NinjaColors.info),
+                Icon(PhosphorIconsRegular.info, color: NinjaColors.info),
                 SizedBox(width: NinjaSpacing.md),
                 Expanded(child: Text('语音识别和评测需要设备麦克风权限和 STT 服务支持。当前版本提供演示体验。',
                     style: TextStyle(fontSize: 13, color: NinjaColors.textSecondary))),
@@ -170,7 +170,7 @@ class _SceneCard extends StatelessWidget {
         leading: Icon(icon, color: NinjaColors.primary, size: 28),
         title: Text(title, style: NinjaTextStyles.heading3),
         subtitle: Text(desc, style: NinjaTextStyles.bodySmall),
-        trailing: const Icon(PhosphorIcons.regular.caretRight, size: 16),
+        trailing: const Icon(PhosphorIconsRegular.caretRight, size: 16),
         onTap: onTap,
       ),
     );

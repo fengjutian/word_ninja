@@ -66,18 +66,18 @@ class NinjaIcon extends StatelessWidget {
   /// 每个忍者图标的 Material 回退图标（SVG 加载失败时使用）
   static IconData? _fallbackIcon(String name) {
     return switch (name) {
-      'shuriken'    => PhosphorIcons.regular.star,
-      'scroll'      => PhosphorIcons.regular.bookOpen,
-      'ninja_head'  => PhosphorIcons.regular.user,
-      'chat_bubble' => PhosphorIcons.regular.chats,
-      'trophy'      => PhosphorIcons.regular.trophy,
-      'coin'        => PhosphorIcons.regular.coin,
-      'headphone'   => PhosphorIcons.regular.headphones,
-      'mic'         => PhosphorIcons.regular.microphone,
-      'mountain'    => PhosphorIcons.regular.mountains,
-      'sword'       => PhosphorIcons.regular.barbell,
-      'pen'         => PhosphorIcons.regular.pencilSimple,
-      'calendar'    => PhosphorIcons.regular.calendar,
+      'shuriken'    => PhosphorIconsRegular.star,
+      'scroll'      => PhosphorIconsRegular.bookOpen,
+      'ninja_head'  => PhosphorIconsRegular.user,
+      'chat_bubble' => PhosphorIconsRegular.chats,
+      'trophy'      => PhosphorIconsRegular.trophy,
+      'coin'        => PhosphorIconsRegular.coin,
+      'headphone'   => PhosphorIconsRegular.headphones,
+      'mic'         => PhosphorIconsRegular.microphone,
+      'mountain'    => PhosphorIconsRegular.mountains,
+      'sword'       => PhosphorIconsRegular.barbell,
+      'pen'         => PhosphorIconsRegular.pencilSimple,
+      'calendar'    => PhosphorIconsRegular.calendar,
       _             => null,
     };
   }

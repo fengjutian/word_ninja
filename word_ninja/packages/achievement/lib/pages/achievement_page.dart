@@ -127,7 +127,7 @@ class AchievementPage extends ConsumerWidget {
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Row(mainAxisSize: MainAxisSize.min, children: [
-                            const Icon(PhosphorIcons.regular.check, size: 12, color: NinjaColors.success),
+                            const Icon(PhosphorIconsRegular.check, size: 12, color: NinjaColors.success),
                             const SizedBox(width: 2),
                             Text('已完成', style: TextStyle(fontSize: 10, color: NinjaColors.success, fontWeight: FontWeight.w600)),
                           ]),

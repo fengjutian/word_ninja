@@ -40,7 +40,7 @@ class WordNinjaApp extends ConsumerWidget {
                 : Colors.grey.shade400,
             onPressed: DebugOverlay.toggleAll,
             child: Icon(
-              DebugOverlay.isActive ? PhosphorIcons.regular.eye : PhosphorIcons.regular.eyeSlash,
+              DebugOverlay.isActive ? PhosphorIconsRegular.eye : PhosphorIconsRegular.eyeSlash,
               size: 20,
             ),
           ),

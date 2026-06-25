@@ -132,7 +132,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
             const Spacer(),
             if (_lastError != null)
               IconButton(
-                icon: const Icon(PhosphorIcons.regular.arrowsClockwise, size: 18, color: Colors.white70),
+                icon: const Icon(PhosphorIconsRegular.arrowsClockwise, size: 18, color: Colors.white70),
                 tooltip: '重试',
                 onPressed: _retry,
               ),
@@ -171,7 +171,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(PhosphorIcons.regular.microphone, color: NinjaColors.primary),
+                    icon: const Icon(PhosphorIconsRegular.microphone, color: NinjaColors.primary),
                     tooltip: '语音输入（即将上线）',
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -198,7 +198,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                     child: CircleAvatar(
                       backgroundColor: _isLoading ? NinjaColors.textSecondary : NinjaColors.primary,
                       child: IconButton(
-                        icon: Icon(PhosphorIcons.regular.paperPlaneTilt, color: Colors.white, size: 18),
+                        icon: Icon(PhosphorIconsRegular.paperPlaneTilt, color: Colors.white, size: 18),
                         onPressed: _isLoading ? null : _sendMessage,
                       ),
                     ),

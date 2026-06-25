@@ -94,7 +94,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     keyboardType: TextInputType.emailAddress,
                     decoration: const InputDecoration(
                       labelText: '邮箱',
-                      prefixIcon: Icon(PhosphorIcons.regular.envelope),
+                      prefixIcon: Icon(PhosphorIconsRegular.envelope),
                     ),
                     validator: (v) {
                       if (v == null || v.trim().isEmpty) return '请输入邮箱';
@@ -110,11 +110,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     obscureText: _obscurePassword,
                     decoration: InputDecoration(
                       labelText: '密码',
-                      prefixIcon: const Icon(PhosphorIcons.regular.lock),
+                      prefixIcon: const Icon(PhosphorIconsRegular.lock),
                       suffixIcon: IconButton(
                         icon: Icon(_obscurePassword
-                            ? PhosphorIcons.regular.eyeSlash
-                            : PhosphorIcons.regular.eye),
+                            ? PhosphorIconsRegular.eyeSlash
+                            : PhosphorIconsRegular.eye),
                         onPressed: () =>
                             setState(() => _obscurePassword = !_obscurePassword),
                       ),

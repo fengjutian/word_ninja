@@ -156,7 +156,7 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                       icon: _isGenerating
                           ? const SizedBox.square(
                               dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Icon(PhosphorIcons.regular.sparkle),
+                          : const Icon(PhosphorIconsRegular.sparkle),
                       label: Text(_isGenerating ? '生成中...' : '生成范文'),
                     ),
                   ),
@@ -200,7 +200,7 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                           icon: _isCorrecting
                               ? const SizedBox.square(
                                   dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                              : const Icon(PhosphorIcons.regular.chatCircleText),
+                              : const Icon(PhosphorIconsRegular.chatCircleText),
                           label: Text(_isCorrecting ? '批改中...' : 'AI批改'),
                         ),
                       ),
@@ -211,7 +211,7 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                           icon: _isScoring
                               ? const SizedBox.square(
                                   dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                              : const Icon(PhosphorIcons.regular.graduationCap),
+                              : const Icon(PhosphorIconsRegular.graduationCap),
                           label: Text(_isScoring ? '评分中...' : 'IELTS评分'),
                           style: ElevatedButton.styleFrom(backgroundColor: NinjaColors.accentGold),
                         ),

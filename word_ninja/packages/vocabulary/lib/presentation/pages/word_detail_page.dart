@@ -19,12 +19,12 @@ class WordDetailPage extends ConsumerWidget {
         title: Text(word.word),
         actions: [
           IconButton(
-            icon: const Icon(PhosphorIcons.regular.pencilSimple),
+            icon: const Icon(PhosphorIconsRegular.pencilSimple),
             tooltip: '编辑单词',
             onPressed: () => context.push('/vocabulary/edit/${word.id}'),
           ),
           IconButton(
-            icon: const Icon(PhosphorIcons.regular.trash),
+            icon: const Icon(PhosphorIconsRegular.trash),
             tooltip: '删除单词',
             onPressed: () => _confirmDelete(context, ref),
           ),

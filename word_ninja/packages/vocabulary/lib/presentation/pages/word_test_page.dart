@@ -149,7 +149,7 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(PhosphorIcons.regular.brain, size: 64, color: NinjaColors.textSecondary),
+              Icon(PhosphorIconsRegular.brain, size: 64, color: NinjaColors.textSecondary),
               SizedBox(height: 16),
               Text('需要至少 2 个单词才能开始测试', style: NinjaTextStyles.bodyLarge),
             ],
@@ -233,9 +233,9 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
                               child: Text(option, style: NinjaTextStyles.bodyLarge),
                             ),
                             if (_showResult && isCorrect)
-                              const Icon(PhosphorIcons.regular.checkCircle, color: NinjaColors.success),
+                              const Icon(PhosphorIconsRegular.checkCircle, color: NinjaColors.success),
                             if (_showResult && isSelected && !isCorrect)
-                              const Icon(PhosphorIcons.regular.xCircle, color: NinjaColors.error),
+                              const Icon(PhosphorIconsRegular.xCircle, color: NinjaColors.error),
                           ],
                         ),
                       ),

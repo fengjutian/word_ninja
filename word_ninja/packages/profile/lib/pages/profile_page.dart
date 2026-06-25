@@ -65,7 +65,7 @@ class ProfilePage extends ConsumerWidget {
 
           // 功能列表
           _MenuItem(
-            const Icon(PhosphorIcons.regular.gear, size: 20, color: NinjaColors.primary),
+            const Icon(PhosphorIconsRegular.gear, size: 20, color: NinjaColors.primary),
             '设置',
             () => context.push('/settings'),
           ),
@@ -75,7 +75,7 @@ class ProfilePage extends ConsumerWidget {
             () => context.push('/membership'),
           ),
           _MenuItem(
-            const Icon(PhosphorIcons.regular.arrowsClockwise, size: 20, color: NinjaColors.primary),
+            const Icon(PhosphorIconsRegular.arrowsClockwise, size: 20, color: NinjaColors.primary),
             '数据同步',
             () async {
               final syncService = ref.read(syncProvider);
@@ -88,12 +88,12 @@ class ProfilePage extends ConsumerWidget {
             },
           ),
           _MenuItem(
-            const Icon(PhosphorIcons.regular.trophy, size: 20, color: NinjaColors.primary),
+            const Icon(PhosphorIconsRegular.trophy, size: 20, color: NinjaColors.primary),
             '成就中心',
             () => context.push('/achievement'),
           ),
           _MenuItem(
-            const Icon(PhosphorIcons.regular.info, size: 20, color: NinjaColors.primary),
+            const Icon(PhosphorIconsRegular.info, size: 20, color: NinjaColors.primary),
             '关于 Word Ninja',
             () => _showAboutDialog(context),
           ),
@@ -187,7 +187,7 @@ class _MenuItem extends StatelessWidget {
           child: Center(child: icon),
         ),
         title: Text(title, style: NinjaTextStyles.bodyMedium),
-        trailing: const Icon(PhosphorIcons.regular.caretRight, size: 18, color: NinjaColors.textSecondary),
+        trailing: const Icon(PhosphorIconsRegular.caretRight, size: 18, color: NinjaColors.textSecondary),
         onTap: onTap,
       ),
     );

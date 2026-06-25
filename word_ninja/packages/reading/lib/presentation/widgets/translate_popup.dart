@@ -46,7 +46,7 @@ class TranslatePopup extends ConsumerWidget {
                       SnackBar(content: Text('「$word」已加入单词本')),
                     );
                   },
-                  icon: const Icon(PhosphorIcons.regular.bookmarkSimple, size: 16),
+                  icon: const Icon(PhosphorIconsRegular.bookmarkSimple, size: 16),
                   label: const Text('加入单词本'),
                 ),
                 const Spacer(),
@@ -56,7 +56,7 @@ class TranslatePopup extends ConsumerWidget {
                       SnackBar(content: Text('正在AI解析「$word」...')),
                     );
                   },
-                  icon: const Icon(PhosphorIcons.regular.sparkle, size: 16),
+                  icon: const Icon(PhosphorIconsRegular.sparkle, size: 16),
                   label: const Text('AI解析'),
                 ),
               ],

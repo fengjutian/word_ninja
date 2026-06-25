@@ -292,12 +292,12 @@ class _HomeTab extends StatelessWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(PhosphorIcons.regular.trophy),
+            icon: const Icon(PhosphorIconsRegular.trophy),
             tooltip: '成就',
             onPressed: () => context.push(AppRoutes.achievement),
           ),
           IconButton(
-            icon: const Icon(PhosphorIcons.regular.medal),
+            icon: const Icon(PhosphorIconsRegular.medal),
             tooltip: '排行榜',
             onPressed: () => context.push(AppRoutes.leaderboard),
           ),
@@ -311,7 +311,7 @@ class _HomeTab extends StatelessWidget {
           const SizedBox(height: NinjaSpacing.lg),
 
           // 今日任务
-          SectionHeader(title: '今日任务', icon: const Icon(PhosphorIcons.regular.checkSquare, size: 18, color: NinjaColors.primary)),
+          SectionHeader(title: '今日任务', icon: const Icon(PhosphorIconsRegular.checkSquare, size: 18, color: NinjaColors.primary)),
           const SizedBox(height: NinjaSpacing.sm),
           _TaskItem(
             icon: NinjaIcon.scroll(size: 20, color: NinjaColors.primary),
@@ -570,7 +570,7 @@ class _TaskItemState extends State<_TaskItem> with SingleTickerProviderStateMixi
               child: Center(child: widget.icon),
             ),
             title: Text(widget.title, style: NinjaTextStyles.bodyMedium),
-            trailing: const Icon(PhosphorIcons.regular.caretRight, size: 18, color: NinjaColors.textSecondary),
+            trailing: const Icon(PhosphorIconsRegular.caretRight, size: 18, color: NinjaColors.textSecondary),
             onTap: () => context.push(widget.route),
           ),
         ),

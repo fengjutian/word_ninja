@@ -77,12 +77,12 @@ class _AdminDashboardState extends State<AdminDashboard> {
             )
           else
             IconButton(
-              icon: const Icon(PhosphorIcons.regular.arrowsClockwise),
+              icon: const Icon(PhosphorIconsRegular.arrowsClockwise),
               tooltip: '刷新数据',
               onPressed: _refreshStats,
             ),
           IconButton(
-            icon: const Icon(PhosphorIcons.regular.signOut),
+            icon: const Icon(PhosphorIconsRegular.signOut),
             tooltip: '退出',
             onPressed: () {
               ScaffoldMessenger.of(context).showSnackBar(
@@ -99,10 +99,10 @@ class _AdminDashboardState extends State<AdminDashboard> {
             onDestinationSelected: (i) => setState(() => _selectedIndex = i),
             labelType: NavigationRailLabelType.all,
             destinations: const [
-              NavigationRailDestination(icon: Icon(PhosphorIcons.regular.squaresFour), label: Text('概览')),
-              NavigationRailDestination(icon: Icon(PhosphorIcons.regular.users), label: Text('用户')),
-              NavigationRailDestination(icon: Icon(PhosphorIcons.regular.bookOpen), label: Text('单词')),
-              NavigationRailDestination(icon: Icon(PhosphorIcons.regular.gear), label: Text('设置')),
+              NavigationRailDestination(icon: Icon(PhosphorIconsRegular.squaresFour), label: Text('概览')),
+              NavigationRailDestination(icon: Icon(PhosphorIconsRegular.users), label: Text('用户')),
+              NavigationRailDestination(icon: Icon(PhosphorIconsRegular.bookOpen), label: Text('单词')),
+              NavigationRailDestination(icon: Icon(PhosphorIconsRegular.gear), label: Text('设置')),
             ],
           ),
           const VerticalDivider(width: 1),
@@ -151,12 +151,12 @@ class _DashboardTab extends StatelessWidget {
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
       children: [
-        _StatCard('总用户', userCount, PhosphorIcons.regular.users, Colors.blue),
-        _StatCard('单词总数', wordCount, PhosphorIcons.regular.bookOpen, Colors.green),
-        _StatCard('今日活跃', activeToday, PhosphorIcons.regular.trendUp, Colors.orange),
-        _StatCard('会员数', memberCount, PhosphorIcons.regular.star, Colors.purple),
-        _StatCard('AI对话', '12,345', PhosphorIcons.regular.chats, Colors.teal),
-        _StatCard('同步请求', '89,012', PhosphorIcons.regular.arrowsClockwise, Colors.indigo),
+        _StatCard('总用户', userCount, PhosphorIconsRegular.users, Colors.blue),
+        _StatCard('单词总数', wordCount, PhosphorIconsRegular.bookOpen, Colors.green),
+        _StatCard('今日活跃', activeToday, PhosphorIconsRegular.trendUp, Colors.orange),
+        _StatCard('会员数', memberCount, PhosphorIconsRegular.star, Colors.purple),
+        _StatCard('AI对话', '12,345', PhosphorIconsRegular.chats, Colors.teal),
+        _StatCard('同步请求', '89,012', PhosphorIconsRegular.arrowsClockwise, Colors.indigo),
       ],
     );
   }
@@ -199,7 +199,7 @@ class _UsersTab extends StatelessWidget {
       children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('用户管理', style: Theme.of(context).textTheme.headlineSmall),
-          TextButton.icon(onPressed: onRefresh, icon: const Icon(PhosphorIcons.regular.arrowsClockwise, size: 18), label: const Text('刷新')),
+          TextButton.icon(onPressed: onRefresh, icon: const Icon(PhosphorIconsRegular.arrowsClockwise, size: 18), label: const Text('刷新')),
         ]),
         const SizedBox(height: 16),
         Card(
@@ -227,8 +227,8 @@ class _UsersTab extends StatelessWidget {
     DataCell(Text('$level')),
     DataCell(Text('$exp')),
     DataCell(Row(children: [
-      IconButton(icon: const Icon(PhosphorIcons.regular.pencilSimple, size: 18), onPressed: () {}),
-      IconButton(icon: const Icon(PhosphorIcons.regular.trash, size: 18, color: Colors.red), onPressed: () {}),
+      IconButton(icon: const Icon(PhosphorIconsRegular.pencilSimple, size: 18), onPressed: () {}),
+      IconButton(icon: const Icon(PhosphorIconsRegular.trash, size: 18, color: Colors.red), onPressed: () {}),
     ])),
   ]);
 }
@@ -245,8 +245,8 @@ class _WordsTab extends StatelessWidget {
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Text('单词管理', style: Theme.of(context).textTheme.headlineSmall),
           Row(children: [
-            TextButton.icon(onPressed: onRefresh, icon: const Icon(PhosphorIcons.regular.arrowsClockwise, size: 18), label: const Text('刷新')),
-            FilledButton.icon(onPressed: () {}, icon: const Icon(PhosphorIcons.regular.plus, size: 18), label: const Text('添加单词')),
+            TextButton.icon(onPressed: onRefresh, icon: const Icon(PhosphorIconsRegular.arrowsClockwise, size: 18), label: const Text('刷新')),
+            FilledButton.icon(onPressed: () {}, icon: const Icon(PhosphorIconsRegular.plus, size: 18), label: const Text('添加单词')),
           ]),
         ]),
         const SizedBox(height: 16),
@@ -279,8 +279,8 @@ class _WordsTab extends StatelessWidget {
       Text('$mastery%'),
     ])),
     DataCell(Row(children: [
-      IconButton(icon: const Icon(PhosphorIcons.regular.pencilSimple, size: 18), onPressed: () {}),
-      IconButton(icon: const Icon(PhosphorIcons.regular.trash, size: 18, color: Colors.red), onPressed: () {}),
+      IconButton(icon: const Icon(PhosphorIconsRegular.pencilSimple, size: 18), onPressed: () {}),
+      IconButton(icon: const Icon(PhosphorIconsRegular.trash, size: 18, color: Colors.red), onPressed: () {}),
     ])),
   ]);
 }
@@ -301,7 +301,7 @@ class _SettingsTab extends StatelessWidget {
             SwitchListTile(title: const Text('允许新用户注册'), value: true, onChanged: (_) {}),
             SwitchListTile(title: const Text('AI 服务开关'), value: true, onChanged: (_) {}),
             SwitchListTile(title: const Text('调试模式'), value: false, onChanged: (_) {}),
-            ListTile(title: const Text('API 限流'), subtitle: const Text('当前: 100 req/min'), trailing: const Icon(PhosphorIcons.regular.caretRight), onTap: () {}),
+            ListTile(title: const Text('API 限流'), subtitle: const Text('当前: 100 req/min'), trailing: const Icon(PhosphorIconsRegular.caretRight), onTap: () {}),
             ListTile(title: const Text('缓存管理'), subtitle: const Text('当前缓存: 256 MB'), trailing: TextButton(onPressed: () {}, child: const Text('清除'))),
           ]),
         ),

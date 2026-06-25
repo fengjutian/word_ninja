@@ -116,7 +116,7 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
                       icon: _isGenerating
                           ? const SizedBox.square(
                               dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Icon(PhosphorIcons.regular.sparkle),
+                          : const Icon(PhosphorIconsRegular.sparkle),
                       label: Text(_isGenerating ? 'AI 生成中...' : 'AI生成计划'),
                     ),
                   ),

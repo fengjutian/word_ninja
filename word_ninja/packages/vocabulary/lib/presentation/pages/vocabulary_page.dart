@@ -72,7 +72,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
             : const Text('单词修炼'),
         actions: [
           IconButton(
-            icon: Icon(_isSearching ? PhosphorIcons.regular.x : PhosphorIcons.regular.magnifyingGlass),
+            icon: Icon(_isSearching ? PhosphorIconsRegular.x : PhosphorIconsRegular.magnifyingGlass),
             onPressed: () => setState(() {
               _isSearching = !_isSearching;
               if (!_isSearching) {
@@ -88,7 +88,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
       floatingActionButton: FloatingActionButton(
         onPressed: () => context.push('/vocabulary/add'),
         backgroundColor: NinjaColors.primary,
-        child: const Icon(PhosphorIcons.regular.plus, color: Colors.white),
+        child: const Icon(PhosphorIconsRegular.plus, color: Colors.white),
       ),
     );
   }
@@ -103,7 +103,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(PhosphorIcons.regular.warningCircle, size: 48, color: NinjaColors.error),
+            const Icon(PhosphorIconsRegular.warningCircle, size: 48, color: NinjaColors.error),
             const SizedBox(height: NinjaSpacing.md),
             Text(state.error!, style: NinjaTextStyles.bodyMedium),
             const SizedBox(height: NinjaSpacing.lg),
@@ -122,7 +122,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(PhosphorIcons.regular.bookOpen, size: 64, color: NinjaColors.textSecondary),
+            const Icon(PhosphorIconsRegular.bookOpen, size: 64, color: NinjaColors.textSecondary),
             const SizedBox(height: NinjaSpacing.md),
             Text('还没有单词', style: NinjaTextStyles.heading3),
             const SizedBox(height: NinjaSpacing.sm),

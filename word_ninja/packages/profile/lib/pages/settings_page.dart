@@ -46,7 +46,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
         children: [
           const Text('学习设置', style: NinjaTextStyles.heading3),
           _SliderTile(
-            '每日单词目标', '$_dailyWordGoal 词', PhosphorIcons.regular.bookOpen,
+            '每日单词目标', '$_dailyWordGoal 词', PhosphorIconsRegular.bookOpen,
             value: _dailyWordGoal.toDouble(), min: 5, max: 100, divisions: 19,
             onChanged: (v) {
               setState(() => _dailyWordGoal = v.round());
@@ -54,7 +54,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
           _SliderTile(
-            '每日阅读目标', '$_dailyReadingGoal 篇', PhosphorIcons.regular.books,
+            '每日阅读目标', '$_dailyReadingGoal 篇', PhosphorIconsRegular.books,
             value: _dailyReadingGoal.toDouble(), min: 1, max: 10, divisions: 9,
             onChanged: (v) {
               setState(() => _dailyReadingGoal = v.round());
@@ -62,7 +62,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
           _SliderTile(
-            'AI对话时长', '$_aiDuration 分钟', PhosphorIcons.regular.timer,
+            'AI对话时长', '$_aiDuration 分钟', PhosphorIconsRegular.timer,
             value: _aiDuration.toDouble(), min: 5, max: 60, divisions: 11,
             onChanged: (v) {
               setState(() => _aiDuration = v.round());
@@ -70,7 +70,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
           SwitchListTile(
-            secondary: const Icon(PhosphorIcons.regular.bell, color: NinjaColors.textSecondary),
+            secondary: const Icon(PhosphorIconsRegular.bell, color: NinjaColors.textSecondary),
             title: const Text('复习提醒'),
             subtitle: Text(_reminderEnabled ? '每天 20:00' : '已关闭'),
             value: _reminderEnabled,
@@ -82,7 +82,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           const SizedBox(height: NinjaSpacing.lg),
           const Text('显示设置', style: NinjaTextStyles.heading3),
           SwitchListTile(
-            secondary: const Icon(PhosphorIcons.regular.moon, color: NinjaColors.textSecondary),
+            secondary: const Icon(PhosphorIconsRegular.moon, color: NinjaColors.textSecondary),
             title: const Text('深色模式'),
             subtitle: Text(_darkMode ? '已开启' : '跟随系统'),
             value: _darkMode,
@@ -92,7 +92,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             },
           ),
           _DropdownTile(
-            '字体大小', PhosphorIcons.regular.textAa,
+            '字体大小', PhosphorIconsRegular.textAa,
             value: _fontSize,
             items: const {0.8: '小', 1.0: '标准', 1.2: '大', 1.4: '特大'},
             onChanged: (v) {
@@ -103,7 +103,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           const SizedBox(height: NinjaSpacing.lg),
           const Text('其他', style: NinjaTextStyles.heading3),
           ListTile(
-            leading: const Icon(PhosphorIcons.regular.database, color: NinjaColors.textSecondary),
+            leading: const Icon(PhosphorIconsRegular.database, color: NinjaColors.textSecondary),
             title: const Text('清除缓存'),
             trailing: TextButton(
               onPressed: () {
@@ -115,9 +115,9 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             ),
           ),
           ListTile(
-            leading: const Icon(PhosphorIcons.regular.question, color: NinjaColors.textSecondary),
+            leading: const Icon(PhosphorIconsRegular.question, color: NinjaColors.textSecondary),
             title: const Text('帮助与反馈'),
-            trailing: const Icon(PhosphorIcons.regular.caretRight, size: 18),
+            trailing: const Icon(PhosphorIconsRegular.caretRight, size: 18),
             onTap: () {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('帮助中心即将上线')),

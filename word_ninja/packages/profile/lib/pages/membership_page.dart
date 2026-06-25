@@ -21,7 +21,7 @@ class MembershipPage extends ConsumerWidget {
         children: [
           const SizedBox(height: NinjaSpacing.xl),
           const Center(
-            child: Icon(PhosphorIcons.regular.star, size: 64, color: NinjaColors.accentGold),
+            child: Icon(PhosphorIconsRegular.star, size: 64, color: NinjaColors.accentGold),
           ),
           const SizedBox(height: NinjaSpacing.md),
           const Center(
@@ -36,11 +36,11 @@ class MembershipPage extends ConsumerWidget {
             ),
           const SizedBox(height: NinjaSpacing.xxl),
 
-          _BenefitTile(PhosphorIcons.regular.sparkle, '无限AI对话', '不受限制地使用AI导师'),
-          _BenefitTile(PhosphorIcons.regular.cloudArrowUp, '云同步', '多端数据实时同步'),
-          _BenefitTile(PhosphorIcons.regular.microphoneStage, '口语评分', 'AI发音评测'),
-          _BenefitTile(PhosphorIcons.regular.chartBar, '详细统计', '学习数据深度分析'),
-          _BenefitTile(PhosphorIcons.regular.eye, '无广告', '纯净学习体验'),
+          _BenefitTile(PhosphorIconsRegular.sparkle, '无限AI对话', '不受限制地使用AI导师'),
+          _BenefitTile(PhosphorIconsRegular.cloudArrowUp, '云同步', '多端数据实时同步'),
+          _BenefitTile(PhosphorIconsRegular.microphoneStage, '口语评分', 'AI发音评测'),
+          _BenefitTile(PhosphorIconsRegular.chartBar, '详细统计', '学习数据深度分析'),
+          _BenefitTile(PhosphorIconsRegular.eye, '无广告', '纯净学习体验'),
 
           const SizedBox(height: NinjaSpacing.xxl),
           Card(

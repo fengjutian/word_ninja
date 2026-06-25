@@ -7,7 +7,10 @@ environment:
   sdk: ^3.5.0
 
 dependencies:
-  phosphor_flutter: 2.1.0
+  phosphor_flutter:
+    git:
+      url: https://github.com/subarnaPdl/phosphor_icons.git
+      ref: main
   flutter:
     sdk: flutter
   core:

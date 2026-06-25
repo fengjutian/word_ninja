@@ -32,7 +32,7 @@ class WordNinjaDesktopApp extends StatelessWidget {
         heroTag: '__debug_toggle__',  
         backgroundColor: DebugOverlay.isActive ? Colors.lightGreen : Colors.grey.shade400,  
         onPressed: DebugOverlay.toggleAll,  
-        child: Icon(DebugOverlay.isActive ? PhosphorIcons.regular.eye : PhosphorIcons.regular.eyeSlash, size: 20),  
+        child: Icon(DebugOverlay.isActive ? PhosphorIconsRegular.eye : PhosphorIconsRegular.eyeSlash, size: 20),  
       )),  
     ]);  
   }  
@@ -78,9 +78,9 @@ class DesktopShell extends StatelessWidget {
           child: Text('??', style: TextStyle(fontSize: 24)),  
         ), 
         destinations: const [  
-          NavigationRailDestination(icon: Icon(PhosphorIcons.regular.house), selectedIcon: Icon(PhosphorIcons.regular.house), label: Text('Home')),  
-          NavigationRailDestination(icon: Icon(PhosphorIcons.regular.bookOpen), selectedIcon: Icon(PhosphorIcons.regular.bookOpen), label: Text('Vocab')),  
-          NavigationRailDestination(icon: Icon(PhosphorIcons.regular.books), selectedIcon: Icon(PhosphorIcons.regular.books), label: Text('Reading')),  
+          NavigationRailDestination(icon: Icon(PhosphorIconsRegular.house), selectedIcon: Icon(PhosphorIconsRegular.house), label: Text('Home')),  
+          NavigationRailDestination(icon: Icon(PhosphorIconsRegular.bookOpen), selectedIcon: Icon(PhosphorIconsRegular.bookOpen), label: Text('Vocab')),  
+          NavigationRailDestination(icon: Icon(PhosphorIconsRegular.books), selectedIcon: Icon(PhosphorIconsRegular.books), label: Text('Reading')),  
         ], 
       ),  
       const VerticalDivider(width: 1),  

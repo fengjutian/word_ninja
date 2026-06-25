@@ -100,7 +100,7 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
                     ? const SizedBox(
                         width: 18, height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Icon(PhosphorIcons.regular.sparkle),
+                    : const Icon(PhosphorIconsRegular.sparkle),
                 label: Text(_isAiLoading ? 'AI 补全中...' : 'AI 智能补全'),
               ),
             ],
