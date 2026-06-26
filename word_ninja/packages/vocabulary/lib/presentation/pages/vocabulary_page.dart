@@ -8,6 +8,7 @@ import 'package:ui_kit/loading/ninja_loading.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
 import '../providers/word_provider.dart';
+import 'add_word_page.dart';
 
 /// 单词本主页面 — 单词修炼
 class VocabularyPage extends ConsumerStatefulWidget {
@@ -102,7 +103,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
       ),
       body: _buildBody(state),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => context.push('/vocabulary/add'),
+        onPressed: () => AddWordPage.showAsBottomSheet(context),
         backgroundColor: NinjaColors.primary,
         child: const Icon(PhosphorIconsRegular.plus, color: Colors.white),
       ),
