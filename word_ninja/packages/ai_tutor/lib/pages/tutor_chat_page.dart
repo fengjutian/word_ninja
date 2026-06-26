@@ -124,15 +124,15 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text('Sensei Shell', style: TextStyle(fontSize: 16)),
+                  Text('Sensei Shell', style: NinjaTextStyles.titleMedium.copyWith(color: Colors.white)),
                 Text(_isLoading ? '输入中...' : '在线',
-                    style: TextStyle(fontSize: 12, color: _isLoading ? Colors.orange.shade200 : Colors.white70)),
+                    style: TextStyle(fontSize: 12, color: _isLoading ? NinjaColors.warning : NinjaColors.textOnDark.withValues(alpha: 0.7))),
               ],
             ),
             const Spacer(),
             if (_lastError != null)
               IconButton(
-                icon: const Icon(PhosphorIconsRegular.arrowsClockwise, size: 18, color: Colors.white70),
+                icon: Icon(PhosphorIconsRegular.arrowsClockwise, size: 18, color: NinjaColors.textOnDark.withValues(alpha: 0.7)),
                 tooltip: '重试',
                 onPressed: _retry,
               ),
@@ -158,10 +158,10 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
           Container(
             padding: const EdgeInsets.all(NinjaSpacing.md),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: NinjaColors.surface,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.05),
+                  color: NinjaColors.divider.withValues(alpha: 0.3),
                   blurRadius: 8,
                   offset: const Offset(0, -2),
                 ),

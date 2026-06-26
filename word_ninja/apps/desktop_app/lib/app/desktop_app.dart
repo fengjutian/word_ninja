@@ -2,10 +2,13 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/foundation.dart';  
 import 'package:flutter/material.dart'; 
 import 'package:go_router/go_router.dart'; 
+import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ui_kit/ninja_theme/theme_data.dart'; 
+import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
 import 'package:vocabulary/presentation/pages/vocabulary_page.dart'; 
 import 'package:reading/presentation/pages/reader_page.dart'; 
-import '../debug_overlay.dart'; 
+import '../debug_overlay.dart';
+import 'package:window_manager/window_manager.dart';
   
 /// Desktop app root widget 
 class WordNinjaDesktopApp extends StatelessWidget { 
@@ -61,14 +64,16 @@ GoRouter createDesktopRouter() {
   );  
 } 
   
-/// Desktop shell with left navigation rail  
+/// Desktop shell with left navigation rail and custom title bar
 class DesktopShell extends StatelessWidget {  
   final Widget child;  
   const DesktopShell({super.key, required this.child});  
   
   @override  
   Widget build(BuildContext context) {  
-    return Row(children: [  
+    return Column(children: [  
+      _buildTitleBar(context),  
+      Expanded(child: Row(children: [  
       NavigationRail(  
         selectedIndex: _calcIndex(context),  
         onDestinationSelected: (i) => _navigate(context, i), 
@@ -85,9 +90,50 @@ class DesktopShell extends StatelessWidget {
       ),  
       const VerticalDivider(width: 1),  
       Expanded(child: child),  
+    ])),  
     ]);  
+  }  
+  // --- Ninja Title Bar ---  
+  Widget _buildTitleBar(BuildContext context) {  
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    return GestureDetector(  
+      onDoubleTap: () => windowManager.isMaximized().then(  
+        (m) => m ? windowManager.unmaximize() : windowManager.maximize(),  
+      ),  
+      onPanStart: (_) => windowManager.startDragging(),  
+      child: Container(  
+        height: 36, 
+        color: isDark ? NinjaColors.surfaceDark : NinjaColors.surface,  
+        child: Row(children: [  
+          Padding(  
+            padding: EdgeInsets.only(left: 12),  
+            child: Row(children: [  
+              Text('\u{1F977}', style: TextStyle(fontSize: 18, color: isDark ? NinjaColors.textOnDark : NinjaColors.textPrimary)),  
+              SizedBox(width: 8),  
+              Text('Word Ninja', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: isDark ? NinjaColors.textOnDark : NinjaColors.textPrimary)),  
+            ]),  
+          ), 
+          const Spacer(),  
+          _WindowBtn(icon: Icons.visibility_off_outlined, tooltip: 'Hide', isDark: isDark, onTap: () => windowManager.hide()),  
+          _WindowBtn(icon: Icons.minimize_rounded, tooltip: 'Minimize', isDark: isDark, onTap: () => windowManager.minimize()),  
+          _WindowBtn(icon: Icons.crop_square_rounded, tooltip: 'Maximize', isDark: isDark, onTap: () => windowManager.isMaximized().then((m) => m ? windowManager.unmaximize() : windowManager.maximize())),  
+          _WindowBtn(icon: Icons.close_rounded, tooltip: 'Close', isDark: isDark, isClose: true, onTap: () => windowManager.close()),  
+        ]),  
+      ),  
+    );  
   } 
   
+  Widget _WindowBtn({required IconData icon, required String tooltip, required VoidCallback onTap, required bool isDark, bool isClose = false}) {  
+    return Tooltip(  
+      message: tooltip,  
+      child: InkWell(  
+        onTap: onTap,  
+        child: Container(width: 46, height: 36, alignment: Alignment.center, child: Icon(icon, size: 18, color: isDark ? NinjaColors.textOnDark : NinjaColors.textPrimary)),  
+        hoverColor: isClose ? NinjaColors.primary : NinjaColors.divider.withValues(alpha: 0.3),  
+      ),  
+    );  
+  }  
+
   int _calcIndex(BuildContext context) {  
     final uri = GoRouterState.of(context).uri.toString();  
     if (uri.startsWith(DesktopRoutes.vocabulary)) return 1;  
@@ -108,8 +154,20 @@ class _DesktopHome extends StatelessWidget {
   const _DesktopHome();  
   @override  
   Widget build(BuildContext context) {  
-    return const Scaffold(  
-      body: Center(child: Text('Word Ninja Desktop', style: TextStyle(fontSize: 24))),  
+    return Scaffold(
+      backgroundColor: NinjaColors.background,
+      body: Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            NinjaIcon.shuriken(size: 64, color: NinjaColors.primary),
+            const SizedBox(height: NinjaSpacing.lg),
+            Text('Word Ninja', style: NinjaTextStyles.displayMedium),
+            const SizedBox(height: NinjaSpacing.sm),
+            Text('你的 AI 英语忍者修炼之路', style: NinjaTextStyles.bodyLarge),
+          ],
+        ),
+      ),
     );  
   }  
 } 
