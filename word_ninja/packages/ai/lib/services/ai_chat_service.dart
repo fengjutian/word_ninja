@@ -1,18 +1,25 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:core/logger/logger.dart';
+import '../config/model_config.dart';
 
-/// OpenAI Chat 服务
+/// OpenAI / DeepSeek Chat 服务
 class AiChatService {
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: 'https://api.openai.com/v1',
-    connectTimeout: const Duration(seconds: 30),
-    receiveTimeout: const Duration(seconds: 60),
-  ));
-
+  final Dio _dio;
   final String _apiKey;
+  final String _modelName;
+  final double _temperature;
+  final int _maxTokens;
 
-  AiChatService(this._apiKey) {
+  AiChatService(this._apiKey, {ModelConfig? config})
+      : _modelName = config?.modelName ?? 'gpt-4o-mini',
+        _temperature = config?.temperature ?? 0.7,
+        _maxTokens = config?.maxTokens ?? 1000,
+        _dio = Dio(BaseOptions(
+          baseUrl: config?.baseUrl ?? 'https://api.openai.com/v1',
+          connectTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 60),
+        )) {
     _dio.options.headers['Authorization'] = 'Bearer $_apiKey';
   }
 
@@ -33,10 +40,10 @@ class AiChatService {
 
     try {
       final res = await _dio.post('/chat/completions', data: {
-        'model': 'gpt-4o-mini',
+        'model': _modelName,
         'messages': messages,
-        'temperature': 0.7,
-        'max_tokens': 1000,
+        'temperature': _temperature,
+        'max_tokens': _maxTokens,
       });
       return res.data['choices'][0]['message']['content'] as String;
     } on DioException catch (e) {

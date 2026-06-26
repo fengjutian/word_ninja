@@ -13,6 +13,7 @@ import 'package:vocabulary/presentation/pages/word_test_page.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:reading/presentation/pages/reader_page.dart'; 
 import 'package:ai_tutor/pages/tutor_chat_page.dart';
+import 'package:ai/pages/model_config_page.dart';
 import '../debug_overlay.dart';
 import 'package:window_manager/window_manager.dart';
   
@@ -56,7 +57,8 @@ class DesktopRoutes {
   static const String review = '/vocabulary/review';  
   static const String wordTest = '/vocabulary/test';  
   static const String reading = '/reading';
-  static const String aiTutor = '/ai-tutor';  
+  static const String aiTutor = '/ai-tutor';
+  static const String modelConfig = '/model-config';
 } 
   
 GoRouter createDesktopRouter() {  
@@ -70,6 +72,7 @@ GoRouter createDesktopRouter() {
           GoRoute(path: DesktopRoutes.vocabulary, builder: (ctx, state) => const VocabularyPage()),  
           GoRoute(path: DesktopRoutes.reading, builder: (ctx, state) => const ReaderPage()), 
           GoRoute(path: DesktopRoutes.aiTutor, builder: (ctx, state) => const TutorChatPage()), 
+          GoRoute(path: DesktopRoutes.modelConfig, builder: (ctx, state) => const ModelConfigPage()),
         ],  
       ),  
       // ─── 全屏子页面 ───
@@ -149,6 +152,7 @@ class DesktopShell extends StatelessWidget {
           NavigationRailDestination(icon: Icon(PhosphorIconsRegular.bookOpen), selectedIcon: Icon(PhosphorIconsRegular.bookOpen), label: Text('Vocab')),  
           NavigationRailDestination(icon: Icon(PhosphorIconsRegular.books), selectedIcon: Icon(PhosphorIconsRegular.books), label: Text('Reading')),  
           NavigationRailDestination(icon: Icon(PhosphorIconsRegular.chatTeardrop), selectedIcon: Icon(PhosphorIconsRegular.chatTeardrop), label: Text('AI Tutor')),  
+          NavigationRailDestination(icon: Icon(PhosphorIconsRegular.gear), selectedIcon: Icon(PhosphorIconsRegular.gear), label: Text('模型配置')),  
         ], 
       ),  
       const VerticalDivider(width: 1),  
@@ -202,6 +206,7 @@ class DesktopShell extends StatelessWidget {
     if (uri.startsWith(DesktopRoutes.vocabulary)) return 1;  
     if (uri.startsWith(DesktopRoutes.reading)) return 2;  
     if (uri.startsWith(DesktopRoutes.aiTutor)) return 3;  
+    if (uri.startsWith(DesktopRoutes.modelConfig)) return 4;  
     return 0;  
   } 
   
@@ -211,6 +216,7 @@ class DesktopShell extends StatelessWidget {
       case 1: context.go(DesktopRoutes.vocabulary);  
       case 2: context.go(DesktopRoutes.reading);  
       case 3: context.go(DesktopRoutes.aiTutor);  
+      case 4: context.go(DesktopRoutes.modelConfig);  
     }  
   }  
 } 

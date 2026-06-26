@@ -16,6 +16,8 @@ dependencies:
   freezed_annotation: ^2.4.4
   json_annotation: ^4.9.0
   dio: ^5.7.0
+  shared_preferences: ^2.3.3
+  phosphor_flutter: ^2.1.0
 
 dev_dependencies:
   flutter_test:

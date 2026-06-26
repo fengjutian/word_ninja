@@ -233,7 +233,6 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
         bottom: MediaQuery.of(context).viewInsets.bottom + NinjaSpacing.lg,
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           // 拖动指示条
@@ -265,60 +264,65 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
             ],
           ),
           const SizedBox(height: NinjaSpacing.md),
-          Form(
-            key: _formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  TextFormField(
-                    controller: _wordCtrl,
-                    decoration: const InputDecoration(
-                      labelText: '单词',
-                      hintText: '输入英文单词',
+          // 可滚动的表单区域 — 使用 Expanded 确保有界高度，防止 overflow
+          Expanded(
+            child: Form(
+              key: _formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    TextFormField(
+                      controller: _wordCtrl,
+                      decoration: const InputDecoration(
+                        labelText: '单词',
+                        hintText: '输入英文单词',
+                      ),
+                      validator: (v) =>
+                          v == null || v.trim().isEmpty ? '请输入单词' : null,
                     ),
-                    validator: (v) =>
-                        v == null || v.trim().isEmpty ? '请输入单词' : null,
-                  ),
-                  const SizedBox(height: NinjaSpacing.md),
-                  TextFormField(
-                    controller: _meaningCtrl,
-                    decoration: const InputDecoration(
-                      labelText: '释义',
-                      hintText: '输入中文释义',
+                    const SizedBox(height: NinjaSpacing.md),
+                    TextFormField(
+                      controller: _meaningCtrl,
+                      decoration: const InputDecoration(
+                        labelText: '释义',
+                        hintText: '输入中文释义',
+                      ),
+                      validator: (v) =>
+                          v == null || v.trim().isEmpty ? '请输入释义' : null,
                     ),
-                    validator: (v) =>
-                        v == null || v.trim().isEmpty ? '请输入释义' : null,
-                  ),
-                  const SizedBox(height: NinjaSpacing.md),
-                  TextFormField(
-                    controller: _phoneticCtrl,
-                    decoration: const InputDecoration(
-                      labelText: '音标（可选）',
-                      hintText: '如 ˈbjuːtəfəl',
+                    const SizedBox(height: NinjaSpacing.md),
+                    TextFormField(
+                      controller: _phoneticCtrl,
+                      decoration: const InputDecoration(
+                        labelText: '音标（可选）',
+                        hintText: '如 ˈbjuːtəfəl',
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: NinjaSpacing.md),
-                  TextFormField(
-                    controller: _exampleCtrl,
-                    maxLines: 3,
-                    decoration: const InputDecoration(
-                      labelText: '例句（可选）',
-                      hintText: '输入包含该单词的例句',
-                      alignLabelWithHint: true,
+                    const SizedBox(height: NinjaSpacing.md),
+                    TextFormField(
+                      controller: _exampleCtrl,
+                      maxLines: 3,
+                      decoration: const InputDecoration(
+                        labelText: '例句（可选）',
+                        hintText: '输入包含该单词的例句',
+                        alignLabelWithHint: true,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: NinjaSpacing.md),
-                  // AI 补全按钮
-                  OutlinedButton.icon(
-                    onPressed: _isAiLoading ? null : _aiAutoComplete,
-                    icon: _isAiLoading
-                        ? const SizedBox(
-                            width: 18, height: 18,
-                            child: CircularProgressIndicator(strokeWidth: 2))
-                        : const Icon(PhosphorIconsRegular.sparkle),
-                    label: Text(_isAiLoading ? 'AI 补全中...' : 'AI 智能补全'),
-                  ),
-                ],
+                    const SizedBox(height: NinjaSpacing.md),
+                    // AI 补全按钮
+                    OutlinedButton.icon(
+                      onPressed: _isAiLoading ? null : _aiAutoComplete,
+                      icon: _isAiLoading
+                          ? const SizedBox(
+                              width: 18, height: 18,
+                              child: CircularProgressIndicator(strokeWidth: 2))
+                          : const Icon(PhosphorIconsRegular.sparkle),
+                      label: Text(_isAiLoading ? 'AI 补全中...' : 'AI 智能补全'),
+                    ),
+                    // 底部留白，确保键盘弹出时最后一项不被遮挡
+                    SizedBox(height: MediaQuery.of(context).padding.bottom + NinjaSpacing.lg),
+                  ],
+                ),
               ),
             ),
           ),
