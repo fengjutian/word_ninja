@@ -99,7 +99,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
             onDestinationSelected: (i) => setState(() => _selectedIndex = i),
             labelType: NavigationRailLabelType.all,
             destinations: const [
-              NavigationRailDestination(icon: Icon(PhosphorIconsRegular.squaresFour), label: Text('概览')),
+              NavigationRailDestination(icon: Icon(PhosphorIconsRegular.house), label: Text('概览')),
               NavigationRailDestination(icon: Icon(PhosphorIconsRegular.users), label: Text('用户')),
               NavigationRailDestination(icon: Icon(PhosphorIconsRegular.bookOpen), label: Text('单词')),
               NavigationRailDestination(icon: Icon(PhosphorIconsRegular.gear), label: Text('设置')),
