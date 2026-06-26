@@ -2,7 +2,6 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
-import 'package:ai/providers/ai_providers.dart';
 import '../widgets/translate_popup.dart';
 
 /// 分类
@@ -183,28 +182,120 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
 }
 
 /// 文章阅读器
-class _ArticleReaderView extends ConsumerWidget {
+class _ArticleReaderView extends StatefulWidget {
   final _Article article;
   const _ArticleReaderView({required this.article});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final content = article.content ?? '文章内容加载中...';
+  State<_ArticleReaderView> createState() => _ArticleReaderViewState();
+}
+
+class _ArticleReaderViewState extends State<_ArticleReaderView> {
+  OverlayEntry? _popupOverlay;
+  String _selectedText = '';
+
+  @override
+  void dispose() {
+    _removePopup();
+    super.dispose();
+  }
+
+  void _removePopup() {
+    _popupOverlay?.remove();
+    _popupOverlay = null;
+  }
+
+  void _showTranslatePopup(BuildContext context, String text) {
+    _removePopup();
+    if (text.trim().isEmpty) return;
+
+    _selectedText = text.trim();
+    final overlay = Overlay.of(context);
+    final word = _selectedText;
+
+    _popupOverlay = OverlayEntry(
+      builder: (overlayContext) {
+        // Position near the top of the screen; in a real app you'd compute
+        // position from the selection rect using editableTextState.renderObject
+        return Positioned(
+          left: 16,
+          right: 16,
+          top: MediaQuery.of(overlayContext).padding.top + kToolbarHeight + 8,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              TranslatePopup(word: word),
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: _removePopup,
+                  child: const Text('关闭'),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+
+    overlay.insert(_popupOverlay!);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final content = widget.article.content ?? '文章内容加载中...';
 
     return Scaffold(
-      appBar: AppBar(title: Text(article.title)),
+      appBar: AppBar(title: Text(widget.article.title)),
       body: ListView(
         padding: const EdgeInsets.all(NinjaSpacing.lg),
         children: [
           Row(
             children: [
-              Chip(label: Text(article.level, style: const TextStyle(fontSize: 11))),
+              Chip(label: Text(widget.article.level, style: const TextStyle(fontSize: 11))),
               const SizedBox(width: NinjaSpacing.sm),
-              Text('${article.wordCount} 词 · ${article.source}', style: NinjaTextStyles.caption),
+              Text('${widget.article.wordCount} 词 · ${widget.article.source}', style: NinjaTextStyles.caption),
             ],
           ),
           const SizedBox(height: NinjaSpacing.lg),
-          SelectableText(content, style: NinjaTextStyles.bodyLarge),
+          SelectableText(
+            content,
+            style: NinjaTextStyles.bodyLarge,
+            contextMenuBuilder: (menuContext, editableTextState) {
+              // Get the selected text
+              final selection = editableTextState.textEditingValue.selection;
+              String selected;
+              if (selection.isValid && !selection.isCollapsed) {
+                selected = selection.textInside(editableTextState.textEditingValue.text);
+              } else {
+                selected = '';
+              }
+
+              // Show the translate popup overlay
+              if (selected.trim().isNotEmpty) {
+                WidgetsBinding.instance.addPostFrameCallback((_) {
+                  if (mounted) _showTranslatePopup(context, selected);
+                });
+              }
+
+              // Return the default context menu
+              return AdaptiveTextSelectionToolbar.buttonItems(
+                buttonItems: [
+                  if (selection.isValid && !selection.isCollapsed)
+                    ...EditableText.getDefaultContextMenuItems(editableTextState),
+                  ContextMenuButtonItem(
+                    label: '翻译',
+                    onPressed: () {
+                      if (selected.trim().isNotEmpty) {
+                        _showTranslatePopup(context, selected);
+                      }
+                    },
+                  ),
+                ],
+              );
+            },
+          ),
           const SizedBox(height: NinjaSpacing.xl),
           // 操作提示
           Container(

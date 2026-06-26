@@ -25,6 +25,8 @@ mixin _$Review {
   DateTime get reviewTime => throw _privateConstructorUsedError;
   int get score => throw _privateConstructorUsedError;
   bool get isCompleted => throw _privateConstructorUsedError;
+  int get interval => throw _privateConstructorUsedError;
+  DateTime? get scheduledFor => throw _privateConstructorUsedError;
 
   /// Serializes this Review to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -45,7 +47,9 @@ abstract class $ReviewCopyWith<$Res> {
       String wordId,
       DateTime reviewTime,
       int score,
-      bool isCompleted});
+      bool isCompleted,
+      int interval,
+      DateTime? scheduledFor});
 }
 
 /// @nodoc
@@ -68,6 +72,8 @@ class _$ReviewCopyWithImpl<$Res, $Val extends Review>
     Object? reviewTime = null,
     Object? score = null,
     Object? isCompleted = null,
+    Object? interval = null,
+    Object? scheduledFor = freezed,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -90,6 +96,14 @@ class _$ReviewCopyWithImpl<$Res, $Val extends Review>
           ? _value.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
               as bool,
+      interval: null == interval
+          ? _value.interval
+          : interval // ignore: cast_nullable_to_non_nullable
+              as int,
+      scheduledFor: freezed == scheduledFor
+          ? _value.scheduledFor
+          : scheduledFor // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ) as $Val);
   }
 }
@@ -106,7 +120,9 @@ abstract class _$$ReviewImplCopyWith<$Res> implements $ReviewCopyWith<$Res> {
       String wordId,
       DateTime reviewTime,
       int score,
-      bool isCompleted});
+      bool isCompleted,
+      int interval,
+      DateTime? scheduledFor});
 }
 
 /// @nodoc
@@ -127,6 +143,8 @@ class __$$ReviewImplCopyWithImpl<$Res>
     Object? reviewTime = null,
     Object? score = null,
     Object? isCompleted = null,
+    Object? interval = null,
+    Object? scheduledFor = freezed,
   }) {
     return _then(_$ReviewImpl(
       id: null == id
@@ -149,6 +167,14 @@ class __$$ReviewImplCopyWithImpl<$Res>
           ? _value.isCompleted
           : isCompleted // ignore: cast_nullable_to_non_nullable
               as bool,
+      interval: null == interval
+          ? _value.interval
+          : interval // ignore: cast_nullable_to_non_nullable
+              as int,
+      scheduledFor: freezed == scheduledFor
+          ? _value.scheduledFor
+          : scheduledFor // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
     ));
   }
 }
@@ -161,7 +187,9 @@ class _$ReviewImpl implements _Review {
       required this.wordId,
       required this.reviewTime,
       this.score = 0,
-      this.isCompleted = false});
+      this.isCompleted = false,
+      this.interval = 0,
+      this.scheduledFor});
 
   factory _$ReviewImpl.fromJson(Map<String, dynamic> json) =>
       _$$ReviewImplFromJson(json);
@@ -178,10 +206,15 @@ class _$ReviewImpl implements _Review {
   @override
   @JsonKey()
   final bool isCompleted;
+  @override
+  @JsonKey()
+  final int interval;
+  @override
+  final DateTime? scheduledFor;
 
   @override
   String toString() {
-    return 'Review(id: $id, wordId: $wordId, reviewTime: $reviewTime, score: $score, isCompleted: $isCompleted)';
+    return 'Review(id: $id, wordId: $wordId, reviewTime: $reviewTime, score: $score, isCompleted: $isCompleted, interval: $interval, scheduledFor: $scheduledFor)';
   }
 
   @override
@@ -195,13 +228,17 @@ class _$ReviewImpl implements _Review {
                 other.reviewTime == reviewTime) &&
             (identical(other.score, score) || other.score == score) &&
             (identical(other.isCompleted, isCompleted) ||
-                other.isCompleted == isCompleted));
+                other.isCompleted == isCompleted) &&
+            (identical(other.interval, interval) ||
+                other.interval == interval) &&
+            (identical(other.scheduledFor, scheduledFor) ||
+                other.scheduledFor == scheduledFor));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode =>
-      Object.hash(runtimeType, id, wordId, reviewTime, score, isCompleted);
+  int get hashCode => Object.hash(
+      runtimeType, id, wordId, reviewTime, score, isCompleted, interval, scheduledFor);
 
   /// Create a copy of Review
   /// with the given fields replaced by the non-null parameter values.
@@ -225,7 +262,9 @@ abstract class _Review implements Review {
       required final String wordId,
       required final DateTime reviewTime,
       final int score,
-      final bool isCompleted}) = _$ReviewImpl;
+      final bool isCompleted,
+      final int interval,
+      final DateTime? scheduledFor}) = _$ReviewImpl;
 
   factory _Review.fromJson(Map<String, dynamic> json) = _$ReviewImpl.fromJson;
 
@@ -239,6 +278,10 @@ abstract class _Review implements Review {
   int get score;
   @override
   bool get isCompleted;
+  @override
+  int get interval;
+  @override
+  DateTime? get scheduledFor;
 
   /// Create a copy of Review
   /// with the given fields replaced by the non-null parameter values.

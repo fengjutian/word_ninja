@@ -25,6 +25,10 @@ _$WordImpl _$$WordImplFromJson(Map<String, dynamic> json) => _$WordImpl(
       updatedAt: json['updatedAt'] == null
           ? null
           : DateTime.parse(json['updatedAt'] as String),
+      nextReviewDate: json['nextReviewDate'] == null
+          ? null
+          : DateTime.parse(json['nextReviewDate'] as String),
+      reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$$WordImplToJson(_$WordImpl instance) =>
@@ -41,4 +45,6 @@ Map<String, dynamic> _$$WordImplToJson(_$WordImpl instance) =>
       'tags': instance.tags,
       'createdAt': instance.createdAt?.toIso8601String(),
       'updatedAt': instance.updatedAt?.toIso8601String(),
+      'nextReviewDate': instance.nextReviewDate?.toIso8601String(),
+      'reviewCount': instance.reviewCount,
     };

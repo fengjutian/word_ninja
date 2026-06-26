@@ -23,45 +23,47 @@ class TranslatePopup extends ConsumerWidget {
     return Material(
       elevation: 4,
       borderRadius: BorderRadius.circular(12),
-      child: Container(
-        constraints: const BoxConstraints(maxWidth: 280),
-        padding: const EdgeInsets.all(NinjaSpacing.md),
-        decoration: BoxDecoration(
-          color: Theme.of(context).cardColor,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(word, style: NinjaTextStyles.heading3),
-            const SizedBox(height: 4),
-            _TranslationView(word: word),
-            const Divider(height: NinjaSpacing.lg),
-            Row(
-              children: [
-                TextButton.icon(
-                  onPressed: onAddToVocabulary ?? () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('「$word」已加入单词本')),
-                    );
-                  },
-                  icon: const Icon(PhosphorIconsRegular.bookmarkSimple, size: 16),
-                  label: const Text('加入单词本'),
-                ),
-                const Spacer(),
-                TextButton.icon(
-                  onPressed: onAiAnalysis ?? () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('正在AI解析「$word」...')),
-                    );
-                  },
-                  icon: const Icon(PhosphorIconsRegular.sparkle, size: 16),
-                  label: const Text('AI解析'),
-                ),
-              ],
-            ),
-          ],
+      child: Builder(
+        builder: (context) => Container(
+          constraints: const BoxConstraints(maxWidth: 280),
+          padding: const EdgeInsets.all(NinjaSpacing.md),
+          decoration: BoxDecoration(
+            color: Theme.of(context).cardColor,
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(word, style: NinjaTextStyles.heading3),
+              const SizedBox(height: 4),
+              _TranslationView(word: word),
+              const Divider(height: NinjaSpacing.lg),
+              Row(
+                children: [
+                  TextButton.icon(
+                    onPressed: onAddToVocabulary ?? () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('「$word」已加入单词本')),
+                      );
+                    },
+                    icon: const Icon(PhosphorIconsRegular.bookmarkSimple, size: 16),
+                    label: const Text('加入单词本'),
+                  ),
+                  const Spacer(),
+                  TextButton.icon(
+                    onPressed: onAiAnalysis ?? () {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('正在AI解析「$word」...')),
+                      );
+                    },
+                    icon: const Icon(PhosphorIconsRegular.sparkle, size: 16),
+                    label: const Text('AI解析'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -69,14 +71,22 @@ class TranslatePopup extends ConsumerWidget {
 }
 
 /// 内嵌翻译组件 — 读取 AI 服务获取翻译
-class _TranslationView extends ConsumerWidget {
+class _TranslationView extends ConsumerStatefulWidget {
   final String word;
   const _TranslationView({required this.word});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_TranslationView> createState() => _TranslationViewState();
+}
+
+class _TranslationViewState extends ConsumerState<_TranslationView> {
+  Future<Map<String, dynamic>>? _translationFuture;
+
+  @override
+  Widget build(BuildContext context) {
+    _translationFuture ??= ref.read(aiChatServiceProvider).explainWord(widget.word);
     return FutureBuilder<Map<String, dynamic>>(
-      future: ref.read(aiChatServiceProvider).explainWord(word),
+      future: _translationFuture,
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SizedBox(

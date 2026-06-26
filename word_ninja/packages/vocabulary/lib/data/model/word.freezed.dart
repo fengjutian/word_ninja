@@ -32,6 +32,8 @@ mixin _$Word {
   List<String> get tags => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+  DateTime? get nextReviewDate => throw _privateConstructorUsedError;
+  int get reviewCount => throw _privateConstructorUsedError;
 
   /// Serializes this Word to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -59,7 +61,9 @@ abstract class $WordCopyWith<$Res> {
       String source,
       List<String> tags,
       DateTime? createdAt,
-      DateTime? updatedAt});
+      DateTime? updatedAt,
+      DateTime? nextReviewDate,
+      int reviewCount});
 }
 
 /// @nodoc
@@ -89,6 +93,8 @@ class _$WordCopyWithImpl<$Res, $Val extends Word>
     Object? tags = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? nextReviewDate = freezed,
+    Object? reviewCount = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -139,6 +145,14 @@ class _$WordCopyWithImpl<$Res, $Val extends Word>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      nextReviewDate: freezed == nextReviewDate
+          ? _value.nextReviewDate
+          : nextReviewDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      reviewCount: null == reviewCount
+          ? _value.reviewCount
+          : reviewCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -162,7 +176,9 @@ abstract class _$$WordImplCopyWith<$Res> implements $WordCopyWith<$Res> {
       String source,
       List<String> tags,
       DateTime? createdAt,
-      DateTime? updatedAt});
+      DateTime? updatedAt,
+      DateTime? nextReviewDate,
+      int reviewCount});
 }
 
 /// @nodoc
@@ -189,6 +205,8 @@ class __$$WordImplCopyWithImpl<$Res>
     Object? tags = null,
     Object? createdAt = freezed,
     Object? updatedAt = freezed,
+    Object? nextReviewDate = freezed,
+    Object? reviewCount = null,
   }) {
     return _then(_$WordImpl(
       id: null == id
@@ -239,6 +257,14 @@ class __$$WordImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime?,
+      nextReviewDate: freezed == nextReviewDate
+          ? _value.nextReviewDate
+          : nextReviewDate // ignore: cast_nullable_to_non_nullable
+              as DateTime?,
+      reviewCount: null == reviewCount
+          ? _value.reviewCount
+          : reviewCount // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -258,7 +284,9 @@ class _$WordImpl implements _Word {
       this.source = 'manual',
       final List<String> tags = const [],
       this.createdAt,
-      this.updatedAt})
+      this.updatedAt,
+      this.nextReviewDate,
+      this.reviewCount = 0})
       : _tags = tags;
 
   factory _$WordImpl.fromJson(Map<String, dynamic> json) =>
@@ -300,10 +328,15 @@ class _$WordImpl implements _Word {
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+  @override
+  final DateTime? nextReviewDate;
+  @override
+  @JsonKey()
+  final int reviewCount;
 
   @override
   String toString() {
-    return 'Word(id: $id, userId: $userId, word: $word, meaning: $meaning, phonetic: $phonetic, example: $example, difficulty: $difficulty, mastery: $mastery, source: $source, tags: $tags, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'Word(id: $id, userId: $userId, word: $word, meaning: $meaning, phonetic: $phonetic, example: $example, difficulty: $difficulty, mastery: $mastery, source: $source, tags: $tags, createdAt: $createdAt, updatedAt: $updatedAt, nextReviewDate: $nextReviewDate, reviewCount: $reviewCount)';
   }
 
   @override
@@ -326,7 +359,11 @@ class _$WordImpl implements _Word {
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt));
+                other.updatedAt == updatedAt) &&
+            (identical(other.nextReviewDate, nextReviewDate) ||
+                other.nextReviewDate == nextReviewDate) &&
+            (identical(other.reviewCount, reviewCount) ||
+                other.reviewCount == reviewCount));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -344,7 +381,9 @@ class _$WordImpl implements _Word {
       source,
       const DeepCollectionEquality().hash(_tags),
       createdAt,
-      updatedAt);
+      updatedAt,
+      nextReviewDate,
+      reviewCount);
 
   /// Create a copy of Word
   /// with the given fields replaced by the non-null parameter values.
@@ -375,7 +414,9 @@ abstract class _Word implements Word {
       final String source,
       final List<String> tags,
       final DateTime? createdAt,
-      final DateTime? updatedAt}) = _$WordImpl;
+      final DateTime? updatedAt,
+      final DateTime? nextReviewDate,
+      final int reviewCount}) = _$WordImpl;
 
   factory _Word.fromJson(Map<String, dynamic> json) = _$WordImpl.fromJson;
 
@@ -403,6 +444,10 @@ abstract class _Word implements Word {
   DateTime? get createdAt;
   @override
   DateTime? get updatedAt;
+  @override
+  DateTime? get nextReviewDate;
+  @override
+  int get reviewCount;
 
   /// Create a copy of Word
   /// with the given fields replaced by the non-null parameter values.

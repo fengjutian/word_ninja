@@ -11,6 +11,10 @@ class Review with _$Review {
     required DateTime reviewTime,
     @Default(0) int score,
     @Default(false) bool isCompleted,
+    /// 本次复习使用的艾宾浩斯间隔（天），0=首次复习
+    @Default(0) int interval,
+    /// 本次复习排定日期（对应复习时 word.nextReviewDate）
+    DateTime? scheduledFor,
   }) = _Review;
 
   factory Review.fromJson(Map<String, dynamic> json) => _$ReviewFromJson(json);

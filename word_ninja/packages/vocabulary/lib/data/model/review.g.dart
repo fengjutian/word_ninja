@@ -12,6 +12,10 @@ _$ReviewImpl _$$ReviewImplFromJson(Map<String, dynamic> json) => _$ReviewImpl(
       reviewTime: DateTime.parse(json['reviewTime'] as String),
       score: (json['score'] as num?)?.toInt() ?? 0,
       isCompleted: json['isCompleted'] as bool? ?? false,
+      interval: (json['interval'] as num?)?.toInt() ?? 0,
+      scheduledFor: json['scheduledFor'] == null
+          ? null
+          : DateTime.parse(json['scheduledFor'] as String),
     );
 
 Map<String, dynamic> _$$ReviewImplToJson(_$ReviewImpl instance) =>
@@ -21,4 +25,6 @@ Map<String, dynamic> _$$ReviewImplToJson(_$ReviewImpl instance) =>
       'reviewTime': instance.reviewTime.toIso8601String(),
       'score': instance.score,
       'isCompleted': instance.isCompleted,
+      'interval': instance.interval,
+      'scheduledFor': instance.scheduledFor?.toIso8601String(),
     };

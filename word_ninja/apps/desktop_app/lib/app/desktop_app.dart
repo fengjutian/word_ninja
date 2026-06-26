@@ -36,14 +36,29 @@ class WordNinjaDesktopApp extends StatelessWidget {
   } 
   
   static Widget _debugBuilder(BuildContext context, Widget? child) {  
+    // Use Material+InkWell (self-contained) instead of FloatingActionButton to avoid
+    // requiring Scaffold/Material ancestor context in MaterialApp.router's builder
+    final bool isActive = DebugOverlay.isActive;
     return Stack(children: [  
       if (child != null) child,  
-      Positioned(right: 16, bottom: 40, child: FloatingActionButton.small(  
-        heroTag: '__debug_toggle__',  
-        backgroundColor: DebugOverlay.isActive ? Colors.lightGreen : Colors.grey.shade400,  
-        onPressed: DebugOverlay.toggleAll,  
-        child: Icon(DebugOverlay.isActive ? PhosphorIconsRegular.eye : PhosphorIconsRegular.eyeSlash, size: 20),  
-      )),  
+      Positioned(
+        right: 16, bottom: 40,
+        child: Material(
+          elevation: 4,
+          shape: const CircleBorder(),
+          color: isActive ? Colors.lightGreen : Colors.grey.shade400,
+          child: InkWell(
+            customBorder: const CircleBorder(),
+            onTap: DebugOverlay.toggleAll,
+            child: Container(
+              width: 40,
+              height: 40,
+              alignment: Alignment.center,
+              child: Icon(isActive ? PhosphorIconsRegular.eye : PhosphorIconsRegular.eyeSlash, size: 20, color: Colors.white),
+            ),
+          ),
+        ),
+      ),
     ]);  
   }  
 } 

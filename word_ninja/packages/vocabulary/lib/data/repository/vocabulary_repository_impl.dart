@@ -47,12 +47,15 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
 
   @override
   Future<void> submitReview(String wordId, int score) async {
+    // 记录复习前排定日期
+    final word = await _local.getWord(wordId);
     final review = Review(
       id: _uuid.v4(),
       wordId: wordId,
       reviewTime: DateTime.now(),
       score: score,
       isCompleted: true,
+      scheduledFor: word?.nextReviewDate,
     );
     await _local.saveReview(review);
   }

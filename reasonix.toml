@@ -49,7 +49,7 @@ enabled = true   # language server tools; servers launch lazily when used
 # disabled_skills = ["review"]   # hide noisy or unwanted skills
 
 [permissions]
-allow = ["Bash(mkdir -p:*)", "explore", "Edit", "Bash(cd /d/ && ls -la /d/github/word_ninja/ 2>/dev/null || ls -la ~/github/word_ninja/ 2>/dev/null || pwd && ls -la .)"]
+allow = ["Bash(mkdir -p:*)", "explore", "Edit", "Bash(cd /d/ && ls -la /d/github/word_ninja/ 2>/dev/null || ls -la ~/github/word_ninja/ 2>/dev/null || pwd && ls -la .)", "task", "review"]
 [sandbox]
 # Confine tool blast radius. File-writers (write_file/edit_file/multi_edit/move_file)
 # may only write under workspace_root (empty = current dir) and allow_write extras.
