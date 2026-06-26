@@ -6,6 +6,11 @@ import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ui_kit/ninja_theme/theme_data.dart'; 
 import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
 import 'package:vocabulary/presentation/pages/vocabulary_page.dart'; 
+import 'package:vocabulary/presentation/pages/word_detail_page.dart';
+import 'package:vocabulary/presentation/pages/add_word_page.dart';
+import 'package:vocabulary/presentation/pages/review_page.dart';
+import 'package:vocabulary/presentation/pages/word_test_page.dart';
+import 'package:vocabulary/data/model/word.dart';
 import 'package:reading/presentation/pages/reader_page.dart'; 
 import '../debug_overlay.dart';
 import 'package:window_manager/window_manager.dart';
@@ -45,6 +50,10 @@ class WordNinjaDesktopApp extends StatelessWidget {
 class DesktopRoutes {  
   static const String home = '/';  
   static const String vocabulary = '/vocabulary';  
+  static const String wordDetail = '/vocabulary/detail/:id';  
+  static const String addWord = '/vocabulary/add';  
+  static const String review = '/vocabulary/review';  
+  static const String wordTest = '/vocabulary/test';  
   static const String reading = '/reading';  
 } 
   
@@ -60,6 +69,56 @@ GoRouter createDesktopRouter() {
           GoRoute(path: DesktopRoutes.reading, builder: (ctx, state) => const ReaderPage()), 
         ],  
       ),  
+      // ─── 全屏子页面 ───
+      GoRoute(
+        path: DesktopRoutes.wordDetail,
+        pageBuilder: (ctx, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return MaterialPage(
+            key: state.pageKey,
+            child: WordDetailPage(word: Word(id: id, userId: '', word: '', meaning: '')),
+          );
+        },
+      ),
+      GoRoute(
+        path: DesktopRoutes.addWord,
+        pageBuilder: (ctx, state) => MaterialPage(
+          key: state.pageKey,
+          child: const AddWordPage(),
+        ),
+      ),
+      GoRoute(
+        path: DesktopRoutes.review,
+        pageBuilder: (ctx, state) {
+          final extra = state.extra;
+          if (extra is List<Word> && extra.isNotEmpty) {
+            return MaterialPage(
+              key: state.pageKey,
+              child: ReviewPage(words: extra),
+            );
+          }
+          return MaterialPage(
+            key: state.pageKey,
+            child: ReviewPage(words: []),
+          );
+        },
+      ),
+      GoRoute(
+        path: DesktopRoutes.wordTest,
+        pageBuilder: (ctx, state) {
+          final extra = state.extra;
+          if (extra is List<Word> && extra.length >= 2) {
+            return MaterialPage(
+              key: state.pageKey,
+              child: WordTestPage(words: extra),
+            );
+          }
+          return MaterialPage(
+            key: state.pageKey,
+            child: WordTestPage(words: []),
+          );
+        },
+      ),
     ],  
   );  
 } 

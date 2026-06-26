@@ -11,7 +11,7 @@ import '../providers/word_provider.dart';
 class ReviewPage extends ConsumerStatefulWidget {
   final List<Word> words;
 
-  const ReviewPage({super.key, required this.words});
+  const ReviewPage({super.key, this.words = const []});
 
   @override
   ConsumerState<ReviewPage> createState() => _ReviewPageState();
@@ -25,6 +25,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
   bool _showMeaning = false;
   int _currentIndex = 0;
   bool _isSubmitting = false;
+  List<Word> _words = [];
 
   @override
   void initState() {
@@ -37,6 +38,23 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
     _flipAnim = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _flipCtrl, curve: Curves.easeInOut),
     );
+    _initWords();
+  }
+
+  void _initWords() {
+    if (widget.words.isNotEmpty) {
+      _words = widget.words;
+    } else {
+      // 从 Provider 加载待复习单词
+      _loadDueReviews();
+    }
+  }
+
+  Future<void> _loadDueReviews() async {
+    final words = await ref.read(dueReviewProvider.future);
+    if (mounted) {
+      setState(() => _words = words);
+    }
   }
 
   @override
@@ -57,12 +75,13 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
 
   void _rateWord(int score) async {
     if (_isSubmitting) return;
-    final word = widget.words[_currentIndex];
+    if (_words.isEmpty) return;
+    final word = _words[_currentIndex];
     setState(() => _isSubmitting = true);
     try {
       await ref.read(vocabularyRepositoryProvider).submitReview(word.id, score);
       if (!mounted) return;
-      if (_currentIndex < widget.words.length - 1) {
+      if (_currentIndex < _words.length - 1) {
         final nextIdx = _currentIndex + 1;
         _currentIndex = nextIdx;
         _pageCtrl.nextPage(
@@ -90,7 +109,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.words.isEmpty) {
+    if (_words.isEmpty && widget.words.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('复习')),
         body: const Center(
@@ -106,17 +125,25 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
       );
     }
 
-    final word = widget.words[_currentIndex];
+    // 如果 _words 为空但正在加载，显示加载中
+    if (_words.isEmpty) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('复习')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    final word = _words[_currentIndex];
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('复习 (${_currentIndex + 1}/${widget.words.length})'),
+        title: Text('复习 (${_currentIndex + 1}/${_words.length})'),
       ),
       body: Column(
         children: [
           // 进度条
           LinearProgressIndicator(
-            value: (_currentIndex + 1) / widget.words.length,
+            value: (_currentIndex + 1) / _words.length,
             backgroundColor: NinjaColors.divider.withValues(alpha: 0.2),
             valueColor: const AlwaysStoppedAnimation<Color>(NinjaColors.primary),
           ),
