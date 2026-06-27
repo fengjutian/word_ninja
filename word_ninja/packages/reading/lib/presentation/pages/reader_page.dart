@@ -221,7 +221,10 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
           left: 16,
           right: 16,
           top: MediaQuery.of(overlayContext).padding.top + kToolbarHeight + 8,
-          child: Column(
+          child: Material(
+            elevation: 0,
+            color: Colors.transparent,
+            child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -234,6 +237,7 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
                 ),
               ),
             ],
+          ),
           ),
         );
       },
@@ -255,7 +259,7 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
             children: [
               Chip(label: Text(widget.article.level, style: const TextStyle(fontSize: 11))),
               const SizedBox(width: NinjaSpacing.sm),
-              Text('${widget.article.wordCount} 词 · ${widget.article.source}', style: NinjaTextStyles.caption),
+              Flexible(child: Text('${widget.article.wordCount} 词 · ${widget.article.source}', style: NinjaTextStyles.caption)),
             ],
           ),
           const SizedBox(height: NinjaSpacing.lg),
@@ -346,7 +350,7 @@ class _ArticleCard extends StatelessWidget {
               const SizedBox(width: NinjaSpacing.sm),
               Text('${article.wordCount} 词', style: NinjaTextStyles.bodySmall),
               const SizedBox(width: NinjaSpacing.sm),
-              Text(article.source, style: NinjaTextStyles.caption),
+              Flexible(child: Text(article.source, style: NinjaTextStyles.caption)),
             ],
           ),
         ),
