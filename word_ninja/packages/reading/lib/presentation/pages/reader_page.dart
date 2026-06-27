@@ -283,7 +283,7 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
               return AdaptiveTextSelectionToolbar.buttonItems(
                 buttonItems: [
                   if (selection.isValid && !selection.isCollapsed)
-                    ...EditableText.getDefaultContextMenuItems(editableTextState),
+                    ...editableTextState.contextMenuButtonItems,
                   ContextMenuButtonItem(
                     label: '翻译',
                     onPressed: () {
@@ -293,6 +293,7 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
                     },
                   ),
                 ],
+                anchors: editableTextState.contextMenuAnchors,
               );
             },
           ),
