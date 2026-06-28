@@ -160,7 +160,7 @@ class DesktopShell extends StatelessWidget {
         labelType: NavigationRailLabelType.all,  
         leading: const Padding(  
           padding: EdgeInsets.symmetric(vertical: 8),  
-          child: Text('??', style: TextStyle(fontSize: 24)),  
+          child: Text('忍者', style: TextStyle(fontSize: 24)),  
         ), 
         destinations: const [  
           NavigationRailDestination(icon: Icon(PhosphorIconsRegular.house), selectedIcon: Icon(PhosphorIconsRegular.house), label: Text('Home')),  
@@ -208,10 +208,13 @@ class DesktopShell extends StatelessWidget {
   Widget _WindowBtn({required IconData icon, required String tooltip, required VoidCallback onTap, required bool isDark, bool isClose = false}) {  
     return Tooltip(  
       message: tooltip,  
-      child: InkWell(  
-        onTap: onTap,  
-        child: Container(width: 46, height: 36, alignment: Alignment.center, child: Icon(icon, size: 18, color: isDark ? NinjaColors.textOnDark : NinjaColors.textPrimary)),  
-        hoverColor: isClose ? NinjaColors.primary : NinjaColors.divider.withValues(alpha: 0.3),  
+      child: Material(  
+        color: Colors.transparent,  
+        child: InkWell(  
+          onTap: onTap,  
+          child: Container(width: 46, height: 36, alignment: Alignment.center, child: Icon(icon, size: 18, color: isDark ? NinjaColors.textOnDark : NinjaColors.textPrimary)),  
+          hoverColor: isClose ? NinjaColors.primary : NinjaColors.divider.withValues(alpha: 0.3),  
+        ),  
       ),  
     );  
   }  
