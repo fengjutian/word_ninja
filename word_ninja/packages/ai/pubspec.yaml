@@ -17,7 +17,10 @@ dependencies:
   json_annotation: ^4.9.0
   dio: ^5.7.0
   shared_preferences: ^2.3.3
-  phosphor_flutter: ^2.1.0
+  phosphor_flutter:
+    git:
+      url: https://github.com/subarnaPdl/phosphor_icons.git
+      ref: main
 
 dev_dependencies:
   flutter_test:
