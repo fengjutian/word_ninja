@@ -111,7 +111,28 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   }
 
   void _deleteMessage(int index) {
-    ref.read(chatHistoryProvider.notifier).deleteAt(index);
+    showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('删除消息'),
+        content: const Text('确定要删除这条消息吗？\n删除用户消息时，AI 回复也会一并删除。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('取消'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: TextButton.styleFrom(foregroundColor: NinjaColors.error),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    ).then((confirmed) {
+      if (confirmed == true) {
+        ref.read(chatHistoryProvider.notifier).deleteAt(index);
+      }
+    });
   }
 
   void _scrollToBottom() {
