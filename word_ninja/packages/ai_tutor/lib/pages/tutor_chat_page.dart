@@ -1,5 +1,6 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
@@ -135,6 +136,17 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     });
   }
 
+  void _copyConversation(List<ChatMessage> messages) {
+    final text = messages
+        .where((m) => !m.isLoading && !m.isError)
+        .map((m) => '${m.isUser ? '👤 你' : '🤖 Sensei'}:\n${m.text}')
+        .join('\n\n');
+    Clipboard.setData(ClipboardData(text: text));
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('对话已复制到剪贴板'), duration: Duration(seconds: 1)),
+    );
+  }
+
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollCtrl.hasClients) {
@@ -205,6 +217,11 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                 tooltip: '重试',
                 onPressed: _retry,
               ),
+            IconButton(
+              icon: Icon(PhosphorIconsRegular.copy, size: 18, color: NinjaColors.textOnDark.withValues(alpha: 0.7)),
+              tooltip: '复制对话',
+              onPressed: () => _copyConversation(messages),
+            ),
           ],
         ),
       ),

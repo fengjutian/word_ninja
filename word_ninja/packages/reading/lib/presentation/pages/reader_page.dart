@@ -2,6 +2,8 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:vocabulary/presentation/providers/word_provider.dart';
+import 'package:vocabulary/data/model/word.dart';
 import '../widgets/translate_popup.dart';
 
 /// 分类
@@ -170,7 +172,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
 
   void _openArticle(_Article article) {
     Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => _ArticleReaderView(article: article),
+      builder: (_) => _ArticleReaderView(article: article, ref: ref),
     ));
   }
 
@@ -184,15 +186,19 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
 /// 文章阅读器
 class _ArticleReaderView extends StatefulWidget {
   final _Article article;
-  const _ArticleReaderView({required this.article});
+  final WidgetRef ref;
+  const _ArticleReaderView({required this.article, required this.ref});
 
   @override
   State<_ArticleReaderView> createState() => _ArticleReaderViewState();
 }
 
+
 class _ArticleReaderViewState extends State<_ArticleReaderView> {
   OverlayEntry? _popupOverlay;
   String _selectedText = '';
+
+  WidgetRef get ref => widget.ref;
 
   @override
   void dispose() {
@@ -228,7 +234,22 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TranslatePopup(word: word),
+              TranslatePopup(
+                word: word,
+                onAddToVocabulary: () {
+                  ref.read(wordListProvider.notifier).addWord(
+                    Word(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      userId: 'local',
+                      word: word,
+                      meaning: '待补充',
+                      source: 'reading',
+                      createdAt: DateTime.now(),
+                    ),
+                  );
+                  _removePopup();
+                },
+              ),
               Align(
                 alignment: Alignment.centerRight,
                 child: TextButton(
