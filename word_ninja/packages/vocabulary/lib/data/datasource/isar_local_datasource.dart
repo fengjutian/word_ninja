@@ -76,14 +76,28 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
   @override
   Future<List<Word>> searchWords(String query) async {
     final q = query.toLowerCase();
-    // Isar 不支持模糊搜索，用全量+内存过滤
-    final all = await _isar.wordSchemas.where().findAll();
-    return all
-        .where((s) =>
-            s.word.toLowerCase().contains(q) ||
-            s.meaning.toLowerCase().contains(q))
-        .map(_wordFromSchema)
-        .toList();
+    // Use Isar's built-in string contains filter with limit
+    final wordMatch = await _isar.wordSchemas
+        .where()
+        .sortByWord()
+        .filter()
+        .wordContains(q, caseSensitive: false)
+        .limit(100)
+        .findAll();
+    final meaningMatch = await _isar.wordSchemas
+        .where()
+        .sortByWord()
+        .filter()
+        .meaningContains(q, caseSensitive: false)
+        .limit(100)
+        .findAll();
+    // Merge and deduplicate
+    final seen = <String>{};
+    final result = <WordSchema>[];
+    for (final s in [...wordMatch, ...meaningMatch]) {
+      if (seen.add(s.wordId)) result.add(s);
+    }
+    return result.map(_wordFromSchema).toList();
   }
 
   @override
@@ -124,21 +138,22 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
   @override
   Future<List<Word>> getDueReviews() async {
     final now = DateTime.now();
-    // 到期：nextReviewDate 为 null 或 <= now
-    final all = await _isar.wordSchemas.where().findAll();
-    final due = all.where((s) {
-      if (s.nextReviewDate == null) return true;
-      return !s.nextReviewDate!.isAfter(now);
-    }).toList()
-      ..sort((a, b) {
-        if (a.nextReviewDate == null && b.nextReviewDate != null) return -1;
-        if (a.nextReviewDate != null && b.nextReviewDate == null) return 1;
-        if (a.nextReviewDate == null && b.nextReviewDate == null) {
-          return a.mastery.compareTo(b.mastery);
-        }
-        return a.nextReviewDate!.compareTo(b.nextReviewDate!);
-      });
-    return due.map(_wordFromSchema).toList();
+    final nullDue = await _isar.wordSchemas
+        .where()
+        .sortByMastery()
+        .filter()
+        .nextReviewDateIsNull()
+        .limit(500)
+        .findAll();
+    final dateDue = await _isar.wordSchemas
+        .where()
+        .sortByMastery()
+        .filter()
+        .nextReviewDateLessThan(now)
+        .limit(500)
+        .findAll();
+    final all = [...nullDue, ...dateDue];
+    return all.map(_wordFromSchema).toList();
   }
 
   @override
