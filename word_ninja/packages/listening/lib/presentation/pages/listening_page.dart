@@ -1,17 +1,19 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ai/providers/ai_providers.dart' show aiReadingServiceProvider;
+import '../providers/tts_provider.dart';
 
 /// 听力训练页面 - 课程选择 + 三种练习模式
-class ListeningPage extends StatefulWidget {
+class ListeningPage extends ConsumerStatefulWidget {
   const ListeningPage({super.key});
 
   @override
-  State<ListeningPage> createState() => _ListeningPageState();
+  ConsumerState<ListeningPage> createState() => _ListeningPageState();
 }
 
-class _ListeningPageState extends State<ListeningPage> {
+class _ListeningPageState extends ConsumerState<ListeningPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,107 +37,122 @@ class _ListeningPageState extends State<ListeningPage> {
               () => _openMode(context, '听写')),
           _ModeCard('跟读', '边听边读，录音后AI评分', PhosphorIconsRegular.microphoneStage, NinjaColors.success,
               () => _openMode(context, '跟读')),
-          const SizedBox(height: NinjaSpacing.xl),
-          // 提示
-          Card(
-            color: NinjaColors.info.withValues(alpha: 0.05),
-            child: const Padding(
-              padding: EdgeInsets.all(NinjaSpacing.lg),
-              child: Row(children: [
-                Icon(PhosphorIconsRegular.info, color: NinjaColors.info),
-                SizedBox(width: NinjaSpacing.md),
-                Expanded(child: Text('音频播放功能需要 TTS 服务支持，当前使用 AI 生成课程文本。',
-                    style: TextStyle(fontSize: 13, color: NinjaColors.textSecondary))),
-              ]),
-            ),
-          ),
         ],
       ),
     );
   }
 
   void _openLevel(BuildContext ctx, String level) {
+    final tts = ref.read(ttsServiceProvider);
     Navigator.of(ctx).push(MaterialPageRoute(
       builder: (_) => Scaffold(
         appBar: AppBar(title: Text('$level · 听力课程')),
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(PhosphorIconsRegular.headphones, size: 64, color: NinjaColors.primary.withValues(alpha: 0.3)),
-              const SizedBox(height: NinjaSpacing.lg),
-              Text('$level 级别课程', style: NinjaTextStyles.heading2),
-              const SizedBox(height: NinjaSpacing.md),
-              const Text('AI 正在为您准备课程内容...', style: NinjaTextStyles.bodyMedium),
-              const SizedBox(height: NinjaSpacing.lg),
-              Semantics(
-                label: 'AI听力课程内容展示区',
-                child: Container(
-                  padding: const EdgeInsets.all(NinjaSpacing.lg),
-                  margin: const EdgeInsets.symmetric(horizontal: NinjaSpacing.xl),
-                  decoration: BoxDecoration(
-                    color: NinjaColors.background,
-                    borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
-                    border: Border.all(color: NinjaColors.divider),
-                  ),
-                  child: const Text(
-                    '课程内容将包含：\n\n'
-                    '• 对话理解练习\n'
-                    '• 关键信息提取\n'
-                    '• 细节理解题\n'
-                    '• 主旨大意题\n\n'
-                    '音频功能需要设备 TTS 引擎支持。',
-                    style: NinjaTextStyles.bodyMedium,
-                  ),
+        body: Padding(
+          padding: const EdgeInsets.all(NinjaSpacing.lg),
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Icon(PhosphorIconsRegular.headphones, size: 48, color: NinjaColors.primary.withValues(alpha: 0.4)),
+                const SizedBox(height: NinjaSpacing.lg),
+                Text('$level 级别课程', style: NinjaTextStyles.heading2, textAlign: TextAlign.center),
+                const SizedBox(height: NinjaSpacing.lg),
+                _buildSampleSentence(level),
+                const SizedBox(height: NinjaSpacing.xl),
+                FilledButton.icon(
+                  onPressed: () {
+                    final sentence = _getSampleText(level);
+                    tts.speak(sentence, rate: 0.8);
+                  },
+                  icon: const Icon(PhosphorIconsRegular.play),
+                  label: const Text('播放音频'),
                 ),
-              ),
-              const SizedBox(height: NinjaSpacing.xl),
-              FilledButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(_).showSnackBar(
-                    const SnackBar(content: Text('音频功能需要配置 TTS 服务，请先前往「设置」中配置。'), duration: Duration(seconds: 2)),
-                  );
-                },
-                icon: const Icon(PhosphorIconsRegular.play),
-                label: const Text('开始学习'),
-              ),
-            ],
+                const SizedBox(height: NinjaSpacing.md),
+                OutlinedButton.icon(
+                  onPressed: () => tts.stop(),
+                  icon: const Icon(PhosphorIconsRegular.stop),
+                  label: const Text('停止'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     ));
   }
 
+  Widget _buildSampleSentence(String level) {
+    final text = _getSampleText(level);
+    return Container(
+      padding: const EdgeInsets.all(NinjaSpacing.lg),
+      decoration: BoxDecoration(
+        color: NinjaColors.background,
+        borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+        border: Border.all(color: NinjaColors.divider),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text('示例文本：', style: NinjaTextStyles.label),
+          const SizedBox(height: NinjaSpacing.sm),
+          Text(text, style: NinjaTextStyles.bodyLarge),
+          const SizedBox(height: NinjaSpacing.sm),
+          Text('点击下方播放按钮收听系统 TTS 发音', style: NinjaTextStyles.caption),
+        ],
+      ),
+    );
+  }
+
+  String _getSampleText(String level) {
+    switch (level) {
+      case 'N1':
+        return 'The professor delivered an insightful lecture on renewable energy sources, emphasizing the importance of sustainable development.';
+      case 'N2':
+        return 'According to the latest news report, the government plans to invest heavily in public transportation infrastructure.';
+      case 'N3':
+        return 'Yesterday I went to the bookstore and bought a new novel. The story seems really interesting so far.';
+      case 'N4':
+        return 'Hello, my name is John. I enjoy playing basketball and listening to music in my free time.';
+      case 'N5':
+        return 'Hello! How are you? My name is Anna. I like music and movies.';
+      default:
+        return 'Welcome to Word Ninja listening practice.';
+    }
+  }
+
   void _openMode(BuildContext ctx, String mode) {
+    final tts = ref.read(ttsServiceProvider);
     Navigator.of(ctx).push(MaterialPageRoute(
       builder: (_) => Scaffold(
         appBar: AppBar(title: Text('$mode · 听力练习')),
-        body: Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Icon(PhosphorIconsRegular.musicNote, size: 64, color: NinjaColors.primary.withValues(alpha: 0.3)),
-              const SizedBox(height: NinjaSpacing.lg),
-              Text('$mode 模式', style: NinjaTextStyles.heading2),
-              const SizedBox(height: NinjaSpacing.md),
-              Text(
-                mode == '精听' ? '逐句播放，反复练习，提升听力理解能力。'
-                    : mode == '听写' ? '听取音频，填写缺失的单词或句子。'
-                    : '聆听标准发音，跟读录音，AI 评估发音准确度。',
-                style: NinjaTextStyles.bodyMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: NinjaSpacing.xl),
-              FilledButton.icon(
-                onPressed: () {
-                  ScaffoldMessenger.of(_).showSnackBar(
-                    const SnackBar(content: Text('音频功能需要配置 TTS 服务，请先前往「设置」中配置。'), duration: Duration(seconds: 2)),
-                  );
-                },
-                icon: const Icon(PhosphorIconsRegular.play),
-                label: const Text('开始练习'),
-              ),
-            ],
+        body: Padding(
+          padding: const EdgeInsets.all(NinjaSpacing.lg),
+          child: Center(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(PhosphorIconsRegular.musicNote, size: 48, color: NinjaColors.primary.withValues(alpha: 0.4)),
+                const SizedBox(height: NinjaSpacing.lg),
+                Text('$mode 模式', style: NinjaTextStyles.heading2),
+                const SizedBox(height: NinjaSpacing.md),
+                Text(
+                  mode == '精听' ? '逐句播放，反复练习，提升听力理解能力。'
+                      : mode == '听写' ? '听取音频，填写缺失的单词或句子。'
+                      : '聆听标准发音，跟读录音，AI 评估发音准确度。',
+                  style: NinjaTextStyles.bodyMedium,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: NinjaSpacing.xl),
+                FilledButton.icon(
+                  onPressed: () {
+                    final sample = 'Practice makes perfect. Keep listening and you will improve your English skills.';
+                    tts.speak(sample, rate: 0.8);
+                  },
+                  icon: const Icon(PhosphorIconsRegular.play),
+                  label: const Text('播放示例'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
