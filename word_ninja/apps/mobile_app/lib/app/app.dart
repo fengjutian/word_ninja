@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ninja_theme/theme_data.dart';
+import 'package:core/storage/preferences.dart';
 import '../debug_overlay.dart';
 
 /// App 根组件
@@ -19,7 +20,7 @@ class WordNinjaApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: NinjaTheme.light,
       darkTheme: NinjaTheme.dark,
-      themeMode: ThemeMode.light,
+      themeMode: Preferences.getBool('dark_mode') ? ThemeMode.dark : ThemeMode.light,
       routerConfig: router,
       builder: kDebugMode ? _debugBuilder : null,
     );

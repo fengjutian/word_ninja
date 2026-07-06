@@ -20,4 +20,6 @@ class WordSchema {
   List<String> tags = [];
   DateTime? createdAt;
   DateTime? updatedAt;
+  DateTime? nextReviewDate;
+  int reviewCount = 0;
 }

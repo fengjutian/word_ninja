@@ -1,6 +1,7 @@
 /// 单词数据层
 export 'datasource/vocabulary_local_datasource.dart';
 export 'datasource/in_memory_local_datasource.dart';
+export 'datasource/isar_local_datasource.dart';
 export 'datasource/vocabulary_remote_datasource.dart';
 export 'datasource/api_vocabulary_remote_datasource.dart';
 export 'model/model.dart';

@@ -42,38 +42,48 @@ const WordSchemaSchema = CollectionSchema(
       name: r'meaning',
       type: IsarType.string,
     ),
-    r'phonetic': PropertySchema(
+    r'nextReviewDate': PropertySchema(
       id: 5,
+      name: r'nextReviewDate',
+      type: IsarType.dateTime,
+    ),
+    r'phonetic': PropertySchema(
+      id: 6,
       name: r'phonetic',
       type: IsarType.string,
     ),
+    r'reviewCount': PropertySchema(
+      id: 7,
+      name: r'reviewCount',
+      type: IsarType.long,
+    ),
     r'source': PropertySchema(
-      id: 6,
+      id: 8,
       name: r'source',
       type: IsarType.string,
     ),
     r'tags': PropertySchema(
-      id: 7,
+      id: 9,
       name: r'tags',
       type: IsarType.stringList,
     ),
     r'updatedAt': PropertySchema(
-      id: 8,
+      id: 10,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
     r'userId': PropertySchema(
-      id: 9,
+      id: 11,
       name: r'userId',
       type: IsarType.string,
     ),
     r'word': PropertySchema(
-      id: 10,
+      id: 12,
       name: r'word',
       type: IsarType.string,
     ),
     r'wordId': PropertySchema(
-      id: 11,
+      id: 13,
       name: r'wordId',
       type: IsarType.string,
     )
@@ -150,13 +160,15 @@ void _wordSchemaSerialize(
   writer.writeString(offsets[2], object.example);
   writer.writeLong(offsets[3], object.mastery);
   writer.writeString(offsets[4], object.meaning);
-  writer.writeString(offsets[5], object.phonetic);
-  writer.writeString(offsets[6], object.source);
-  writer.writeStringList(offsets[7], object.tags);
-  writer.writeDateTime(offsets[8], object.updatedAt);
-  writer.writeString(offsets[9], object.userId);
-  writer.writeString(offsets[10], object.word);
-  writer.writeString(offsets[11], object.wordId);
+  writer.writeDateTime(offsets[5], object.nextReviewDate);
+  writer.writeString(offsets[6], object.phonetic);
+  writer.writeLong(offsets[7], object.reviewCount);
+  writer.writeString(offsets[8], object.source);
+  writer.writeStringList(offsets[9], object.tags);
+  writer.writeDateTime(offsets[10], object.updatedAt);
+  writer.writeString(offsets[11], object.userId);
+  writer.writeString(offsets[12], object.word);
+  writer.writeString(offsets[13], object.wordId);
 }
 
 WordSchema _wordSchemaDeserialize(
@@ -172,13 +184,15 @@ WordSchema _wordSchemaDeserialize(
   object.id = id;
   object.mastery = reader.readLong(offsets[3]);
   object.meaning = reader.readString(offsets[4]);
-  object.phonetic = reader.readStringOrNull(offsets[5]);
-  object.source = reader.readString(offsets[6]);
-  object.tags = reader.readStringList(offsets[7]) ?? [];
-  object.updatedAt = reader.readDateTimeOrNull(offsets[8]);
-  object.userId = reader.readString(offsets[9]);
-  object.word = reader.readString(offsets[10]);
-  object.wordId = reader.readString(offsets[11]);
+  object.nextReviewDate = reader.readDateTimeOrNull(offsets[5]);
+  object.phonetic = reader.readStringOrNull(offsets[6]);
+  object.reviewCount = reader.readLong(offsets[7]);
+  object.source = reader.readString(offsets[8]);
+  object.tags = reader.readStringList(offsets[9]) ?? [];
+  object.updatedAt = reader.readDateTimeOrNull(offsets[10]);
+  object.userId = reader.readString(offsets[11]);
+  object.word = reader.readString(offsets[12]);
+  object.wordId = reader.readString(offsets[13]);
   return object;
 }
 
@@ -200,18 +214,22 @@ P _wordSchemaDeserializeProp<P>(
     case 4:
       return (reader.readString(offset)) as P;
     case 5:
-      return (reader.readStringOrNull(offset)) as P;
-    case 6:
-      return (reader.readString(offset)) as P;
-    case 7:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 8:
       return (reader.readDateTimeOrNull(offset)) as P;
+    case 6:
+      return (reader.readStringOrNull(offset)) as P;
+    case 7:
+      return (reader.readLong(offset)) as P;
+    case 8:
+      return (reader.readString(offset)) as P;
     case 9:
-      return (reader.readString(offset)) as P;
+      return (reader.readStringList(offset) ?? []) as P;
     case 10:
-      return (reader.readString(offset)) as P;
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 11:
+      return (reader.readString(offset)) as P;
+    case 12:
+      return (reader.readString(offset)) as P;
+    case 13:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -869,6 +887,80 @@ extension WordSchemaQueryFilter
     });
   }
 
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      nextReviewDateIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'nextReviewDate',
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      nextReviewDateIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'nextReviewDate',
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      nextReviewDateEqualTo(DateTime? value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'nextReviewDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      nextReviewDateGreaterThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'nextReviewDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      nextReviewDateLessThan(
+    DateTime? value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'nextReviewDate',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      nextReviewDateBetween(
+    DateTime? lower,
+    DateTime? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'nextReviewDate',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition> phoneticIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1016,6 +1108,62 @@ extension WordSchemaQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'phonetic',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      reviewCountEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'reviewCount',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      reviewCountGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'reviewCount',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      reviewCountLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'reviewCount',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      reviewCountBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'reviewCount',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -1906,6 +2054,19 @@ extension WordSchemaQuerySortBy
     });
   }
 
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> sortByNextReviewDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'nextReviewDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy>
+      sortByNextReviewDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'nextReviewDate', Sort.desc);
+    });
+  }
+
   QueryBuilder<WordSchema, WordSchema, QAfterSortBy> sortByPhonetic() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'phonetic', Sort.asc);
@@ -1915,6 +2076,18 @@ extension WordSchemaQuerySortBy
   QueryBuilder<WordSchema, WordSchema, QAfterSortBy> sortByPhoneticDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'phonetic', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> sortByReviewCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reviewCount', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> sortByReviewCountDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reviewCount', Sort.desc);
     });
   }
 
@@ -2053,6 +2226,19 @@ extension WordSchemaQuerySortThenBy
     });
   }
 
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> thenByNextReviewDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'nextReviewDate', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy>
+      thenByNextReviewDateDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'nextReviewDate', Sort.desc);
+    });
+  }
+
   QueryBuilder<WordSchema, WordSchema, QAfterSortBy> thenByPhonetic() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'phonetic', Sort.asc);
@@ -2062,6 +2248,18 @@ extension WordSchemaQuerySortThenBy
   QueryBuilder<WordSchema, WordSchema, QAfterSortBy> thenByPhoneticDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'phonetic', Sort.desc);
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> thenByReviewCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reviewCount', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> thenByReviewCountDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'reviewCount', Sort.desc);
     });
   }
 
@@ -2160,10 +2358,22 @@ extension WordSchemaQueryWhereDistinct
     });
   }
 
+  QueryBuilder<WordSchema, WordSchema, QDistinct> distinctByNextReviewDate() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'nextReviewDate');
+    });
+  }
+
   QueryBuilder<WordSchema, WordSchema, QDistinct> distinctByPhonetic(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'phonetic', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QDistinct> distinctByReviewCount() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'reviewCount');
     });
   }
 
@@ -2246,9 +2456,22 @@ extension WordSchemaQueryProperty
     });
   }
 
+  QueryBuilder<WordSchema, DateTime?, QQueryOperations>
+      nextReviewDateProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'nextReviewDate');
+    });
+  }
+
   QueryBuilder<WordSchema, String?, QQueryOperations> phoneticProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'phonetic');
+    });
+  }
+
+  QueryBuilder<WordSchema, int, QQueryOperations> reviewCountProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'reviewCount');
     });
   }
 

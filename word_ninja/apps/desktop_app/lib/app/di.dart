@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';  
-import 'package:vocabulary/data/datasource/in_memory_local_datasource.dart';  
+import 'package:vocabulary/data/datasource/isar_local_datasource.dart';  
 import 'package:vocabulary/data/datasource/vocabulary_local_datasource.dart';  
 import 'package:vocabulary/data/datasource/vocabulary_remote_datasource.dart';  
 import 'package:vocabulary/data/model/word.dart';  
@@ -13,7 +13,7 @@ final desktopOverrides = <Override>[
   vocabularyRepositoryProvider.overrideWithProvider(  
     Provider<VocabularyRepository>((ref) {  
       return VocabularyRepositoryImpl(  
-        InMemoryVocabularyLocalDataSource(),  
+        IsarVocabularyLocalDataSource(),  
         _StubRemoteDataSource(),  
       );  
     }),  

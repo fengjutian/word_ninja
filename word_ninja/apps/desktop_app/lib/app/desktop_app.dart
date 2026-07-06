@@ -16,6 +16,7 @@ import 'package:ai_tutor/pages/tutor_chat_page.dart';
 import 'package:ai/pages/model_config_page.dart';
 import '../debug_overlay.dart';
 import 'package:window_manager/window_manager.dart';
+import 'package:core/storage/preferences.dart';
   
 /// Desktop app root widget 
 class WordNinjaDesktopApp extends StatelessWidget { 
@@ -29,7 +30,7 @@ class WordNinjaDesktopApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,  
       theme: NinjaTheme.light,  
       darkTheme: NinjaTheme.dark,  
-      themeMode: ThemeMode.light,  
+      themeMode: Preferences.getBool('dark_mode') ? ThemeMode.dark : ThemeMode.light,  
       routerConfig: router,  
       builder: kDebugMode ? _debugBuilder : null,  
     );  
