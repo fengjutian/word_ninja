@@ -149,24 +149,68 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     );
   }
 
-  void _addToVocabulary(String text) {
-    // 提取第一个英文单词（字母组成，至少 2 个字符）
-    final match = RegExp(r'[a-zA-Z]{2,}').firstMatch(text);
-    if (match == null) return;
-    final word = match.group(0)!;
-    ref.read(wordListProvider.notifier).addWord(
-      Word(
-        id: DateTime.now().millisecondsSinceEpoch.toString(),
-        userId: 'local',
-        word: word,
-        meaning: '待补充',
-        source: 'ai_tutor',
-        createdAt: DateTime.now(),
-      ),
-    );
+  void _addAiResponseToVocabulary(int index, List<ChatMessage> messages) {
+    String? word;
+    for (int j = index - 1; j >= 0; j--) {
+      if (messages[j].isUser) {
+        final match = RegExp(r'[a-zA-Z]{2,}').firstMatch(messages[j].text);
+        if (match != null) word = match.group(0);
+        break;
+      }
+    }
+    if (word == null || word.isEmpty) return;
+
+    // 显示加载提示
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('「$word」已加入单词本'), duration: const Duration(seconds: 1)),
+      SnackBar(content: Text('正在查询「$word」的释义...'), duration: const Duration(seconds: 1)),
     );
+
+    final aiService = ref.read(aiChatServiceProvider);
+    aiService.explainWord(word).then((data) {
+      if (!mounted) return;
+      ref.read(wordListProvider.notifier).addWord(
+        Word(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          userId: 'local',
+          word: word!,
+          meaning: (data['meaning'] as String?) ?? '待补充',
+          phonetic: (data['phonetic'] as String?) ?? '',
+          example: (data['example'] as String?) ?? '',
+          tags: _parseCollocations(data['collocations']),
+          source: 'ai_tutor',
+          createdAt: DateTime.now(),
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('已加入单词本（含释义、音标、例句、搭配）'), duration: Duration(seconds: 2)),
+      );
+    }).catchError((_) {
+      if (!mounted) return;
+      // AI 查询失败，至少保存单词本身
+      ref.read(wordListProvider.notifier).addWord(
+        Word(
+          id: DateTime.now().millisecondsSinceEpoch.toString(),
+          userId: 'local',
+          word: word!,
+          meaning: '待补充',
+          source: 'ai_tutor',
+          createdAt: DateTime.now(),
+        ),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('「$word」已加入单词本（释义获取失败）'), duration: const Duration(seconds: 1)),
+      );
+    });
+  }
+
+  /// 解析 AI 返回的搭配为标签列表
+  List<String> _parseCollocations(dynamic raw) {
+    if (raw == null) return [];
+    if (raw is List) return raw.map((e) => e.toString().trim()).where((e) => e.isNotEmpty).toList();
+    if (raw is String && raw.isNotEmpty) {
+      return raw.split(',').map((e) => e.trim()).where((e) => e.isNotEmpty).toList();
+    }
+    return [];
   }
 
   void _scrollToBottom() {
@@ -263,8 +307,8 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                     _msgCtrl.selection = TextSelection.collapsed(offset: msg.text.length);
                   } : null,
                   onDelete: msg.isLoading ? null : () => _deleteMessage(i),
-                  onAddToVocab: msg.isUser && !msg.isLoading
-                      ? () => _addToVocabulary(msg.text)
+                  onAddToVocab: !msg.isUser && !msg.isLoading && !msg.isError
+                      ? () => _addAiResponseToVocabulary(i, messages)
                       : null,
                 );
               },
@@ -483,11 +527,27 @@ class _MessageBubble extends StatelessWidget {
                   Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
                 ])
               : message.isUser
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
+                  ? Text(message.text, style: TextStyle(color: textColor, fontSize: 15))
+                  : Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
+                        MarkdownBody(
+                          data: message.text,
+                          selectable: true,
+                          styleSheet: MarkdownStyleSheet(
+                            p: TextStyle(color: textColor, fontSize: 15, height: 1.5),
+                            code: TextStyle(
+                              color: NinjaColors.accentPurple,
+                              backgroundColor: NinjaColors.background,
+                              fontSize: 13,
+                            ),
+                            codeblockDecoration: BoxDecoration(
+                              color: NinjaColors.background,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                        ),
                         if (onAddToVocab != null)
                           GestureDetector(
                             onTap: onAddToVocab,
@@ -496,30 +556,14 @@ class _MessageBubble extends StatelessWidget {
                               child: Row(
                                 mainAxisSize: MainAxisSize.min,
                                 children: [
-                                  Icon(PhosphorIconsRegular.bookmarkSimple, size: 12, color: Colors.white70),
+                                  Icon(PhosphorIconsRegular.bookmarkSimple, size: 12, color: NinjaColors.primary.withValues(alpha: 0.7)),
                                   const SizedBox(width: 2),
-                                  Text('加入单词本', style: TextStyle(fontSize: 11, color: Colors.white70)),
+                                  Text('加入单词本', style: TextStyle(fontSize: 11, color: NinjaColors.primary.withValues(alpha: 0.7))),
                                 ],
                               ),
                             ),
                           ),
                       ],
-                    )
-                  : MarkdownBody(
-                      data: message.text,
-                      selectable: true,
-                      styleSheet: MarkdownStyleSheet(
-                        p: TextStyle(color: textColor, fontSize: 15, height: 1.5),
-                        code: TextStyle(
-                          color: NinjaColors.accentPurple,
-                          backgroundColor: NinjaColors.background,
-                          fontSize: 13,
-                        ),
-                        codeblockDecoration: BoxDecoration(
-                          color: NinjaColors.background,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
                     ),
         ),
       ),
