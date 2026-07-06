@@ -6,6 +6,8 @@ import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:ai/providers/ai_providers.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:archive/archive.dart';
+import 'dart:convert';
 import '../widgets/translate_popup.dart';
 
 /// 分类
@@ -156,11 +158,11 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
                 const SizedBox(height: NinjaSpacing.md),
                 Row(
                   children: [
-                    _ImportButton('PDF', PhosphorIconsRegular.filePdf, onTap: () => _showImportSnack(context, 'PDF')),
+                    _ImportButton('PDF', PhosphorIconsRegular.filePdf, onTap: () => _importFile('pdf')),
                     const SizedBox(width: NinjaSpacing.md),
-                    _ImportButton('EPUB', PhosphorIconsRegular.book, onTap: () => _showImportSnack(context, 'EPUB')),
+                    _ImportButton('EPUB', PhosphorIconsRegular.book, onTap: () => _importFile('epub')),
                     const SizedBox(width: NinjaSpacing.md),
-                    _ImportButton('TXT', PhosphorIconsRegular.fileText, onTap: () => _importTxtFile()),
+                    _ImportButton('TXT', PhosphorIconsRegular.fileText, onTap: () => _importFile('txt')),
                   ],
                 ),
               ],
@@ -255,47 +257,100 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
     ));
   }
 
-  Future<void> _importTxtFile() async {
+  Future<void> _importFile(String format) async {
     try {
+      final extensions = format == 'pdf' ? ['pdf'] : format == 'epub' ? ['epub'] : ['txt'];
       final result = await FilePicker.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['txt'],
+        allowedExtensions: extensions,
         withData: true,
       );
       if (result == null || result.files.isEmpty) return;
 
       final file = result.files.first;
-      final content = String.fromCharCodes(file.bytes!);
-      final fileName = file.name.replaceAll('.txt', '');
+      final bytes = file.bytes!;
+      final rawName = file.name.replaceAll('.$format', '');
+
+      String content;
+      if (format == 'pdf') {
+        content = _extractPdfText(bytes);
+      } else if (format == 'epub') {
+        content = _extractEpubText(bytes);
+      } else {
+        content = String.fromCharCodes(bytes);
+      }
+
+      if (content.trim().isEmpty) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('无法从 ${format.toUpperCase()} 文件中提取文字')),
+          );
+        }
+        return;
+      }
 
       final article = _Article(
-        title: fileName,
+        title: rawName,
         level: 'N3',
         wordCount: content.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length,
         source: '导入',
-        topic: fileName,
+        topic: rawName,
         category: _ReadingCategory.all,
         content: content,
       );
       setState(() => _articles = [article, ..._articles]);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('已导入: $fileName'), duration: const Duration(seconds: 1)),
+          SnackBar(content: Text('已导入: $rawName (${format.toUpperCase()})'), duration: const Duration(seconds: 2)),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('导入失败: $e')),
+          SnackBar(content: Text('导入 ${format.toUpperCase()} 失败: $e')),
         );
       }
     }
   }
 
-  void _showImportSnack(BuildContext ctx, String format) {
-    ScaffoldMessenger.of(ctx).showSnackBar(
-      SnackBar(content: Text('$format 导入功能即将上线'), duration: const Duration(seconds: 1)),
-    );
+  String _extractPdfText(List<int> bytes) {
+    final text = String.fromCharCodes(bytes);
+    final buf = StringBuffer();
+    final textRe = RegExp(r'\(([^)]*)\)\s*Tj');
+    for (final m in textRe.allMatches(text)) {
+      final t = m.group(1) ?? '';
+      if (t.trim().isNotEmpty) buf.writeln(t);
+    }
+    final hexRe = RegExp(r'<([0-9A-Fa-f]+)>\s*Tj');
+    for (final m in hexRe.allMatches(text)) {
+      try {
+        final hex = m.group(1)!;
+        final chars = <int>[];
+        for (int i = 0; i < hex.length; i += 4) {
+          final codeUnit = int.parse(hex.substring(i, i + 4), radix: 16);
+          if (codeUnit > 31 && codeUnit < 127) chars.add(codeUnit);
+        }
+        if (chars.isNotEmpty) buf.writeln(String.fromCharCodes(chars));
+      } catch (_) {}
+    }
+    return buf.toString().trim();
+  }
+
+  String _extractEpubText(List<int> bytes) {
+    final archive = ZipDecoder().decodeBytes(bytes);
+    final xhtmlFiles = archive.files.where((f) =>
+        f.name.endsWith('.xhtml') || f.name.endsWith('.html') || f.name.endsWith('.htm'));
+    final buf = StringBuffer();
+    for (final file in xhtmlFiles) {
+      final content = utf8.decode(file.content as List<int>);
+      final stripped = content
+          .replaceAll(RegExp(r'<[^>]+>'), '\n')
+          .replaceAll(RegExp(r'&[a-z]+;'), ' ')
+          .replaceAll(RegExp(r'\n{3,}'), '\n\n')
+          .trim();
+      if (stripped.isNotEmpty) buf.writeln(stripped);
+    }
+    return buf.toString().trim();
   }
 }
 
