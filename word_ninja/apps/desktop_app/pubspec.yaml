@@ -13,6 +13,7 @@ dependencies:
       ref: main
   flutter:
     sdk: flutter
+  fluent_ui: ^4.16.0
   core:
     path: ../../packages/core
   ui_kit:
