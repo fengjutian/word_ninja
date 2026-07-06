@@ -45,7 +45,8 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   Future<void> _callAiService(String text) async {
     try {
       final aiService = ref.read(aiChatServiceProvider);
-      final messages = ref.read(chatHistoryProvider);
+      final state = ref.read(chatHistoryProvider);
+      final messages = state.current.messages;
       final history = messages
           .where((m) => !m.isLoading)
           .map((m) => {'role': m.isUser ? 'user' : 'assistant', 'content': m.text})
@@ -57,7 +58,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
       );
       if (!mounted) return;
       final notifier = ref.read(chatHistoryProvider.notifier);
-      notifier.removeLast(); // 移除"思考中"
+      notifier.removeLast();
       notifier.addMessage(ChatMessage(reply, isUser: false));
       setState(() => _isLoading = false);
     } catch (e) {
@@ -75,13 +76,21 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   void _retry() {
     if (_lastError == null) return;
     final notifier = ref.read(chatHistoryProvider.notifier);
-    notifier.removeLast(); // 错误消息
+    notifier.removeLast();
     notifier.addMessage(ChatMessage('思考中...', isUser: false, isLoading: true));
     setState(() {
       _isLoading = true;
       _lastError = null;
     });
     _callAiService(_msgCtrl.text.trim().isNotEmpty ? _msgCtrl.text.trim() : '请重试');
+  }
+
+  void _startNewSession() {
+    ref.read(chatHistoryProvider.notifier).newSession();
+    setState(() {
+      _lastError = null;
+      _isLoading = false;
+    });
   }
 
   void _scrollToBottom() {
@@ -98,7 +107,9 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
 
   @override
   Widget build(BuildContext context) {
-    final messages = ref.watch(chatHistoryProvider);
+    final sessionsState = ref.watch(chatHistoryProvider);
+    final messages = sessionsState.current.messages;
+    final notifier = ref.read(chatHistoryProvider.notifier);
 
     return Scaffold(
       appBar: AppBar(
@@ -117,15 +128,28 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
               ),
             ),
             const SizedBox(width: 8),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text('Sensei Shell', style: NinjaTextStyles.titleMedium.copyWith(color: Colors.white)),
-                Text(_isLoading ? '输入中...' : '在线',
-                    style: TextStyle(fontSize: 12, color: _isLoading ? NinjaColors.warning : NinjaColors.textOnDark.withValues(alpha: 0.7))),
-              ],
+            Expanded(
+              child: sessionsState.sessions.length <= 1
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Sensei Shell', style: NinjaTextStyles.titleMedium.copyWith(color: Colors.white)),
+                        Text(_isLoading ? '输入中...' : '在线',
+                            style: TextStyle(fontSize: 12, color: _isLoading ? NinjaColors.warning : NinjaColors.textOnDark.withValues(alpha: 0.7))),
+                      ],
+                    )
+                  : _SessionDropdown(
+                      sessions: sessionsState.sessions,
+                      currentIndex: sessionsState.currentIndex,
+                      onSelect: (i) => notifier.switchToSession(i),
+                      onDelete: (i) => notifier.deleteSession(i),
+                    ),
             ),
-            const Spacer(),
+            IconButton(
+              icon: Icon(PhosphorIconsRegular.plusCircle, size: 20, color: NinjaColors.textOnDark.withValues(alpha: 0.7)),
+              tooltip: '新会话',
+              onPressed: _startNewSession,
+            ),
             if (_lastError != null)
               IconButton(
                 icon: Icon(PhosphorIconsRegular.arrowsClockwise, size: 18, color: NinjaColors.textOnDark.withValues(alpha: 0.7)),
@@ -142,13 +166,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
               controller: _scrollCtrl,
               padding: const EdgeInsets.all(NinjaSpacing.md),
               itemCount: messages.length,
-              itemBuilder: (ctx, i) {
-                final msg = messages[i];
-                return Semantics(
-                  label: msg.isUser ? '你: ${msg.text}' : 'Sensei: ${msg.text}',
-                  child: _MessageBubble(msg),
-                );
-              },
+              itemBuilder: (ctx, i) => _MessageBubble(messages[i]),
             ),
           ),
           Container(
@@ -189,14 +207,11 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                     ),
                   ),
                   const SizedBox(width: NinjaSpacing.sm),
-                  Semantics(
-                    label: '发送消息',
-                    child: CircleAvatar(
-                      backgroundColor: _isLoading ? NinjaColors.textSecondary : NinjaColors.primary,
-                      child: IconButton(
-                        icon: Icon(PhosphorIconsRegular.paperPlaneTilt, color: Colors.white, size: 18),
-                        onPressed: _isLoading ? null : _sendMessage,
-                      ),
+                  CircleAvatar(
+                    backgroundColor: _isLoading ? NinjaColors.textSecondary : NinjaColors.primary,
+                    child: IconButton(
+                      icon: Icon(PhosphorIconsRegular.paperPlaneTilt, color: Colors.white, size: 18),
+                      onPressed: _isLoading ? null : _sendMessage,
                     ),
                   ),
                 ],
@@ -205,6 +220,75 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
           ),
         ],
       ),
+    );
+  }
+}
+
+/// 会话切换下拉
+class _SessionDropdown extends StatelessWidget {
+  final List<ChatSession> sessions;
+  final int currentIndex;
+  final ValueChanged<int> onSelect;
+  final ValueChanged<int> onDelete;
+
+  const _SessionDropdown({
+    required this.sessions,
+    required this.currentIndex,
+    required this.onSelect,
+    required this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final current = sessions[currentIndex];
+    return PopupMenuButton<int>(
+      offset: const Offset(0, 40),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            child: Text(
+              current.title,
+              style: NinjaTextStyles.titleMedium.copyWith(color: Colors.white),
+              overflow: TextOverflow.ellipsis,
+            ),
+          ),
+          const Icon(PhosphorIconsRegular.caretDown, size: 14, color: Colors.white70),
+        ],
+      ),
+      itemBuilder: (ctx) => List.generate(sessions.length, (i) {
+        final s = sessions[i];
+        return PopupMenuItem<int>(
+          value: i,
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  s.title,
+                  style: TextStyle(
+                    fontWeight: i == currentIndex ? FontWeight.bold : FontWeight.normal,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              if (i == currentIndex)
+                const Icon(PhosphorIconsRegular.check, size: 16, color: NinjaColors.primary),
+              if (sessions.length > 1)
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    onDelete(i);
+                  },
+                  child: const Padding(
+                    padding: EdgeInsets.only(left: 8),
+                    child: Icon(PhosphorIconsRegular.trash, size: 16, color: NinjaColors.textSecondary),
+                  ),
+                ),
+            ],
+          ),
+        );
+      }),
+      onSelected: onSelect,
     );
   }
 }
