@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ai/ai.dart';
+import '../providers/chat_history_provider.dart';
 
 /// AI 导师聊天页 — Sensei Shell
 class TutorChatPage extends ConsumerStatefulWidget {
@@ -16,12 +17,6 @@ class TutorChatPage extends ConsumerStatefulWidget {
 class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   final _msgCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
-  final _messages = <_ChatMessage>[
-    _ChatMessage(
-      '你好！我是 Sensei Shell，你的英语忍者导师。\n有什么问题尽管问我！',
-      isUser: false,
-    ),
-  ];
   bool _isLoading = false;
   String? _lastError;
 
@@ -35,10 +30,11 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   void _sendMessage() {
     final text = _msgCtrl.text.trim();
     if (text.isEmpty || _isLoading) return;
+    final notifier = ref.read(chatHistoryProvider.notifier);
+    notifier.addMessage(ChatMessage(text, isUser: true));
+    notifier.addMessage(ChatMessage('思考中...', isUser: false, isLoading: true));
+    _msgCtrl.clear();
     setState(() {
-      _messages.add(_ChatMessage(text, isUser: true));
-      _messages.add(_ChatMessage('思考中...', isUser: false, isLoading: true));
-      _msgCtrl.clear();
       _lastError = null;
       _isLoading = true;
     });
@@ -49,8 +45,8 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   Future<void> _callAiService(String text) async {
     try {
       final aiService = ref.read(aiChatServiceProvider);
-      // 构建聊天历史
-      final history = _messages
+      final messages = ref.read(chatHistoryProvider);
+      final history = messages
           .where((m) => !m.isLoading)
           .map((m) => {'role': m.isUser ? 'user' : 'assistant', 'content': m.text})
           .toList();
@@ -60,16 +56,16 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
         history: history,
       );
       if (!mounted) return;
-      setState(() {
-        _messages.removeLast();
-        _messages.add(_ChatMessage(reply, isUser: false));
-        _isLoading = false;
-      });
+      final notifier = ref.read(chatHistoryProvider.notifier);
+      notifier.removeLast(); // 移除"思考中"
+      notifier.addMessage(ChatMessage(reply, isUser: false));
+      setState(() => _isLoading = false);
     } catch (e) {
       if (!mounted) return;
+      final notifier = ref.read(chatHistoryProvider.notifier);
+      notifier.removeLast();
+      notifier.addMessage(ChatMessage('抱歉，暂时无法连接AI。请稍后再试。', isUser: false, isError: true));
       setState(() {
-        _messages.removeLast();
-        _messages.add(_ChatMessage('抱歉，暂时无法连接AI。请稍后再试。', isUser: false, isError: true));
         _lastError = e.toString();
         _isLoading = false;
       });
@@ -78,15 +74,12 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
 
   void _retry() {
     if (_lastError == null) return;
-    // 移除最后的错误消息和加载消息
+    final notifier = ref.read(chatHistoryProvider.notifier);
+    notifier.removeLast(); // 错误消息
+    notifier.addMessage(ChatMessage('思考中...', isUser: false, isLoading: true));
     setState(() {
-      if (_messages.length >= 2) {
-        _messages.removeLast(); // 错误消息
-        final lastUserMsg = _messages.lastWhere((m) => m.isUser, orElse: () => _messages.last);
-        _messages.add(_ChatMessage('思考中...', isUser: false, isLoading: true));
-        _isLoading = true;
-        _lastError = null;
-      }
+      _isLoading = true;
+      _lastError = null;
     });
     _callAiService(_msgCtrl.text.trim().isNotEmpty ? _msgCtrl.text.trim() : '请重试');
   }
@@ -105,6 +98,8 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
 
   @override
   Widget build(BuildContext context) {
+    final messages = ref.watch(chatHistoryProvider);
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -125,7 +120,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                  Text('Sensei Shell', style: NinjaTextStyles.titleMedium.copyWith(color: Colors.white)),
+                Text('Sensei Shell', style: NinjaTextStyles.titleMedium.copyWith(color: Colors.white)),
                 Text(_isLoading ? '输入中...' : '在线',
                     style: TextStyle(fontSize: 12, color: _isLoading ? NinjaColors.warning : NinjaColors.textOnDark.withValues(alpha: 0.7))),
               ],
@@ -146,9 +141,9 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
             child: ListView.builder(
               controller: _scrollCtrl,
               padding: const EdgeInsets.all(NinjaSpacing.md),
-              itemCount: _messages.length,
+              itemCount: messages.length,
               itemBuilder: (ctx, i) {
-                final msg = _messages[i];
+                final msg = messages[i];
                 return Semantics(
                   label: msg.isUser ? '你: ${msg.text}' : 'Sensei: ${msg.text}',
                   child: _MessageBubble(msg),
@@ -214,17 +209,8 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   }
 }
 
-class _ChatMessage {
-  final String text;
-  final bool isUser;
-  final bool isLoading;
-  final bool isError;
-
-  const _ChatMessage(this.text, {required this.isUser, this.isLoading = false, this.isError = false});
-}
-
 class _MessageBubble extends StatelessWidget {
-  final _ChatMessage message;
+  final ChatMessage message;
   const _MessageBubble(this.message);
 
   @override
