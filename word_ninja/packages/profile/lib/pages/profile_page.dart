@@ -80,7 +80,7 @@ class ProfilePage extends ConsumerWidget {
             () async {
               final syncService = ref.read(syncProvider);
               final result = await syncService.sync();
-              if (context.mounted) {
+              if (mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text(result.message)),
                 );

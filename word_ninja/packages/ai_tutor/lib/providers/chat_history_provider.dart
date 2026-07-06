@@ -135,7 +135,7 @@ class ChatHistoryNotifier extends StateNotifier<ChatSessionsState> {
           return;
         }
       }
-    } catch (_) {}
+    } catch (e) { log.w('Chat history load failed', e); }
     final s = _newSession('default');
     state = ChatSessionsState(sessions: [s], currentIndex: 0);
     _save();
@@ -164,7 +164,7 @@ class ChatHistoryNotifier extends StateNotifier<ChatSessionsState> {
           'currentIndex': state.currentIndex,
         }),
       );
-    } catch (_) {}
+    } catch (e) { log.w('Chat history save failed', e); }
   }
 
   void addMessage(ChatMessage msg) {

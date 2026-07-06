@@ -19,6 +19,8 @@ dependencies:
     path: ../ui_kit
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
+  listening:
+    path: ../listening
 
 dev_dependencies:
   flutter_test:

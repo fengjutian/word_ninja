@@ -87,7 +87,7 @@ class AiChatService {
               final json = jsonDecode(data) as Map<String, dynamic>;
               final delta = json['choices']?[0]?['delta']?['content'];
               if (delta is String && delta.isNotEmpty) yield delta;
-            } catch (_) {}
+            } catch (e) { log.w('SSE chunk parse failed', e); }
           }
         }
       }

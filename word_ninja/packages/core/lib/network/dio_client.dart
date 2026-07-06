@@ -138,7 +138,7 @@ class _AuthInterceptor extends Interceptor {
           // TODO 调用 refresh token API
           await SecureStorage.delete(StorageKeys.accessToken);
           await SecureStorage.delete(StorageKeys.refreshToken);
-        } catch (_) {}
+        } catch (e) { log.w('Token refresh failed', e); }
       }
     }
     handler.next(err);

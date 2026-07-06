@@ -19,6 +19,7 @@ import 'package:study_plan/pages/study_plan_page.dart';
 import 'package:profile/pages/profile_page.dart';
 import 'package:profile/pages/settings_page.dart';
 import 'package:listening/presentation/pages/listening_page.dart';
+import 'package:speaking/presentation/pages/speaking_page.dart';
 import '../debug_overlay.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:core/storage/preferences.dart';
@@ -118,6 +119,7 @@ class DesktopRoutes {
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String listening = '/listening';
+  static const String speaking = '/speaking';
 }
 
 GoRouter createDesktopRouter() {
@@ -157,6 +159,9 @@ GoRouter createDesktopRouter() {
           GoRoute(
               path: DesktopRoutes.listening,
               builder: (ctx, state) => const ListeningPage()),
+          GoRoute(
+              path: DesktopRoutes.speaking,
+              builder: (ctx, state) => const SpeakingPage()),
         ],
       ),
       // ─── 全屏子页面 ───
@@ -253,6 +258,11 @@ class DesktopShell extends StatelessWidget {
           PaneItem(
             icon: const Icon(FluentIcons.headphones),
             title: const Text('Listening'),
+            body: const SizedBox.shrink(),
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.mic_on),
+            title: const Text('Speaking'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
@@ -374,12 +384,13 @@ class DesktopShell extends StatelessWidget {
     if (uri.startsWith(DesktopRoutes.vocabulary)) return 1;
     if (uri.startsWith(DesktopRoutes.reading)) return 2;
     if (uri.startsWith(DesktopRoutes.listening)) return 3;
-    if (uri.startsWith(DesktopRoutes.aiTutor)) return 4;
-    if (uri.startsWith(DesktopRoutes.writing)) return 5;
-    if (uri.startsWith(DesktopRoutes.studyPlan)) return 6;
-    if (uri.startsWith(DesktopRoutes.modelConfig)) return 7;
+    if (uri.startsWith(DesktopRoutes.speaking)) return 4;
+    if (uri.startsWith(DesktopRoutes.aiTutor)) return 5;
+    if (uri.startsWith(DesktopRoutes.writing)) return 6;
+    if (uri.startsWith(DesktopRoutes.studyPlan)) return 7;
+    if (uri.startsWith(DesktopRoutes.modelConfig)) return 8;
     if (uri.startsWith(DesktopRoutes.profile) ||
-        uri.startsWith(DesktopRoutes.settings)) return 8;
+        uri.startsWith(DesktopRoutes.settings)) return 9;
     return 0;
   }
 
@@ -394,14 +405,16 @@ class DesktopShell extends StatelessWidget {
       case 3:
         context.go(DesktopRoutes.listening);
       case 4:
-        context.go(DesktopRoutes.aiTutor);
+        context.go(DesktopRoutes.speaking);
       case 5:
-        context.go(DesktopRoutes.writing);
+        context.go(DesktopRoutes.aiTutor);
       case 6:
-        context.go(DesktopRoutes.studyPlan);
+        context.go(DesktopRoutes.writing);
       case 7:
-        context.go(DesktopRoutes.modelConfig);
+        context.go(DesktopRoutes.studyPlan);
       case 8:
+        context.go(DesktopRoutes.modelConfig);
+      case 9:
         context.go(DesktopRoutes.profile);
     }
   }

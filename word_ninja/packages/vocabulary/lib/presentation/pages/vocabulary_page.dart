@@ -68,7 +68,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
     context.push('/vocabulary/review');
   }
 
-  void _showWordDetail(dynamic word) {
+  void _showWordDetail(Word word) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -334,8 +334,8 @@ class _PracticeCard extends StatelessWidget {
 
 /// 单词详情弹层
 class _WordDetailSheet extends ConsumerWidget {
-  final dynamic word;
-  const _WordDetailSheet({required this.word});
+  final Word word;
+  _WordDetailSheet({required this.word});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

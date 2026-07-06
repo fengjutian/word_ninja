@@ -331,7 +331,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
           if (codeUnit > 31 && codeUnit < 127) chars.add(codeUnit);
         }
         if (chars.isNotEmpty) buf.writeln(String.fromCharCodes(chars));
-      } catch (_) {}
+      } catch (e) { log.w('PDF hex decode failed', e); }
     }
     return buf.toString().trim();
   }

@@ -89,7 +89,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
         _flipCtrl.reset();
         _showMeaning = false;
       } else {
-        if (context.mounted) {
+        if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('🎉 复习完成！')),
           );
