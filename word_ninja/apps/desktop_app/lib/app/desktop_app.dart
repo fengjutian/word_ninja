@@ -208,7 +208,7 @@ class DesktopShell extends StatelessWidget {
       pane: NavigationPane(
         selected: _calcIndex(context),
         onChanged: (i) => _navigate(context, i),
-        displayMode: PaneDisplayMode.auto,
+        displayMode: PaneDisplayMode.compact,
         items: [
           PaneItem(
             icon: const Icon(FluentIcons.home),
