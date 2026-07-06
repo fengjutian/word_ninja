@@ -92,6 +92,7 @@ func main() {
 			authorized.GET("/words/:id", vocabHandler.Get)
 			authorized.PUT("/words/:id", vocabHandler.Update)
 			authorized.DELETE("/words/:id", vocabHandler.Delete)
+			authorized.GET("/words/:id/graph", vocabHandler.Graph)
 			authorized.POST("/words/reviews", vocabHandler.Review)
 			authorized.GET("/words/reviews/due", vocabHandler.DueReviews)
 
@@ -103,6 +104,13 @@ func main() {
 
 			// 同步
 			authorized.POST("/sync", syncHandler.Sync)
+
+			// 学习计划
+			authorized.GET("/plans", vocabHandler.ListPlans)
+			authorized.GET("/plans/:id", vocabHandler.GetPlan)
+			authorized.POST("/plans", vocabHandler.CreatePlan)
+			authorized.PUT("/plans/:id", vocabHandler.UpdatePlan)
+			authorized.DELETE("/plans/:id", vocabHandler.DeletePlan)
 		}
 	}
 
@@ -110,6 +118,9 @@ func main() {
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok", "service": "word-ninja"})
 	})
+
+	// 排行榜（公开）
+	r.GET("/api/v1/leaderboard", vocabHandler.Leaderboard)
 
 	// ─── 启动服务器 ───
 	srv := &http.Server{

@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ui_kit/ninja_theme/theme_data.dart';
 import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
+import 'package:vocabulary/presentation/pages/word_graph_page.dart';
 import 'package:vocabulary/presentation/pages/vocabulary_page.dart';
 import 'package:vocabulary/presentation/pages/word_detail_page.dart';
 import 'package:vocabulary/presentation/pages/add_word_page.dart';
@@ -64,9 +65,12 @@ class WordNinjaDesktopApp extends StatelessWidget {
           isDark ? NinjaColors.surfaceDark : NinjaColors.background,
       navigationPaneTheme: NavigationPaneThemeData(
         backgroundColor:
-            isDark ? NinjaColors.surfaceDark : NinjaColors.surface,
+            isDark ? NinjaColors.surfaceDark.withValues(alpha: 0.92) : NinjaColors.surface.withValues(alpha: 0.92),
         highlightColor: NinjaColors.primary.withValues(alpha: 0.08),
       ),
+      acrylicBackgroundColor: isDark
+          ? NinjaColors.surfaceDark.withValues(alpha: 0.4)
+          : NinjaColors.surface.withValues(alpha: 0.4),
     );
   }
 
@@ -114,6 +118,7 @@ class DesktopRoutes {
   static const String addWord = '/vocabulary/add';
   static const String review = '/vocabulary/review';
   static const String wordTest = '/vocabulary/test';
+  static const String wordGraph = '/vocabulary/graph';
   static const String reading = '/reading';
   static const String aiTutor = '/ai-tutor';
   static const String modelConfig = '/model-config';
@@ -218,6 +223,22 @@ GoRouter createDesktopRouter() {
           );
         },
       ),
+      GoRoute(
+        path: DesktopRoutes.wordGraph,
+        pageBuilder: (ctx, state) {
+          final extra = state.extra;
+          if (extra is List<Word>) {
+            return mt.MaterialPage(
+              key: state.pageKey,
+              child: WordGraphPage(words: extra),
+            );
+          }
+          return mt.MaterialPage(
+            key: state.pageKey,
+            child: WordGraphPage(words: []),
+          );
+        },
+      ),
     ],
   );
 }
@@ -235,8 +256,12 @@ class DesktopShell extends StatelessWidget {
       paneBodyBuilder: (item, body) {
         return mt.Theme(
           data: isDark ? NinjaTheme.dark : NinjaTheme.light,
-          child: mt.Material(
-            child: child,
+          child: Builder(
+            builder: (ctx) => mt.Material(
+              child: mt.ScaffoldMessenger(
+                child: child,
+              ),
+            ),
           ),
         );
       },

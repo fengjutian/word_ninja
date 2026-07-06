@@ -267,3 +267,101 @@ func GetUserAchievements(db *gorm.DB, userID string) ([]Achievement, error) {
 	}
 	return achievements, nil
 }
+
+// ─── Graph API ───
+
+// GraphNode 图谱节点
+type GraphNode struct {
+	Word       string `json:"word"`
+	Meaning    string `json:"meaning"`
+	Difficulty int    `json:"difficulty"`
+	Source     string `json:"source"`
+	Tags       string `json:"tags"`
+	IsCenter   bool   `json:"is_center"`
+}
+
+// GraphEdge 图谱边
+type GraphEdge struct {
+	From     int    `json:"from"`
+	To       int    `json:"to"`
+	Label    string `json:"label"`
+	Strength float64 `json:"strength"`
+}
+
+// GraphData 图谱数据
+type GraphData struct {
+	Nodes []GraphNode `json:"nodes"`
+	Edges []GraphEdge `json:"edges"`
+}
+
+// GraphWords 获取单词的关系图谱（标签/来源/难度分组）
+func GraphWords(db *gorm.DB, userID, wordID string) (*GraphData, error) {
+	var center Word
+	if err := db.Where("id = ? AND user_id = ?", wordID, userID).First(&center).Error; err != nil {
+		return nil, err
+	}
+
+	// 获取用户所有单词
+	var all []Word
+	db.Where("user_id = ?", userID).Find(&all)
+
+	nodes := []GraphNode{{
+		Word:       center.Word,
+		Meaning:    center.Meaning,
+		Difficulty: center.Difficulty,
+		Source:     center.Source,
+		Tags:       center.Tags,
+		IsCenter:   true,
+	}}
+	edges := []GraphEdge{}
+	seen := map[string]bool{center.Word: true}
+
+	for _, w := range all {
+		if w.Word == center.Word {
+			continue
+		}
+		relation := ""
+		strength := 0.0
+
+		// 标签重叠
+		if center.Tags != "" && w.Tags != "" && center.Tags == w.Tags {
+			relation = "同标签"
+			strength = 0.5
+		} else if center.Source == w.Source && center.Source != "" {
+			relation = "同来源"
+			strength = 0.3
+		} else if abs(center.Difficulty-w.Difficulty) <= 1 {
+			relation = "难度相近"
+			strength = 0.2
+		}
+
+		if relation != "" && !seen[w.Word] {
+			seen[w.Word] = true
+			nodes = append(nodes, GraphNode{
+				Word:       w.Word,
+				Meaning:    w.Meaning,
+				Difficulty: w.Difficulty,
+				Source:     w.Source,
+				Tags:       w.Tags,
+			})
+			edges = append(edges, GraphEdge{
+				From:     0,
+				To:       len(nodes) - 1,
+				Label:    relation,
+				Strength: strength,
+			})
+		}
+		if len(nodes) >= 12 {
+			break
+		}
+	}
+
+	return &GraphData{Nodes: nodes, Edges: edges}, nil
+}
+
+func abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}

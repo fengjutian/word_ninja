@@ -100,6 +100,15 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
               )
             : const Text('单词修炼'),
         actions: [
+          if (state.words.isNotEmpty)
+            IconButton(
+              icon: const Icon(PhosphorIconsRegular.graph),
+              tooltip: '单词图谱',
+              onPressed: () => context.push(
+                '/vocabulary/graph',
+                extra: state.words,
+              ),
+            ),
           IconButton(
             icon: Icon(_isSearching ? PhosphorIconsRegular.x : PhosphorIconsRegular.magnifyingGlass),
             onPressed: () => setState(() {

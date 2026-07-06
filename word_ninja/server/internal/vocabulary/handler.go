@@ -118,3 +118,122 @@ func (h *Handler) DueReviews(c *gin.Context) {
 	}
 	c.JSON(http.StatusOK, gin.H{"data": words})
 }
+
+// Graph 获取单词关系图谱
+func (h *Handler) Graph(c *gin.Context) {
+	userID := c.GetString("user_id")
+	wordID := c.Param("id")
+	result, err := GraphWords(h.DB, userID, wordID)
+	if err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "单词不存在"})
+		return
+	}
+	c.JSON(http.StatusOK, result)
+}
+
+// Leaderboard 获取排行榜
+func (h *Handler) Leaderboard(c *gin.Context) {
+	limit := 20
+	if l, err := strconv.Atoi(c.DefaultQuery("limit", "20")); err == nil && l > 0 && l <= 100 {
+		limit = l
+	}
+	entries, err := GetLeaderboard(h.DB, limit)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取排行榜失败"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": entries})
+}
+
+// ─── Study Plan ───
+
+// ListPlans 获取学习计划列表
+func (h *Handler) ListPlans(c *gin.Context) {
+	userID := c.GetString("user_id")
+	var plans []StudyPlan
+	h.DB.Where("user_id = ?", userID).Order("created_at DESC").Find(&plans)
+	c.JSON(http.StatusOK, gin.H{"data": plans})
+}
+
+// GetPlan 获取单个计划
+func (h *Handler) GetPlan(c *gin.Context) {
+	userID := c.GetString("user_id")
+	planID := c.Param("id")
+	var plan StudyPlan
+	if err := h.DB.Where("id = ? AND user_id = ?", planID, userID).First(&plan).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "计划不存在"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"data": plan})
+}
+
+// CreatePlan 创建学习计划
+func (h *Handler) CreatePlan(c *gin.Context) {
+	userID := c.GetString("user_id")
+	var req struct {
+		Goal     string `json:"goal" binding:"required"`
+		DayCount int    `json:"day_count"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	if req.DayCount <= 0 {
+		req.DayCount = 7
+	}
+	plan := StudyPlan{
+		UserID:   userID,
+		Goal:     req.Goal,
+		DayCount: req.DayCount,
+		IsActive: true,
+	}
+	if err := h.DB.Create(&plan).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "创建计划失败"})
+		return
+	}
+	c.JSON(http.StatusCreated, gin.H{"data": plan})
+}
+
+// UpdatePlan 更新学习计划进度
+func (h *Handler) UpdatePlan(c *gin.Context) {
+	userID := c.GetString("user_id")
+	planID := c.Param("id")
+	var req struct {
+		CurrentDay *int  `json:"current_day"`
+		IsActive   *bool `json:"is_active"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	updates := map[string]interface{}{}
+	if req.CurrentDay != nil {
+		updates["current_day"] = *req.CurrentDay
+	}
+	if req.IsActive != nil {
+		updates["is_active"] = *req.IsActive
+	}
+	if len(updates) == 0 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "无更新内容"})
+		return
+	}
+	if err := h.DB.Model(&StudyPlan{}).
+		Where("id = ? AND user_id = ?", planID, userID).
+		Updates(updates).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "更新计划失败"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "更新成功"})
+}
+
+// DeletePlan 删除学习计划
+func (h *Handler) DeletePlan(c *gin.Context) {
+	userID := c.GetString("user_id")
+	planID := c.Param("id")
+	result := h.DB.Where("id = ? AND user_id = ?", planID, userID).Delete(&StudyPlan{})
+	if result.RowsAffected == 0 {
+		c.JSON(http.StatusNotFound, gin.H{"error": "计划不存在"})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "删除成功"})
+}
