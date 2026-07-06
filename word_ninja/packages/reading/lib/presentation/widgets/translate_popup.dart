@@ -6,9 +6,9 @@ import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 
 /// 划词翻译弹窗
 /// 显示翻译结果并提供加入单词本和AI解析操作
-class TranslatePopup extends ConsumerWidget {
+class TranslatePopup extends ConsumerStatefulWidget {
   final String word;
-  final VoidCallback? onAddToVocabulary;
+  final void Function(String meaning, String example, String phonetic)? onAddToVocabulary;
   final VoidCallback? onAiAnalysis;
 
   const TranslatePopup({
@@ -19,7 +19,36 @@ class TranslatePopup extends ConsumerWidget {
   });
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<TranslatePopup> createState() => _TranslatePopupState();
+}
+
+class _TranslatePopupState extends ConsumerState<TranslatePopup> {
+  Future<Map<String, dynamic>>? _translationFuture;
+  Map<String, dynamic>? _translationData;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchTranslation();
+  }
+
+  @override
+  void didUpdateWidget(covariant TranslatePopup oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.word != widget.word) {
+      _fetchTranslation();
+    }
+  }
+
+  void _fetchTranslation() {
+    _translationFuture = ref.read(aiChatServiceProvider).explainWord(widget.word);
+    _translationFuture?.then((data) {
+      if (mounted) setState(() => _translationData = data);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Material(
       elevation: 4,
       borderRadius: BorderRadius.circular(12),
@@ -35,26 +64,37 @@ class TranslatePopup extends ConsumerWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(word, style: NinjaTextStyles.heading3),
+              Text(widget.word, style: NinjaTextStyles.heading3),
               const SizedBox(height: 4),
-              _TranslationView(word: word),
+              _TranslationResult(future: _translationFuture),
               const Divider(height: NinjaSpacing.lg),
               Row(
                 children: [
                   TextButton.icon(
-                    onPressed: onAddToVocabulary ?? () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('「$word」已加入单词本')),
-                      );
+                    onPressed: () {
+                      final data = _translationData;
+                      if (widget.onAddToVocabulary != null && data != null) {
+                        widget.onAddToVocabulary!(
+                          data['meaning'] as String? ?? '',
+                          data['example'] as String? ?? '',
+                          data['phonetic'] as String? ?? '',
+                        );
+                      } else if (widget.onAddToVocabulary != null) {
+                        widget.onAddToVocabulary!('', '', '');
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('「${widget.word}」已加入单词本')),
+                        );
+                      }
                     },
                     icon: const Icon(PhosphorIconsRegular.bookmarkSimple, size: 16),
                     label: const Text('加入单词本'),
                   ),
                   const Spacer(),
                   TextButton.icon(
-                    onPressed: onAiAnalysis ?? () {
+                    onPressed: widget.onAiAnalysis ?? () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('正在AI解析「$word」...')),
+                        SnackBar(content: Text('正在AI解析「${widget.word}」...')),
                       );
                     },
                     icon: const Icon(PhosphorIconsRegular.sparkle, size: 16),
@@ -70,23 +110,19 @@ class TranslatePopup extends ConsumerWidget {
   }
 }
 
-/// 内嵌翻译组件 — 读取 AI 服务获取翻译
-class _TranslationView extends ConsumerStatefulWidget {
-  final String word;
-  const _TranslationView({required this.word});
-
-  @override
-  ConsumerState<_TranslationView> createState() => _TranslationViewState();
-}
-
-class _TranslationViewState extends ConsumerState<_TranslationView> {
-  Future<Map<String, dynamic>>? _translationFuture;
+/// 翻译结果展示组件
+class _TranslationResult extends StatelessWidget {
+  final Future<Map<String, dynamic>>? future;
+  const _TranslationResult({required this.future});
 
   @override
   Widget build(BuildContext context) {
-    _translationFuture ??= ref.read(aiChatServiceProvider).explainWord(widget.word);
+    final f = future;
+    if (f == null) {
+      return const SizedBox(height: 20, child: Center(child: CircularProgressIndicator(strokeWidth: 2)));
+    }
     return FutureBuilder<Map<String, dynamic>>(
-      future: _translationFuture,
+      future: f,
       builder: (ctx, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SizedBox(

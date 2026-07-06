@@ -153,7 +153,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     String? word;
     for (int j = index - 1; j >= 0; j--) {
       if (messages[j].isUser) {
-        final match = RegExp(r'[a-zA-Z]{2,}').firstMatch(messages[j].text);
+        final match = RegExp(r"[a-zA-Z]{2,}(?:-[a-zA-Z]+)*").firstMatch(messages[j].text);
         if (match != null) word = match.group(0);
         break;
       }

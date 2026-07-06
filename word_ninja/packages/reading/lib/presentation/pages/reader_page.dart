@@ -4,6 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
+import 'package:ai/providers/ai_providers.dart';
+import 'package:file_picker/file_picker.dart';
 import '../widgets/translate_popup.dart';
 
 /// 分类
@@ -101,11 +103,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
           IconButton(
             icon: const Icon(PhosphorIconsRegular.sparkle),
             tooltip: 'AI 生成文章',
-            onPressed: () async {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('AI文章生成功能即将上线'), duration: Duration(seconds: 1)),
-              );
-            },
+            onPressed: () => _showAiGenerateDialog(context),
           ),
         ],
       ),
@@ -162,7 +160,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
                     const SizedBox(width: NinjaSpacing.md),
                     _ImportButton('EPUB', PhosphorIconsRegular.book, onTap: () => _showImportSnack(context, 'EPUB')),
                     const SizedBox(width: NinjaSpacing.md),
-                    _ImportButton('TXT', PhosphorIconsRegular.fileText, onTap: () => _showImportSnack(context, 'TXT')),
+                    _ImportButton('TXT', PhosphorIconsRegular.fileText, onTap: () => _importTxtFile()),
                   ],
                 ),
               ],
@@ -170,10 +168,128 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
     );
   }
 
+  void _showAiGenerateDialog(BuildContext context) {
+    final topicController = TextEditingController();
+    int selectedLevel = 3;
+    showDialog(
+      context: context,
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setDialogState) => AlertDialog(
+          title: const Text('AI 生成文章'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: topicController,
+                decoration: const InputDecoration(
+                  labelText: '文章主题',
+                  hintText: '例如: climate change, cooking, travel...',
+                ),
+              ),
+              const SizedBox(height: NinjaSpacing.lg),
+              Row(
+                children: [
+                  const Text('难度等级: '),
+                  const SizedBox(width: NinjaSpacing.sm),
+                  DropdownButton<int>(
+                    value: selectedLevel,
+                    items: List.generate(5, (i) => DropdownMenuItem(value: i + 1, child: Text('N${i + 1}'))),
+                    onChanged: (v) { if (v != null) setDialogState(() => selectedLevel = v); },
+                  ),
+                ],
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+            FilledButton(
+              onPressed: () {
+                final topic = topicController.text.trim();
+                if (topic.isEmpty) return;
+                Navigator.pop(ctx);
+                _generateArticle(topic, selectedLevel);
+              },
+              child: const Text('生成'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _generateArticle(String topic, int level) async {
+    setState(() => _isLoading = true);
+    try {
+      final content = await ref.read(aiReadingServiceProvider).generateArticle(topic: topic, level: level);
+      final article = _Article(
+        title: topic,
+        level: 'N$level',
+        wordCount: content.split(' ').length,
+        source: 'AI生成',
+        topic: topic,
+        category: _ReadingCategory.all,
+        content: content,
+      );
+      setState(() {
+        _articles = [article, ..._articles];
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('AI 文章已生成'), duration: Duration(seconds: 1)),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('生成失败: $e')),
+        );
+      }
+    }
+  }
+
   void _openArticle(_Article article) {
     Navigator.of(context).push(MaterialPageRoute(
       builder: (_) => _ArticleReaderView(article: article, ref: ref),
     ));
+  }
+
+  Future<void> _importTxtFile() async {
+    try {
+      final result = await FilePicker.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['txt'],
+        withData: true,
+      );
+      if (result == null || result.files.isEmpty) return;
+
+      final file = result.files.first;
+      final content = String.fromCharCodes(file.bytes!);
+      final fileName = file.name.replaceAll('.txt', '');
+
+      final article = _Article(
+        title: fileName,
+        level: 'N3',
+        wordCount: content.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length,
+        source: '导入',
+        topic: fileName,
+        category: _ReadingCategory.all,
+        content: content,
+      );
+      setState(() => _articles = [article, ..._articles]);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('已导入: $fileName'), duration: const Duration(seconds: 1)),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('导入失败: $e')),
+        );
+      }
+    }
   }
 
   void _showImportSnack(BuildContext ctx, String format) {
@@ -236,13 +352,15 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
             children: [
               TranslatePopup(
                 word: word,
-                onAddToVocabulary: () {
+                onAddToVocabulary: (meaning, example, phonetic) {
                   ref.read(wordListProvider.notifier).addWord(
                     Word(
                       id: DateTime.now().millisecondsSinceEpoch.toString(),
                       userId: 'local',
                       word: word,
-                      meaning: '待补充',
+                      meaning: meaning.isNotEmpty ? meaning : '待补充',
+                      phonetic: phonetic,
+                      example: example,
                       source: 'reading',
                       createdAt: DateTime.now(),
                     ),

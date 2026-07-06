@@ -24,6 +24,7 @@ dependencies:
   freezed_annotation: ^2.4.4
   vocabulary:
     path: ../vocabulary
+  file_picker: ^11.0.2
 
 dev_dependencies:
   flutter_test:
