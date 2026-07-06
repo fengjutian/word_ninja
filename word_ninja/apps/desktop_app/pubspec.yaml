@@ -24,6 +24,8 @@ dependencies:
     path: ../../packages/vocabulary
   reading:
     path: ../../packages/reading
+  listening:
+    path: ../../packages/listening
   ai:
     path: ../../packages/ai
   ai_tutor:
