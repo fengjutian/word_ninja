@@ -272,10 +272,6 @@ class DesktopShell extends StatelessWidget {
           ),
           const Spacer(),
           _WindowBtn(
-              label: '\u{1F5D6}', tooltip: 'Hide',
-              isDark: isDark,
-              onTap: () => windowManager.hide()),
-          _WindowBtn(
               label: '\u{2014}', tooltip: 'Minimize',
               isDark: isDark,
               onTap: () => windowManager.minimize()),
