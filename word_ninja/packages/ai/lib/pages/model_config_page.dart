@@ -27,7 +27,7 @@ class ModelConfigPage extends ConsumerWidget {
           _ProviderCard(
             icon: PhosphorIconsRegular.lightning,
             title: 'DeepSeek V4 Pro',
-            subtitle: 'deepseek-chat · 强大 · 适合复杂任务',
+            subtitle: 'deepseek-v4-pro · 强大 · 适合复杂任务',
             selected: config.provider == ModelProvider.deepSeek &&
                 config.maxTokens >= 1000,
             onTap: () => notifier.selectProvider(ModelProvider.deepSeek),
@@ -36,7 +36,7 @@ class ModelConfigPage extends ConsumerWidget {
           _ProviderCard(
             icon: PhosphorIconsRegular.rocket,
             title: 'DeepSeek V4 Flash',
-            subtitle: 'deepseek-chat · 极速响应 · 适合简单任务',
+            subtitle: 'deepseek-v4-flash · 极速响应 · 适合简单任务',
             selected: config.provider == ModelProvider.deepSeek &&
                 config.maxTokens < 1000,
             onTap: () => notifier.selectDeepSeekFlash(),
@@ -69,6 +69,20 @@ class ModelConfigPage extends ConsumerWidget {
             initialValue: config.apiKey,
             onSaved: (key) => notifier.updateApiKey(key),
           ),
+          if (config.apiKey.isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(top: NinjaSpacing.sm),
+              child: Row(
+                children: [
+                  const Icon(PhosphorIconsRegular.checkCircle,
+                      color: NinjaColors.success, size: 16),
+                  const SizedBox(width: 4),
+                  Text('密钥已保存 (${config.apiKey.length} 位)',
+                      style: NinjaTextStyles.caption.copyWith(
+                          color: NinjaColors.success)),
+                ],
+              ),
+            ),
 
           const SizedBox(height: NinjaSpacing.xl),
 
@@ -174,7 +188,7 @@ class _ProviderCard extends StatelessWidget {
   }
 }
 
-/// API Key 输入字段
+/// API Key 输入字段 — 带保存按钮
 class _ApiKeyField extends StatefulWidget {
   final String initialValue;
   final ValueChanged<String> onSaved;
@@ -188,11 +202,22 @@ class _ApiKeyField extends StatefulWidget {
 class _ApiKeyFieldState extends State<_ApiKeyField> {
   late TextEditingController _ctrl;
   bool _obscured = true;
+  bool _saved = false;
 
   @override
   void initState() {
     super.initState();
     _ctrl = TextEditingController(text: widget.initialValue);
+    _saved = widget.initialValue.isNotEmpty;
+  }
+
+  @override
+  void didUpdateWidget(covariant _ApiKeyField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != _ctrl.text) {
+      _ctrl.text = widget.initialValue;
+      _saved = widget.initialValue.isNotEmpty;
+    }
   }
 
   @override
@@ -201,20 +226,52 @@ class _ApiKeyFieldState extends State<_ApiKeyField> {
     super.dispose();
   }
 
+  void _save() {
+    widget.onSaved(_ctrl.text.trim());
+    setState(() => _saved = _ctrl.text.trim().isNotEmpty);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(_ctrl.text.trim().isNotEmpty ? '密钥已保存' : '密钥已清空'),
+        duration: const Duration(seconds: 1),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      controller: _ctrl,
-      obscureText: _obscured,
-      decoration: InputDecoration(
-        hintText: 'sk-...',
-        suffixIcon: IconButton(
-          icon: Icon(
-              _obscured ? PhosphorIconsRegular.eye : PhosphorIconsRegular.eyeSlash),
-          onPressed: () => setState(() => _obscured = !_obscured),
+    return Row(
+      children: [
+        Expanded(
+          child: TextFormField(
+            controller: _ctrl,
+            obscureText: _obscured,
+            decoration: InputDecoration(
+              hintText: 'sk-...',
+              suffixIcon: IconButton(
+                icon: Icon(_obscured
+                    ? PhosphorIconsRegular.eye
+                    : PhosphorIconsRegular.eyeSlash),
+                onPressed: () => setState(() => _obscured = !_obscured),
+              ),
+            ),
+            onChanged: (_) => setState(() => _saved = false),
+            onFieldSubmitted: (_) => _save(),
+          ),
         ),
-      ),
-      onFieldSubmitted: widget.onSaved,
+        const SizedBox(width: NinjaSpacing.sm),
+        ElevatedButton.icon(
+          onPressed: _save,
+          icon: Icon(
+            _saved ? PhosphorIconsRegular.checkCircle : PhosphorIconsRegular.floppyDisk,
+            size: 18,
+          ),
+          label: Text(_saved ? '已保存' : '保存'),
+          style: ElevatedButton.styleFrom(
+            backgroundColor: _saved ? NinjaColors.success : NinjaColors.primary,
+            foregroundColor: Colors.white,
+          ),
+        ),
+      ],
     );
   }
 }

@@ -47,8 +47,39 @@ class AiChatService {
       });
       return res.data['choices'][0]['message']['content'] as String;
     } on DioException catch (e) {
-      log.e('AI chat error', e);
-      return '抱歉，AI 暂时无法回复。请稍后再试。';
+      log.e('AI chat error: status=${e.response?.statusCode}, message=${e.message}');
+      log.e('  Request URL: ${_dio.options.baseUrl}/chat/completions');
+      log.e('  Model: $_modelName, Key length: ${_apiKey.length}');
+      final msg = _dioErrorToUserMessage(e);
+      return msg;
+    }
+  }
+
+  /// 将 Dio 异常转为用户可读的错误信息
+  String _dioErrorToUserMessage(DioException e) {
+    switch (e.type) {
+      case DioExceptionType.connectionTimeout:
+        return '连接超时，请检查网络或更换 Base URL。';
+      case DioExceptionType.receiveTimeout:
+        return '响应超时，请稍后重试。';
+      case DioExceptionType.connectionError:
+        return '网络连接失败，请检查网络。';
+      case DioExceptionType.badResponse:
+        final code = e.response?.statusCode;
+        if (code == 401) {
+          return 'API Key 无效或已过期，请检查密钥。';
+        } else if (code == 429) {
+          return '请求过于频繁，请稍后重试。';
+        } else if (code == 404) {
+          return 'API 端点不存在，请检查 Base URL。';
+        } else if (code != null && code >= 500) {
+          return 'AI 服务器异常($code)，请稍后重试。';
+        }
+        return '请求失败($code)，请检查模型配置。';
+      case DioExceptionType.cancel:
+        return '请求已取消。';
+      default:
+        return '抱歉，AI 暂时无法回复。${e.message ?? ""}';
     }
   }
 

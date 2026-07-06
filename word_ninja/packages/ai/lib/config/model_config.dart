@@ -27,7 +27,7 @@ class ModelConfig {
 
   const ModelConfig({
     this.provider = ModelProvider.deepSeek,
-    this.modelName = 'deepseek-chat',
+    this.modelName = 'deepseek-v4-pro',
     this.baseUrl = 'https://api.deepseek.com/v1',
     this.apiKey = '',
     this.temperature = 0.7,
@@ -37,7 +37,7 @@ class ModelConfig {
   /// DeepSeek V4 Pro 默认配置
   static const deepSeekV4Pro = ModelConfig(
     provider: ModelProvider.deepSeek,
-    modelName: 'deepseek-chat',
+    modelName: 'deepseek-v4-pro',
     baseUrl: 'https://api.deepseek.com/v1',
     temperature: 0.7,
     maxTokens: 2000,
@@ -46,7 +46,7 @@ class ModelConfig {
   /// DeepSeek V4 Flash 默认配置 — 更快响应，适合简单任务
   static const deepSeekV4Flash = ModelConfig(
     provider: ModelProvider.deepSeek,
-    modelName: 'deepseek-chat',
+    modelName: 'deepseek-v4-flash',
     baseUrl: 'https://api.deepseek.com/v1',
     temperature: 0.5,
     maxTokens: 512,
@@ -82,6 +82,7 @@ class ModelConfig {
         'provider': provider.name,
         'modelName': modelName,
         'baseUrl': baseUrl,
+        'apiKey': apiKey,
         'temperature': temperature,
         'maxTokens': maxTokens,
       };
@@ -91,7 +92,7 @@ class ModelConfig {
           (e) => e.name == json['provider'],
           orElse: () => ModelProvider.deepSeek,
         ),
-        modelName: json['modelName'] as String? ?? 'deepseek-chat',
+        modelName: json['modelName'] as String? ?? 'deepseek-v4-pro',
         baseUrl: json['baseUrl'] as String? ?? 'https://api.deepseek.com/v1',
         apiKey: json['apiKey'] as String? ?? '',
         temperature: (json['temperature'] as num?)?.toDouble() ?? 0.7,
