@@ -59,4 +59,11 @@ class ModelConfigNotifier extends StateNotifier<ModelConfig> {
         await updateConfig(state.copyWith(provider: ModelProvider.custom));
     }
   }
+
+  /// 切换到 DeepSeek V4 Flash
+  Future<void> selectDeepSeekFlash() async {
+    await updateConfig(ModelConfig.deepSeekV4Flash.copyWith(
+      apiKey: state.apiKey,
+    ));
+  }
 }

@@ -43,6 +43,15 @@ class ModelConfig {
     maxTokens: 2000,
   );
 
+  /// DeepSeek V4 Flash 默认配置 — 更快响应，适合简单任务
+  static const deepSeekV4Flash = ModelConfig(
+    provider: ModelProvider.deepSeek,
+    modelName: 'deepseek-chat',
+    baseUrl: 'https://api.deepseek.com/v1',
+    temperature: 0.5,
+    maxTokens: 512,
+  );
+
   /// OpenAI 默认配置
   static const openAI = ModelConfig(
     provider: ModelProvider.openAI,

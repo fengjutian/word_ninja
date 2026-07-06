@@ -27,9 +27,19 @@ class ModelConfigPage extends ConsumerWidget {
           _ProviderCard(
             icon: PhosphorIconsRegular.lightning,
             title: 'DeepSeek V4 Pro',
-            subtitle: 'deepseek-chat · 快速 · 性价比高',
-            selected: config.provider == ModelProvider.deepSeek,
+            subtitle: 'deepseek-chat · 强大 · 适合复杂任务',
+            selected: config.provider == ModelProvider.deepSeek &&
+                config.maxTokens >= 1000,
             onTap: () => notifier.selectProvider(ModelProvider.deepSeek),
+          ),
+          const SizedBox(height: NinjaSpacing.sm),
+          _ProviderCard(
+            icon: PhosphorIconsRegular.rocket,
+            title: 'DeepSeek V4 Flash',
+            subtitle: 'deepseek-chat · 极速响应 · 适合简单任务',
+            selected: config.provider == ModelProvider.deepSeek &&
+                config.maxTokens < 1000,
+            onTap: () => notifier.selectDeepSeekFlash(),
           ),
           const SizedBox(height: NinjaSpacing.sm),
           _ProviderCard(
