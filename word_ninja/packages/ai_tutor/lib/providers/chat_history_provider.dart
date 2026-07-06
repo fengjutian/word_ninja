@@ -171,7 +171,6 @@ class ChatHistoryNotifier extends StateNotifier<ChatSessionsState> {
     final sessions = List<ChatSession>.from(state.sessions);
     final cur = sessions[state.currentIndex];
     final newMsgs = [...cur.messages, msg];
-    // 首条用户消息作为会话标题
     var title = cur.title;
     if (title == '新会话' && msg.isUser) {
       title = msg.text.length > 30 ? '${msg.text.substring(0, 30)}...' : msg.text;
@@ -187,6 +186,56 @@ class ChatHistoryNotifier extends StateNotifier<ChatSessionsState> {
       currentIndex: state.currentIndex,
     );
     if (!msg.isLoading) _save();
+  }
+
+  /// 追加文本到最后一个消息（流式输出用）
+  void appendToLastMessage(String chunk) {
+    final sessions = List<ChatSession>.from(state.sessions);
+    final cur = sessions[state.currentIndex];
+    if (cur.messages.isEmpty) return;
+    final allMsgs = [...cur.messages];
+    final last = allMsgs.removeLast();
+    final updated = ChatMessage(last.text + chunk, isUser: last.isUser, isError: last.isError);
+    sessions[state.currentIndex] = ChatSession(
+      id: cur.id,
+      title: cur.title,
+      messages: [...allMsgs, updated],
+      createdAt: cur.createdAt,
+    );
+    state = ChatSessionsState(
+      sessions: sessions,
+      currentIndex: state.currentIndex,
+    );
+  }
+
+  /// 流式结束后保存
+  void finishStream() {
+    _save();
+  }
+
+  /// 删除指定索引的消息（如果是用户消息，同时删除后面的 AI 回复）
+  void deleteAt(int index) {
+    final sessions = List<ChatSession>.from(state.sessions);
+    final cur = sessions[state.currentIndex];
+    if (index < 0 || index >= cur.messages.length) return;
+    final msgs = [...cur.messages];
+    final target = msgs[index];
+    msgs.removeAt(index);
+    // 删除用户消息时，顺带删除紧跟的 AI 回复（如果存在）
+    if (target.isUser && index < msgs.length && !msgs[index].isUser) {
+      msgs.removeAt(index);
+    }
+    sessions[state.currentIndex] = ChatSession(
+      id: cur.id,
+      title: cur.title,
+      messages: msgs,
+      createdAt: cur.createdAt,
+    );
+    state = ChatSessionsState(
+      sessions: sessions,
+      currentIndex: state.currentIndex,
+    );
+    _save();
   }
 
   void removeLast() {

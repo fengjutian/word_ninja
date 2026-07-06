@@ -52,15 +52,21 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
           .where((m) => !m.isLoading)
           .map((m) => {'role': m.isUser ? 'user' : 'assistant', 'content': m.text})
           .toList();
-      final reply = await aiService.chat(
+      final notifier = ref.read(chatHistoryProvider.notifier);
+      notifier.removeLast(); // 移除"思考中..."
+      notifier.addMessage(ChatMessage('', isUser: false)); // 空消息，流式填充
+      final stream = aiService.chatStream(
         message: text,
         systemPrompt: '你是英语忍者导师 Sensei Shell，用友好有趣的方式回答英语学习问题。用中文回复。',
         history: history,
       );
+      await for (final chunk in stream) {
+        if (!mounted) return;
+        ref.read(chatHistoryProvider.notifier).appendToLastMessage(chunk);
+        _scrollToBottom();
+      }
       if (!mounted) return;
-      final notifier = ref.read(chatHistoryProvider.notifier);
-      notifier.removeLast();
-      notifier.addMessage(ChatMessage(reply, isUser: false));
+      ref.read(chatHistoryProvider.notifier).finishStream();
       setState(() => _isLoading = false);
     } catch (e) {
       if (!mounted) return;
@@ -104,14 +110,22 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     });
   }
 
+  void _deleteMessage(int index) {
+    ref.read(chatHistoryProvider.notifier).deleteAt(index);
+  }
+
   void _scrollToBottom() {
-    Future.microtask(() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollCtrl.hasClients) {
-        _scrollCtrl.animateTo(
-          _scrollCtrl.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeOut,
-        );
+        final pos = _scrollCtrl.position;
+        // 只在用户接近底部时自动滚动（距离底部 < 200px）
+        if (pos.maxScrollExtent - pos.pixels < 200) {
+          _scrollCtrl.animateTo(
+            pos.maxScrollExtent,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.easeOut,
+          );
+        }
       }
     });
   }
@@ -180,7 +194,17 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
               controller: _scrollCtrl,
               padding: const EdgeInsets.all(NinjaSpacing.md),
               itemCount: messages.length,
-              itemBuilder: (ctx, i) => _MessageBubble(messages[i]),
+              itemBuilder: (ctx, i) {
+                final msg = messages[i];
+                return _MessageBubble(
+                  msg,
+                  onTap: msg.isUser ? () {
+                    _msgCtrl.text = msg.text;
+                    _msgCtrl.selection = TextSelection.collapsed(offset: msg.text.length);
+                  } : null,
+                  onDelete: msg.isLoading ? null : () => _deleteMessage(i),
+                );
+              },
             ),
           ),
           Container(
@@ -351,7 +375,10 @@ class _SessionTile extends StatelessWidget {
 
 class _MessageBubble extends StatelessWidget {
   final ChatMessage message;
-  const _MessageBubble(this.message);
+  final VoidCallback? onTap;
+  final VoidCallback? onDelete;
+
+  const _MessageBubble(this.message, {this.onTap, this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -368,44 +395,48 @@ class _MessageBubble extends StatelessWidget {
 
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
-        margin: const EdgeInsets.only(bottom: NinjaSpacing.sm),
-        padding: const EdgeInsets.all(NinjaSpacing.md),
-        decoration: BoxDecoration(
-          color: bgColor,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(16),
-            topRight: const Radius.circular(16),
-            bottomLeft: message.isUser ? const Radius.circular(16) : const Radius.circular(4),
-            bottomRight: message.isUser ? const Radius.circular(4) : const Radius.circular(16),
+      child: GestureDetector(
+        onTap: onTap,
+        onLongPress: onDelete,
+        child: Container(
+          constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
+          margin: const EdgeInsets.only(bottom: NinjaSpacing.sm),
+          padding: const EdgeInsets.all(NinjaSpacing.md),
+          decoration: BoxDecoration(
+            color: bgColor,
+            borderRadius: BorderRadius.only(
+              topLeft: const Radius.circular(16),
+              topRight: const Radius.circular(16),
+              bottomLeft: message.isUser ? const Radius.circular(16) : const Radius.circular(4),
+              bottomRight: message.isUser ? const Radius.circular(4) : const Radius.circular(16),
+            ),
+            border: message.isError ? Border.all(color: NinjaColors.error.withValues(alpha: 0.3)) : null,
           ),
-          border: message.isError ? Border.all(color: NinjaColors.error.withValues(alpha: 0.3)) : null,
-        ),
-        child: message.isLoading
-            ? Row(mainAxisSize: MainAxisSize.min, children: [
-                const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
-                const SizedBox(width: 8),
-                Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
-              ])
-            : message.isUser
-                ? Text(message.text, style: TextStyle(color: textColor, fontSize: 15))
-                : MarkdownBody(
-                    data: message.text,
-                    selectable: true,
-                    styleSheet: MarkdownStyleSheet(
-                      p: TextStyle(color: textColor, fontSize: 15, height: 1.5),
-                      code: TextStyle(
-                        color: NinjaColors.accentPurple,
-                        backgroundColor: NinjaColors.background,
-                        fontSize: 13,
-                      ),
-                      codeblockDecoration: BoxDecoration(
-                        color: NinjaColors.background,
-                        borderRadius: BorderRadius.circular(8),
+          child: message.isLoading
+              ? Row(mainAxisSize: MainAxisSize.min, children: [
+                  const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2)),
+                  const SizedBox(width: 8),
+                  Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
+                ])
+              : message.isUser
+                  ? Text(message.text, style: TextStyle(color: textColor, fontSize: 15))
+                  : MarkdownBody(
+                      data: message.text,
+                      selectable: true,
+                      styleSheet: MarkdownStyleSheet(
+                        p: TextStyle(color: textColor, fontSize: 15, height: 1.5),
+                        code: TextStyle(
+                          color: NinjaColors.accentPurple,
+                          backgroundColor: NinjaColors.background,
+                          fontSize: 13,
+                        ),
+                        codeblockDecoration: BoxDecoration(
+                          color: NinjaColors.background,
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                     ),
-                  ),
+        ),
       ),
     );
   }

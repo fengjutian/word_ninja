@@ -23,21 +23,17 @@ class AiChatService {
     _dio.options.headers['Authorization'] = 'Bearer $_apiKey';
   }
 
-  /// 发送聊天消息
+  /// 流式聊天 — 逐字返回
+  /// 普通聊天（非流式）
   Future<String> chat({
     required String message,
     String? systemPrompt,
     List<Map<String, String>>? history,
   }) async {
     final messages = <Map<String, dynamic>>[];
-    if (systemPrompt != null) {
-      messages.add({'role': 'system', 'content': systemPrompt});
-    }
-    if (history != null) {
-      messages.addAll(history);
-    }
+    if (systemPrompt != null) messages.add({'role': 'system', 'content': systemPrompt});
+    if (history != null) messages.addAll(history);
     messages.add({'role': 'user', 'content': message});
-
     try {
       final res = await _dio.post('/chat/completions', data: {
         'model': _modelName,
@@ -50,8 +46,56 @@ class AiChatService {
       log.e('AI chat error: status=${e.response?.statusCode}, message=${e.message}');
       log.e('  Request URL: ${_dio.options.baseUrl}/chat/completions');
       log.e('  Model: $_modelName, Key length: ${_apiKey.length}');
-      final msg = _dioErrorToUserMessage(e);
-      return msg;
+      return _dioErrorToUserMessage(e);
+    }
+  }
+
+  /// 流式聊天 — 逐字返回
+  Stream<String> chatStream({
+    required String message,
+    String? systemPrompt,
+    List<Map<String, String>>? history,
+  }) async* {
+    final messages = <Map<String, dynamic>>[];
+    if (systemPrompt != null) messages.add({'role': 'system', 'content': systemPrompt});
+    if (history != null) messages.addAll(history);
+    messages.add({'role': 'user', 'content': message});
+    try {
+      final response = await _dio.post(
+        '/chat/completions',
+        data: {
+          'model': _modelName,
+          'messages': messages,
+          'temperature': _temperature,
+          'max_tokens': _maxTokens,
+          'stream': true,
+        },
+        options: Options(responseType: ResponseType.stream),
+      );
+      final body = response.data as ResponseBody;
+      String buffer = '';
+      await for (final chunk in body.stream) {
+        buffer += utf8.decode(chunk);
+        while (buffer.contains('\n')) {
+          final newlineIdx = buffer.indexOf('\n');
+          final line = buffer.substring(0, newlineIdx).trim();
+          buffer = buffer.substring(newlineIdx + 1);
+          if (line.startsWith('data: ')) {
+            final data = line.substring(6);
+            if (data == '[DONE]') continue;
+            try {
+              final json = jsonDecode(data) as Map<String, dynamic>;
+              final delta = json['choices']?[0]?['delta']?['content'];
+              if (delta is String && delta.isNotEmpty) yield delta;
+            } catch (_) {}
+          }
+        }
+      }
+    } on DioException catch (e) {
+      log.e('AI stream error: status=${e.response?.statusCode}, message=${e.message}');
+      log.e('  Request URL: ${_dio.options.baseUrl}/chat/completions');
+      log.e('  Model: $_modelName, Key length: ${_apiKey.length}');
+      yield _dioErrorToUserMessage(e);
     }
   }
 
