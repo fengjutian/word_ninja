@@ -30,6 +30,10 @@ dependencies:
     path: ../../packages/ai_tutor
   profile:
     path: ../../packages/profile
+  writing:
+    path: ../../packages/writing
+  study_plan:
+    path: ../../packages/study_plan
   flutter_riverpod: ^2.6.1
   go_router: ^14.8.1
   window_manager: ^0.4.3

@@ -108,6 +108,10 @@ class DesktopRoutes {
   static const String reading = '/reading';
   static const String aiTutor = '/ai-tutor';
   static const String modelConfig = '/model-config';
+  static const String writing = '/writing';
+  static const String studyPlan = '/study-plan';
+  static const String profile = '/profile';
+  static const String settings = '/settings';
 }
 
 GoRouter createDesktopRouter() {
@@ -132,6 +136,18 @@ GoRouter createDesktopRouter() {
           GoRoute(
               path: DesktopRoutes.modelConfig,
               builder: (ctx, state) => const ModelConfigPage()),
+          GoRoute(
+              path: DesktopRoutes.writing,
+              builder: (ctx, state) => const WritingPage()),
+          GoRoute(
+              path: DesktopRoutes.studyPlan,
+              builder: (ctx, state) => const StudyPlanPage()),
+          GoRoute(
+              path: DesktopRoutes.profile,
+              builder: (ctx, state) => const ProfilePage()),
+          GoRoute(
+              path: DesktopRoutes.settings,
+              builder: (ctx, state) => const SettingsPage()),
         ],
       ),
       // ─── 全屏子页面 ───
@@ -231,8 +247,23 @@ class DesktopShell extends StatelessWidget {
             body: const SizedBox.shrink(),
           ),
           PaneItem(
+            icon: const Icon(FluentIcons.design),
+            title: const Text('Writing'),
+            body: const SizedBox.shrink(),
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.task_list),
+            title: const Text('Study Plan'),
+            body: const SizedBox.shrink(),
+          ),
+          PaneItem(
             icon: const Icon(FluentIcons.settings),
             title: const Text('模型配置'),
+            body: const SizedBox.shrink(),
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.person),
+            title: const Text('Profile'),
             body: const SizedBox.shrink(),
           ),
         ],
@@ -329,7 +360,11 @@ class DesktopShell extends StatelessWidget {
     if (uri.startsWith(DesktopRoutes.vocabulary)) return 1;
     if (uri.startsWith(DesktopRoutes.reading)) return 2;
     if (uri.startsWith(DesktopRoutes.aiTutor)) return 3;
-    if (uri.startsWith(DesktopRoutes.modelConfig)) return 4;
+    if (uri.startsWith(DesktopRoutes.writing)) return 4;
+    if (uri.startsWith(DesktopRoutes.studyPlan)) return 5;
+    if (uri.startsWith(DesktopRoutes.modelConfig)) return 6;
+    if (uri.startsWith(DesktopRoutes.profile) ||
+        uri.startsWith(DesktopRoutes.settings)) return 7;
     return 0;
   }
 
@@ -344,7 +379,13 @@ class DesktopShell extends StatelessWidget {
       case 3:
         context.go(DesktopRoutes.aiTutor);
       case 4:
+        context.go(DesktopRoutes.writing);
+      case 5:
+        context.go(DesktopRoutes.studyPlan);
+      case 6:
         context.go(DesktopRoutes.modelConfig);
+      case 7:
+        context.go(DesktopRoutes.profile);
     }
   }
 }
