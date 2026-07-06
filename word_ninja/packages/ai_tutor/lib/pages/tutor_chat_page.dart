@@ -160,7 +160,8 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     }
     if (word == null || word.isEmpty) return;
 
-    // 显示加载提示
+    final aiAnswer = messages[index].text; // AI 的回答内容
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('正在查询「$word」的释义...'), duration: const Duration(seconds: 1)),
     );
@@ -168,14 +169,18 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     final aiService = ref.read(aiChatServiceProvider);
     aiService.explainWord(word).then((data) {
       if (!mounted) return;
+      final meaning = (data['meaning'] as String?) ?? _extractFirstLine(aiAnswer);
+      final example = (data['example'] as String?)?.isNotEmpty == true
+          ? data['example'] as String
+          : aiAnswer;
       ref.read(wordListProvider.notifier).addWord(
         Word(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           userId: 'local',
           word: word!,
-          meaning: (data['meaning'] as String?) ?? '待补充',
+          meaning: meaning,
           phonetic: (data['phonetic'] as String?) ?? '',
-          example: (data['example'] as String?) ?? '',
+          example: example,
           tags: _parseCollocations(data['collocations']),
           source: 'ai_tutor',
           createdAt: DateTime.now(),
@@ -186,21 +191,32 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
       );
     }).catchError((_) {
       if (!mounted) return;
-      // AI 查询失败，至少保存单词本身
       ref.read(wordListProvider.notifier).addWord(
         Word(
           id: DateTime.now().millisecondsSinceEpoch.toString(),
           userId: 'local',
           word: word!,
-          meaning: '待补充',
+          meaning: _extractFirstLine(aiAnswer),
+          example: aiAnswer,
           source: 'ai_tutor',
           createdAt: DateTime.now(),
         ),
       );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('「$word」已加入单词本（释义获取失败）'), duration: const Duration(seconds: 1)),
+        SnackBar(content: Text('「$word」已加入单词本'), duration: const Duration(seconds: 1)),
       );
     });
+  }
+
+  /// 提取文本第一段纯文字作为简要释义
+  String _extractFirstLine(String text) {
+    // 去除 markdown 标记，取第一行
+    final plain = text
+        .replaceAll(RegExp(r'\*{1,3}'), '')
+        .replaceAll(RegExp(r'#{1,6}\s*'), '')
+        .trim();
+    final firstLine = plain.split('\n').firstWhere((l) => l.trim().isNotEmpty, orElse: () => '待补充');
+    return firstLine.length > 80 ? '${firstLine.substring(0, 80)}...' : firstLine;
   }
 
   /// 解析 AI 返回的搭配为标签列表
