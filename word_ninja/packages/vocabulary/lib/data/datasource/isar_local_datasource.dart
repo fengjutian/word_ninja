@@ -22,8 +22,8 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
         userId: s.userId,
         word: s.word,
         meaning: s.meaning,
-        phonetic: s.phonetic,
-        example: s.example,
+        phonetic: s.phonetic ?? '',
+        example: s.example ?? '',
         difficulty: s.difficulty,
         mastery: s.mastery,
         source: s.source,
@@ -191,7 +191,7 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
   @override
   Future<List<Review>> getReviewsForWord(String wordId) async {
     final schemas = await _isar.reviewSchemas
-        .where()
+        .filter()
         .wordIdEqualTo(wordId)
         .findAll();
     return schemas
@@ -211,7 +211,7 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
     final today = DateTime.now();
     final todayStart = DateTime(today.year, today.month, today.day);
     final todayReviews = await _isar.reviewSchemas
-        .where()
+        .filter()
         .reviewTimeGreaterThan(todayStart)
         .count();
     final now = DateTime.now();

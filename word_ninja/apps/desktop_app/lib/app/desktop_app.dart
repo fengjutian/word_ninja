@@ -42,15 +42,15 @@ class WordNinjaDesktopApp extends StatelessWidget {
     final isDark = brightness == Brightness.dark;
     return FluentThemeData(
       brightness: brightness,
-      accentColor: const AccentColor(
-        darkest: Color(0xFFAB000D),
-        darker: Color(0xFFC62828),
-        dark: Color(0xFFD32F2F),
-        normal: NinjaColors.primary,
-        light: NinjaColors.primaryLight,
-        lighter: Color(0xFFFF8A80),
-        lightest: Color(0xFFFFCDD2),
-      ),
+      accentColor: AccentColor('normal', {
+        'darkest': Color(0xFFAB000D),
+        'darker': Color(0xFFC62828),
+        'dark': Color(0xFFD32F2F),
+        'normal': NinjaColors.primary,
+        'light': NinjaColors.primaryLight,
+        'lighter': Color(0xFFFF8A80),
+        'lightest': Color(0xFFFFCDD2),
+      }),
       scaffoldBackgroundColor:
           isDark ? NinjaColors.surfaceDark : NinjaColors.background,
       navigationPaneTheme: NavigationPaneThemeData(
@@ -85,7 +85,7 @@ class WordNinjaDesktopApp extends StatelessWidget {
             onTap: DebugOverlay.toggleAll,
             child: Center(
               child: Icon(
-                isActive ? FluentIcons.eye : FluentIcons.eye_hide,
+                isActive ? FluentIcons.view : FluentIcons.view,
                 size: 18,
                 color: mt.Colors.white,
               ),
@@ -216,7 +216,7 @@ class DesktopShell extends StatelessWidget {
             title: const Text('Home'),
           ),
           PaneItem(
-            icon: const Icon(FluentIcons.library),
+            icon: const Icon(FluentIcons.bookmarks),
             title: const Text('Vocab'),
           ),
           PaneItem(
@@ -224,7 +224,7 @@ class DesktopShell extends StatelessWidget {
             title: const Text('Reading'),
           ),
           PaneItem(
-            icon: const Icon(FluentIcons.chat_bubbles_question),
+            icon: const Icon(FluentIcons.chat),
             title: const Text('AI Tutor'),
           ),
           PaneItem(
