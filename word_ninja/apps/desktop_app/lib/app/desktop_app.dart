@@ -232,7 +232,9 @@ class DesktopShell extends StatelessWidget {
       paneBodyBuilder: (item, body) {
         return mt.Theme(
           data: isDark ? NinjaTheme.dark : NinjaTheme.light,
-          child: child,
+          child: mt.Material(
+            child: child,
+          ),
         );
       },
       pane: NavigationPane(
