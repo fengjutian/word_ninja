@@ -208,7 +208,7 @@ class DesktopShell extends StatelessWidget {
       pane: NavigationPane(
         selected: _calcIndex(context),
         onChanged: (i) => _navigate(context, i),
-        displayMode: PaneDisplayMode.expanded,
+        displayMode: PaneDisplayMode.auto,
         items: [
           PaneItem(
             icon: const Icon(FluentIcons.home),
@@ -252,8 +252,10 @@ class DesktopShell extends StatelessWidget {
         color: isDark ? NinjaColors.surfaceDark : NinjaColors.surface,
         child: Row(children: [
           Padding(
-            padding: const EdgeInsets.only(left: 12),
+            padding: const EdgeInsets.only(left: 8),
             child: Row(children: [
+              const PaneToggleButton(),
+              const SizedBox(width: 4),
               Text('\u{1F977}',
                   style: TextStyle(
                       fontSize: 18,
