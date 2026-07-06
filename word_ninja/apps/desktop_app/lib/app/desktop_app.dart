@@ -198,9 +198,8 @@ class DesktopShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = FluentTheme.of(context).brightness == Brightness.dark;
     return NavigationView(
+      titleBar: _buildTitleBar(context, isDark),
       paneBodyBuilder: (item, body) {
-        // Wrap child pages in Material Theme so shared Material widgets
-        // (from vocabulary, reading, ai_tutor, etc.) work inside FluentApp
         return mt.Theme(
           data: isDark ? NinjaTheme.dark : NinjaTheme.light,
           child: child,
@@ -214,24 +213,115 @@ class DesktopShell extends StatelessWidget {
           PaneItem(
             icon: const Icon(FluentIcons.home),
             title: const Text('Home'),
+            body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.bookmarks),
             title: const Text('Vocab'),
+            body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.reading_mode),
             title: const Text('Reading'),
+            body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.chat),
             title: const Text('AI Tutor'),
+            body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.settings),
             title: const Text('模型配置'),
+            body: const SizedBox.shrink(),
           ),
         ],
+      ),
+    );
+  }
+
+  /// Custom title bar with window controls (drag, min/max/close)
+  Widget _buildTitleBar(BuildContext context, bool isDark) {
+    return GestureDetector(
+      onDoubleTap: () => windowManager.isMaximized().then(
+            (m) => m ? windowManager.unmaximize() : windowManager.maximize(),
+          ),
+      onPanStart: (_) => windowManager.startDragging(),
+      child: Container(
+        height: 36,
+        color: isDark ? NinjaColors.surfaceDark : NinjaColors.surface,
+        child: Row(children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: Row(children: [
+              Text('\u{1F977}',
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: isDark
+                          ? NinjaColors.textOnDark
+                          : NinjaColors.textPrimary)),
+              const SizedBox(width: 8),
+              Text('Word Ninja',
+                  style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? NinjaColors.textOnDark
+                          : NinjaColors.textPrimary)),
+            ]),
+          ),
+          const Spacer(),
+          _WindowBtn(
+              label: '\u{1F5D6}', tooltip: 'Hide',
+              isDark: isDark,
+              onTap: () => windowManager.hide()),
+          _WindowBtn(
+              label: '\u{2014}', tooltip: 'Minimize',
+              isDark: isDark,
+              onTap: () => windowManager.minimize()),
+          _WindowBtn(
+              label: '\u{25A1}', tooltip: 'Maximize',
+              isDark: isDark,
+              onTap: () => windowManager
+                  .isMaximized()
+                  .then((m) => m
+                      ? windowManager.unmaximize()
+                      : windowManager.maximize())),
+          _WindowBtn(
+              label: '\u{2715}', tooltip: 'Close',
+              isDark: isDark, isClose: true,
+              onTap: () => windowManager.close()),
+        ]),
+      ),
+    );
+  }
+
+  Widget _WindowBtn(
+      {required String label,
+      required String tooltip,
+      required VoidCallback onTap,
+      required bool isDark,
+      bool isClose = false}) {
+    return Tooltip(
+      message: tooltip,
+      child: mt.Material(
+        color: mt.Colors.transparent,
+        child: mt.InkWell(
+          onTap: onTap,
+          hoverColor:
+              isClose ? NinjaColors.primary : NinjaColors.divider.withValues(alpha: 0.3),
+          child: Container(
+            width: 46,
+            height: 36,
+            alignment: Alignment.center,
+            child: Text(label,
+                style: TextStyle(
+                    fontSize: 14,
+                    color: isDark
+                        ? NinjaColors.textOnDark
+                        : NinjaColors.textPrimary)),
+          ),
+        ),
       ),
     );
   }
