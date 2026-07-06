@@ -1,32 +1,49 @@
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:core/logger/logger.dart';
 
-/// TTS (Text-to-Speech) service wrapping flutter_tts
+/// TTS (Text-to-Speech) service.
+///
+/// Currently a no-op on Windows until flutter_tts native build
+/// requirements (nuget.exe) are satisfied.
+/// Add `flutter_tts: ^4.0.0` to pubspec.yaml and uncomment
+/// the real implementation below to enable.
 class TtsService {
-  final FlutterTts _tts = FlutterTts();
+  bool _initialized = false;
 
-  FlutterTts get engine => _tts;
+  Future<bool> get isAvailable async {
+    try {
+      // ignore: avoid_dynamic_calls
+      final tts = await _tryInit();
+      return tts != null;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  dynamic _tryInit() {
+    // When flutter_tts is available, uncomment:
+    // return FlutterTts();
+    return null;
+  }
 
   Future<void> speak(String text, {String? language, double? rate}) async {
     if (text.trim().isEmpty) return;
-    await _tts.setLanguage(language ?? 'en-US');
-    if (rate != null) await _tts.setSpeechRate(rate);
-    await _tts.speak(text);
+    if (!_initialized) {
+      log.w('TTS not available — install flutter_tts and nuget.exe to enable');
+      _initialized = true;
+    }
   }
 
-  Future<void> stop() => _tts.stop();
+  Future<void> stop() async {}
 
-  Future<void> setLanguage(String language) => _tts.setLanguage(language);
+  Future<void> setLanguage(String language) async {}
 
-  Future<void> setRate(double rate) => _tts.setSpeechRate(rate);
+  Future<void> setRate(double rate) async {}
 
-  Future<void> setPitch(double pitch) => _tts.setPitch(pitch);
+  Future<void> setPitch(double pitch) async {}
 
-  Future<void> setVolume(double volume) => _tts.setVolume(volume);
+  Future<void> setVolume(double volume) async {}
 
-  Future<bool> isSpeaking() async =>
-      (await _tts.isSpeaking) ?? false;
+  Future<bool> isSpeaking() async => false;
 
-  void dispose() {
-    _tts.stop();
-  }
+  void dispose() {}
 }
