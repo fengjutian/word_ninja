@@ -6,6 +6,7 @@ import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:ai/providers/ai_providers.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:core/logger/logger.dart';
 import 'package:archive/archive.dart';
 import 'dart:convert';
 import '../widgets/translate_popup.dart';

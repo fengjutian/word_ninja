@@ -117,14 +117,14 @@ class WordDetailPage extends ConsumerWidget {
               Navigator.pop(ctx);
               try {
                 await ref.read(wordListProvider.notifier).deleteWord(word.id);
-                if (mounted) {
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('单词已删除')),
                   );
                   context.pop();
                 }
               } catch (e) {
-                if (mounted) {
+                if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text('删除失败: $e')),
                   );

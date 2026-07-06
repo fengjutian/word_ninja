@@ -256,12 +256,12 @@ class DesktopShell extends StatelessWidget {
             body: const SizedBox.shrink(),
           ),
           PaneItem(
-            icon: const Icon(FluentIcons.headphones),
+            icon: const Icon(FluentIcons.headset),
             title: const Text('Listening'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
-            icon: const Icon(FluentIcons.mic_on),
+            icon: const Icon(FluentIcons.microphone),
             title: const Text('Speaking'),
             body: const SizedBox.shrink(),
           ),
@@ -286,7 +286,7 @@ class DesktopShell extends StatelessWidget {
             body: const SizedBox.shrink(),
           ),
           PaneItem(
-            icon: const Icon(FluentIcons.person),
+            icon: const Icon(FluentIcons.contact),
             title: const Text('Profile'),
             body: const SizedBox.shrink(),
           ),

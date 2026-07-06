@@ -8,6 +8,7 @@ import 'package:ui_kit/loading/ninja_loading.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
 import '../providers/word_provider.dart';
+import '../../data/model/word.dart';
 import 'add_word_page.dart';
 
 /// 单词本主页面 — 单词修炼

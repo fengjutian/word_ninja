@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ai/providers/ai_providers.dart' show aiReadingServiceProvider;
-import '../providers/tts_provider.dart';
+import 'package:listening/providers/tts_provider.dart';
 
 /// 听力训练页面 - 课程选择 + 三种练习模式
 class ListeningPage extends ConsumerStatefulWidget {

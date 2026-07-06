@@ -34,6 +34,8 @@ dependencies:
     path: ../../packages/ai_tutor
   profile:
     path: ../../packages/profile
+  sync:
+    path: ../../packages/sync
   writing:
     path: ../../packages/writing
   study_plan:
