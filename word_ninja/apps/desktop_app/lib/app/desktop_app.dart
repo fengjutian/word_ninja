@@ -1,6 +1,7 @@
 import 'package:fluent_ui/fluent_ui.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as mt;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ui_kit/ninja_theme/theme_data.dart';
@@ -11,6 +12,8 @@ import 'package:vocabulary/presentation/pages/add_word_page.dart';
 import 'package:vocabulary/presentation/pages/review_page.dart';
 import 'package:vocabulary/presentation/pages/word_test_page.dart';
 import 'package:vocabulary/data/model/word.dart';
+import 'package:vocabulary/data/model/vocabulary_stats.dart';
+import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:reading/presentation/pages/reader_page.dart';
 import 'package:ai_tutor/pages/tutor_chat_page.dart';
 import 'package:ai/pages/model_config_page.dart';
@@ -282,6 +285,8 @@ class DesktopShell extends StatelessWidget {
             title: const Text('Study Plan'),
             body: const SizedBox.shrink(),
           ),
+        ],
+        footerItems: [
           PaneItem(
             icon: const Icon(FluentIcons.settings),
             title: const Text('模型配置'),
@@ -422,38 +427,171 @@ class DesktopShell extends StatelessWidget {
   }
 }
 
-class _DesktopHome extends StatelessWidget {
+class _DesktopHome extends ConsumerWidget {
   const _DesktopHome();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final isDark = FluentTheme.of(context).brightness == Brightness.dark;
+    final textColor =
+        isDark ? NinjaColors.textOnDark : NinjaColors.textPrimary;
+    final subColor = isDark
+        ? NinjaColors.textOnDark.withValues(alpha: 0.6)
+        : NinjaColors.textSecondary;
+
+    // Try to load stats (may fail if vocabulary not yet initialized)
+    final statsAsync = ref.watch(vocabularyStatsProvider);
+
     return ScaffoldPage(
-      content: Center(
+      padding: const EdgeInsets.all(24),
+      content: SingleChildScrollView(
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            NinjaIcon.shuriken(size: 64, color: NinjaColors.primary),
-            const SizedBox(height: NinjaSpacing.lg),
-            Text(
-              'Word Ninja',
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.w900,
-                color: isDark ? NinjaColors.textOnDark : NinjaColors.textPrimary,
+            // Header
+            Row(children: [
+              NinjaIcon.shuriken(size: 40, color: NinjaColors.primary),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Word Ninja',
+                      style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w800,
+                          color: textColor)),
+                  Text('你的 AI 英语忍者修炼之路',
+                      style: TextStyle(fontSize: 13, color: subColor)),
+                ],
               ),
+            ]),
+            const SizedBox(height: 24),
+
+            // Stats cards
+            statsAsync.when(
+              data: (stats) => _buildStatsRow(stats, textColor, subColor),
+              loading: () => const SizedBox.shrink(),
+              error: (_, __) =>
+                  const SizedBox.shrink(), // silently skip if not available
             ),
-            const SizedBox(height: NinjaSpacing.sm),
-            Text(
-              '你的 AI 英语忍者修炼之路',
-              style: TextStyle(
-                fontSize: 16,
-                color: isDark
-                    ? NinjaColors.textOnDark.withValues(alpha: 0.7)
-                    : NinjaColors.textSecondary,
-              ),
+            const SizedBox(height: 20),
+
+            // Quick actions
+            Text('快捷入口',
+                style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: textColor)),
+            const SizedBox(height: 12),
+            Wrap(
+              spacing: 12,
+              runSpacing: 12,
+              children: [
+                _QuickCard(
+                    icon: FluentIcons.bookmarks,
+                    label: '单词本',
+                    color: NinjaColors.secondary,
+                    onTap: () => context.go(DesktopRoutes.vocabulary)),
+                _QuickCard(
+                    icon: FluentIcons.reading_mode,
+                    label: '阅读',
+                    color: NinjaColors.success,
+                    onTap: () => context.go(DesktopRoutes.reading)),
+                _QuickCard(
+                    icon: FluentIcons.chat,
+                    label: 'AI Tutor',
+                    color: NinjaColors.accentPurple,
+                    onTap: () => context.go(DesktopRoutes.aiTutor)),
+                _QuickCard(
+                    icon: FluentIcons.design,
+                    label: '写作',
+                    color: NinjaColors.info,
+                    onTap: () => context.go(DesktopRoutes.writing)),
+                _QuickCard(
+                    icon: FluentIcons.task_list,
+                    label: '学习计划',
+                    color: NinjaColors.accentGold,
+                    onTap: () => context.go(DesktopRoutes.studyPlan)),
+                _QuickCard(
+                    icon: FluentIcons.headset,
+                    label: '听力',
+                    color: NinjaColors.levelAdvanced,
+                    onTap: () => context.go(DesktopRoutes.listening)),
+              ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatsRow(VocabularyStats stats, Color textColor, Color subColor) {
+    final items = [
+      _StatItem(stats.totalWords.toString(), '总词汇', NinjaColors.primary),
+      _StatItem(stats.masteredWords.toString(), '已掌握', NinjaColors.success),
+      _StatItem(stats.todayReview.toString(), '今日复习', NinjaColors.accentGold),
+      _StatItem(stats.learningWords.toString(), '待复习', NinjaColors.warning),
+    ];
+    return Row(
+      children: items.map((s) => Expanded(child: s)).toList(),
+    );
+  }
+}
+
+class _StatItem extends StatelessWidget {
+  final String value, label;
+  final Color color;
+  const _StatItem(this.value, this.label, this.color);
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 4),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        child: Column(children: [
+          Text(value,
+              style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w700,
+                  color: color)),
+          const SizedBox(height: 4),
+          Text(label,
+              style: TextStyle(
+                  fontSize: 12, color: NinjaColors.textSecondary)),
+        ]),
+      ),
+    );
+  }
+}
+
+class _QuickCard extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _QuickCard(
+      {required this.icon,
+      required this.label,
+      required this.color,
+      required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 120,
+      child: Button(
+        onPressed: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
+          child: Column(children: [
+            Icon(icon, size: 28, color: color),
+            const SizedBox(height: 8),
+            Text(label,
+                style: TextStyle(fontSize: 13, color: color),
+                textAlign: TextAlign.center),
+          ]),
         ),
       ),
     );
