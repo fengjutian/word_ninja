@@ -1,4 +1,4 @@
-import 'entities/user.dart';
+import '../entities/user.dart';
 
 /// 认证仓库接口（依赖倒置）
 abstract class AuthRepository {

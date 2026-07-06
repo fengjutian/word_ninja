@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 /// 用户领域实体
 class User {
   final String id;
@@ -20,7 +22,7 @@ class User {
   int get expToNextLevel {
     int total = 0;
     for (int i = 1; i <= level; i++) {
-      total += (1500 * (1.15).pow(i - 1)).round();
+      total += (1500 * math.pow(1.15, i - 1)).round();
     }
     return total;
   }
@@ -30,7 +32,7 @@ class User {
     final prevExp = () {
       int total = 0;
       for (int i = 1; i < level; i++) {
-        total += (1500 * (1.15).pow(i - 1)).round();
+        total += (1500 * math.pow(1.15, i - 1)).round();
       }
       return total;
     }();

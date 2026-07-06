@@ -94,7 +94,7 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
           _DropdownTile(
             '字体大小', PhosphorIconsRegular.textAa,
             value: _fontSize,
-            items: const {0.8: '小', 1.0: '标准', 1.2: '大', 1.4: '特大'},
+            items: {0.8: '小', 1.0: '标准', 1.2: '大', 1.4: '特大'},
             onChanged: (v) {
               setState(() => _fontSize = v);
               Preferences.setDouble('font_size', v);
