@@ -229,12 +229,6 @@ class _ApiKeyFieldState extends State<_ApiKeyField> {
   void _save() {
     widget.onSaved(_ctrl.text.trim());
     setState(() => _saved = _ctrl.text.trim().isNotEmpty);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_ctrl.text.trim().isNotEmpty ? '密钥已保存' : '密钥已清空'),
-        duration: const Duration(seconds: 1),
-      ),
-    );
   }
 
   @override
@@ -259,16 +253,18 @@ class _ApiKeyFieldState extends State<_ApiKeyField> {
           ),
         ),
         const SizedBox(width: NinjaSpacing.sm),
-        ElevatedButton.icon(
-          onPressed: _save,
-          icon: Icon(
-            _saved ? PhosphorIconsRegular.checkCircle : PhosphorIconsRegular.floppyDisk,
-            size: 18,
-          ),
-          label: Text(_saved ? '已保存' : '保存'),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _saved ? NinjaColors.success : NinjaColors.primary,
-            foregroundColor: Colors.white,
+        SizedBox(
+          height: 40,
+          child: FilledButton.icon(
+            onPressed: _save,
+            icon: Icon(
+              _saved ? PhosphorIconsRegular.checkCircle : PhosphorIconsRegular.floppyDisk,
+              size: 18,
+            ),
+            label: Text(_saved ? '已保存' : '保存'),
+            style: FilledButton.styleFrom(
+              backgroundColor: _saved ? NinjaColors.success : NinjaColors.primary,
+            ),
           ),
         ),
       ],

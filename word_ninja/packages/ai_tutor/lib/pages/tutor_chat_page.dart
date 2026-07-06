@@ -1,6 +1,7 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ai/ai.dart';
 
@@ -261,7 +262,24 @@ class _MessageBubble extends StatelessWidget {
                 const SizedBox(width: 8),
                 Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
               ])
-            : Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
+            : message.isUser
+                ? Text(message.text, style: TextStyle(color: textColor, fontSize: 15))
+                : MarkdownBody(
+                    data: message.text,
+                    selectable: true,
+                    styleSheet: MarkdownStyleSheet(
+                      p: TextStyle(color: textColor, fontSize: 15, height: 1.5),
+                      code: TextStyle(
+                        color: NinjaColors.accentPurple,
+                        backgroundColor: NinjaColors.background,
+                        fontSize: 13,
+                      ),
+                      codeblockDecoration: BoxDecoration(
+                        color: NinjaColors.background,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                  ),
       ),
     );
   }
