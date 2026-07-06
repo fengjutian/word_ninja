@@ -17,6 +17,7 @@ class TutorChatPage extends ConsumerStatefulWidget {
 class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   final _msgCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
+  final _drawerKey = GlobalKey<ScaffoldState>();
   bool _isLoading = false;
   String? _lastError;
 
@@ -85,8 +86,18 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     _callAiService(_msgCtrl.text.trim().isNotEmpty ? _msgCtrl.text.trim() : '请重试');
   }
 
-  void _startNewSession() {
+  void _selectAndClose(int index) {
+    ref.read(chatHistoryProvider.notifier).switchToSession(index);
+    _drawerKey.currentState?.closeDrawer();
+    setState(() {
+      _lastError = null;
+      _isLoading = false;
+    });
+  }
+
+  void _newAndClose() {
     ref.read(chatHistoryProvider.notifier).newSession();
+    _drawerKey.currentState?.closeDrawer();
     setState(() {
       _lastError = null;
       _isLoading = false;
@@ -109,10 +120,21 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   Widget build(BuildContext context) {
     final sessionsState = ref.watch(chatHistoryProvider);
     final messages = sessionsState.current.messages;
-    final notifier = ref.read(chatHistoryProvider.notifier);
 
     return Scaffold(
+      key: _drawerKey,
+      drawer: _SessionDrawer(
+        sessions: sessionsState.sessions,
+        currentIndex: sessionsState.currentIndex,
+        onSelect: _selectAndClose,
+        onDelete: (i) => ref.read(chatHistoryProvider.notifier).deleteSession(i),
+        onNew: _newAndClose,
+      ),
       appBar: AppBar(
+        leading: IconButton(
+          icon: const Icon(PhosphorIconsRegular.list, color: Colors.white),
+          onPressed: () => _drawerKey.currentState?.openDrawer(),
+        ),
         title: Row(
           children: [
             Container(
@@ -129,26 +151,18 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
             ),
             const SizedBox(width: 8),
             Expanded(
-              child: sessionsState.sessions.length <= 1
-                  ? Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Sensei Shell', style: NinjaTextStyles.titleMedium.copyWith(color: Colors.white)),
-                        Text(_isLoading ? '输入中...' : '在线',
-                            style: TextStyle(fontSize: 12, color: _isLoading ? NinjaColors.warning : NinjaColors.textOnDark.withValues(alpha: 0.7))),
-                      ],
-                    )
-                  : _SessionDropdown(
-                      sessions: sessionsState.sessions,
-                      currentIndex: sessionsState.currentIndex,
-                      onSelect: (i) => notifier.switchToSession(i),
-                      onDelete: (i) => notifier.deleteSession(i),
-                    ),
-            ),
-            IconButton(
-              icon: Icon(PhosphorIconsRegular.plusCircle, size: 20, color: NinjaColors.textOnDark.withValues(alpha: 0.7)),
-              tooltip: '新会话',
-              onPressed: _startNewSession,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    sessionsState.current.title,
+                    style: NinjaTextStyles.titleMedium.copyWith(color: Colors.white),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  Text(_isLoading ? '输入中...' : '在线',
+                      style: TextStyle(fontSize: 12, color: _isLoading ? NinjaColors.warning : NinjaColors.textOnDark.withValues(alpha: 0.7))),
+                ],
+              ),
             ),
             if (_lastError != null)
               IconButton(
@@ -187,11 +201,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                   IconButton(
                     icon: const Icon(PhosphorIconsRegular.microphone, color: NinjaColors.primary),
                     tooltip: '语音输入（即将上线）',
-                    onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('语音输入功能即将上线'), duration: Duration(seconds: 1)),
-                      );
-                    },
+                    onPressed: () {},
                   ),
                   Expanded(
                     child: TextField(
@@ -224,71 +234,117 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   }
 }
 
-/// 会话切换下拉
-class _SessionDropdown extends StatelessWidget {
+/// 左侧会话抽屉
+class _SessionDrawer extends StatelessWidget {
   final List<ChatSession> sessions;
   final int currentIndex;
   final ValueChanged<int> onSelect;
   final ValueChanged<int> onDelete;
+  final VoidCallback onNew;
 
-  const _SessionDropdown({
+  const _SessionDrawer({
     required this.sessions,
     required this.currentIndex,
     required this.onSelect,
     required this.onDelete,
+    required this.onNew,
   });
 
   @override
   Widget build(BuildContext context) {
-    final current = sessions[currentIndex];
-    return PopupMenuButton<int>(
-      offset: const Offset(0, 40),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
+    return Drawer(
+      width: 280,
+      child: Column(
         children: [
-          Flexible(
-            child: Text(
-              current.title,
-              style: NinjaTextStyles.titleMedium.copyWith(color: Colors.white),
-              overflow: TextOverflow.ellipsis,
+          // 顶部：新会话按钮
+          SafeArea(
+            child: Padding(
+              padding: const EdgeInsets.all(NinjaSpacing.md),
+              child: SizedBox(
+                width: double.infinity,
+                child: OutlinedButton.icon(
+                  onPressed: onNew,
+                  icon: const Icon(PhosphorIconsRegular.plus, size: 18),
+                  label: const Text('新会话'),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: NinjaColors.textPrimary,
+                    side: BorderSide(color: NinjaColors.divider.withValues(alpha: 0.5)),
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
+                ),
+              ),
             ),
           ),
-          const Icon(PhosphorIconsRegular.caretDown, size: 14, color: Colors.white70),
+          const Divider(height: 1),
+          // 会话列表
+          Expanded(
+            child: ListView.builder(
+              itemCount: sessions.length,
+              itemBuilder: (ctx, i) {
+                final s = sessions[i];
+                final isActive = i == currentIndex;
+                return _SessionTile(
+                  title: s.title,
+                  isActive: isActive,
+                  onTap: () => onSelect(i),
+                  onDelete: sessions.length > 1 ? () => onDelete(i) : null,
+                );
+              },
+            ),
+          ),
         ],
       ),
-      itemBuilder: (ctx) => List.generate(sessions.length, (i) {
-        final s = sessions[i];
-        return PopupMenuItem<int>(
-          value: i,
+    );
+  }
+}
+
+/// 会话列表项
+class _SessionTile extends StatelessWidget {
+  final String title;
+  final bool isActive;
+  final VoidCallback onTap;
+  final VoidCallback? onDelete;
+
+  const _SessionTile({
+    required this.title,
+    required this.isActive,
+    required this.onTap,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: isActive ? NinjaColors.primary.withValues(alpha: 0.1) : Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: NinjaSpacing.md, vertical: NinjaSpacing.sm + 2),
           child: Row(
             children: [
               Expanded(
                 child: Text(
-                  s.title,
+                  title,
                   style: TextStyle(
-                    fontWeight: i == currentIndex ? FontWeight.bold : FontWeight.normal,
+                    fontSize: 14,
+                    fontWeight: isActive ? FontWeight.w600 : FontWeight.normal,
+                    color: isActive ? NinjaColors.primary : NinjaColors.textPrimary,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
-              if (i == currentIndex)
-                const Icon(PhosphorIconsRegular.check, size: 16, color: NinjaColors.primary),
-              if (sessions.length > 1)
+              if (onDelete != null)
                 GestureDetector(
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    onDelete(i);
-                  },
+                  onTap: onDelete,
                   child: const Padding(
-                    padding: EdgeInsets.only(left: 8),
+                    padding: EdgeInsets.only(left: 4),
                     child: Icon(PhosphorIconsRegular.trash, size: 16, color: NinjaColors.textSecondary),
                   ),
                 ),
             ],
           ),
-        );
-      }),
-      onSelected: onSelect,
+        ),
+      ),
     );
   }
 }
