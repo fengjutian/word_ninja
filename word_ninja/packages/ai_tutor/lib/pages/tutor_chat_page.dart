@@ -5,6 +5,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ai/ai.dart';
+import 'package:vocabulary/presentation/providers/word_provider.dart';
+import 'package:vocabulary/data/model/word.dart';
 import '../providers/chat_history_provider.dart';
 
 /// AI 导师聊天页 — Sensei Shell
@@ -147,6 +149,26 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     );
   }
 
+  void _addToVocabulary(String text) {
+    // 提取第一个英文单词（字母组成，至少 2 个字符）
+    final match = RegExp(r'[a-zA-Z]{2,}').firstMatch(text);
+    if (match == null) return;
+    final word = match.group(0)!;
+    ref.read(wordListProvider.notifier).addWord(
+      Word(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        userId: 'local',
+        word: word,
+        meaning: '待补充',
+        source: 'ai_tutor',
+        createdAt: DateTime.now(),
+      ),
+    );
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('「$word」已加入单词本'), duration: const Duration(seconds: 1)),
+    );
+  }
+
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollCtrl.hasClients) {
@@ -241,6 +263,9 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                     _msgCtrl.selection = TextSelection.collapsed(offset: msg.text.length);
                   } : null,
                   onDelete: msg.isLoading ? null : () => _deleteMessage(i),
+                  onAddToVocab: msg.isUser && !msg.isLoading
+                      ? () => _addToVocabulary(msg.text)
+                      : null,
                 );
               },
             ),
@@ -415,8 +440,9 @@ class _MessageBubble extends StatelessWidget {
   final ChatMessage message;
   final VoidCallback? onTap;
   final VoidCallback? onDelete;
+  final VoidCallback? onAddToVocab;
 
-  const _MessageBubble(this.message, {this.onTap, this.onDelete});
+  const _MessageBubble(this.message, {this.onTap, this.onDelete, this.onAddToVocab});
 
   @override
   Widget build(BuildContext context) {
@@ -457,7 +483,28 @@ class _MessageBubble extends StatelessWidget {
                   Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
                 ])
               : message.isUser
-                  ? Text(message.text, style: TextStyle(color: textColor, fontSize: 15))
+                  ? Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(message.text, style: TextStyle(color: textColor, fontSize: 15)),
+                        if (onAddToVocab != null)
+                          GestureDetector(
+                            onTap: onAddToVocab,
+                            child: Padding(
+                              padding: const EdgeInsets.only(top: 6),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(PhosphorIconsRegular.bookmarkSimple, size: 12, color: Colors.white70),
+                                  const SizedBox(width: 2),
+                                  Text('加入单词本', style: TextStyle(fontSize: 11, color: Colors.white70)),
+                                ],
+                              ),
+                            ),
+                          ),
+                      ],
+                    )
                   : MarkdownBody(
                       data: message.text,
                       selectable: true,

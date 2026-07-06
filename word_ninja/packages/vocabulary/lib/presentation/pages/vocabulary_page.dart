@@ -68,6 +68,17 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
     context.push('/vocabulary/review');
   }
 
+  void _showWordDetail(dynamic word) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => _WordDetailSheet(word: word),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(wordListProvider);
@@ -240,7 +251,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
         meaning: word.meaning,
         phonetic: word.phonetic.isNotEmpty ? '/${word.phonetic}/' : null,
         mastery: word.mastery,
-        onTap: () => context.push('/vocabulary/detail/${word.id}'),
+        onTap: () => _showWordDetail(word),
       ));
       // Loading indicator at the end
       if (i == state.words.length - 1 && state.hasMore) {
@@ -318,5 +329,105 @@ class _PracticeCard extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// 单词详情弹层
+class _WordDetailSheet extends ConsumerWidget {
+  final dynamic word;
+  const _WordDetailSheet({required this.word});
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.7,
+      maxChildSize: 0.95,
+      minChildSize: 0.3,
+      expand: false,
+      builder: (ctx, scrollCtrl) => SingleChildScrollView(
+        controller: scrollCtrl,
+        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40, height: 4,
+                decoration: BoxDecoration(
+                  color: NinjaColors.divider,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: NinjaSpacing.lg),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(NinjaSpacing.xl),
+                child: Column(
+                  children: [
+                    Text(word.word as String, style: NinjaTextStyles.displayMedium),
+                    if ((word.phonetic as String).isNotEmpty) ...[
+                      const SizedBox(height: NinjaSpacing.sm),
+                      Text('/${word.phonetic}/', style: NinjaTextStyles.bodyLarge),
+                    ],
+                    const SizedBox(height: NinjaSpacing.md),
+                    Text(word.meaning as String,
+                        style: NinjaTextStyles.heading3.copyWith(color: NinjaColors.primary)),
+                    const SizedBox(height: NinjaSpacing.lg),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [_buildMasteryBadge(word.mastery as int)],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: NinjaSpacing.lg),
+            if ((word.example as String).isNotEmpty) ...[
+              const Text('例句', style: NinjaTextStyles.heading3),
+              const SizedBox(height: NinjaSpacing.sm),
+              Card(
+                child: Padding(
+                  padding: const EdgeInsets.all(NinjaSpacing.lg),
+                  child: Text(word.example as String, style: NinjaTextStyles.bodyLarge),
+                ),
+              ),
+              const SizedBox(height: NinjaSpacing.lg),
+            ],
+            if ((word.tags as List).isNotEmpty) ...[
+              const Text('标签', style: NinjaTextStyles.heading3),
+              const SizedBox(height: NinjaSpacing.sm),
+              Wrap(
+                spacing: NinjaSpacing.sm,
+                children: (word.tags as List)
+                    .map((tag) => Chip(label: Text(tag.toString()), backgroundColor: NinjaColors.primary.withValues(alpha: 0.1)))
+                    .toList(),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMasteryBadge(int mastery) {
+    final (color, label) = _masteryInfo(mastery);
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: color.withValues(alpha: 0.3)),
+      ),
+      child: Text('$label · $mastery%',
+          style: TextStyle(color: color, fontWeight: FontWeight.w600)),
+    );
+  }
+
+  (Color, String) _masteryInfo(int mastery) {
+    if (mastery >= 85) return (NinjaColors.success, '已掌握');
+    if (mastery >= 60) return (NinjaColors.info, '熟悉');
+    if (mastery >= 30) return (NinjaColors.warning, '学习中');
+    return (NinjaColors.error, '陌生');
   }
 }
