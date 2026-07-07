@@ -65,12 +65,9 @@ class WordNinjaDesktopApp extends StatelessWidget {
           isDark ? NinjaColors.surfaceDark : NinjaColors.background,
       navigationPaneTheme: NavigationPaneThemeData(
         backgroundColor:
-            isDark ? NinjaColors.surfaceDark.withValues(alpha: 0.92) : NinjaColors.surface.withValues(alpha: 0.92),
+            isDark ? NinjaColors.surfaceDark : NinjaColors.surface,
         highlightColor: NinjaColors.primary.withValues(alpha: 0.08),
       ),
-      acrylicBackgroundColor: isDark
-          ? NinjaColors.surfaceDark.withValues(alpha: 0.4)
-          : NinjaColors.surface.withValues(alpha: 0.4),
     );
   }
 

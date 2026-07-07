@@ -102,7 +102,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
         actions: [
           if (state.words.isNotEmpty)
             IconButton(
-              icon: const Icon(PhosphorIconsRegular.graph),
+              icon: const Icon(PhosphorIconsRegular.shareNetwork),
               tooltip: '单词图谱',
               onPressed: () => context.push(
                 '/vocabulary/graph',
