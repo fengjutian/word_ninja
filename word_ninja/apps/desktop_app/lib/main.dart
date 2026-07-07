@@ -21,7 +21,6 @@ Offset _normalPos = Offset.zero;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await windowManager.ensureInitialized();
-  await hotKeyManager.unregisterAll();
 
   const windowOptions = WindowOptions(
     title: 'Word Ninja',
@@ -37,14 +36,11 @@ void main() async {
     await windowManager.focus();
   });
 
-  // Alt+W: toggle wallpaper mode
-  await hotKeyManager.register(
-    HotKey(
-      key: LogicalKeyboardKey.keyW,
-      modifiers: [KeyModifier.alt],
-    ),
-    keyDownHandler: (_) => _toggleWallpaper(),
-  );
+  // Alt+W hotkey disabled (hotkey_manager API mismatch with 0.2.3)
+  // await hotKeyManager.register(
+  //   HotKey(key: LogicalKeyboardKey.keyW, modifiers: [HotKeyModifier.alt]),
+  //   keyDownHandler: (_) => _toggleWallpaper(),
+  // );
 
   await AppBootstrap.init();
   log.i('Word Ninja Desktop started');
