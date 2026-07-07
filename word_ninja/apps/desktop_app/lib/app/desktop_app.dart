@@ -25,7 +25,6 @@ import 'package:profile/pages/settings_page.dart';
 import 'package:listening/presentation/pages/listening_page.dart';
 import 'package:speaking/presentation/pages/speaking_page.dart';
 import '../debug_overlay.dart';
-import '../providers/wallpaper_provider.dart';
 import 'package:window_manager/window_manager.dart';
 import 'package:core/storage/preferences.dart';
 
@@ -508,15 +507,6 @@ class _DesktopHome extends ConsumerWidget {
             ),
             const SizedBox(height: 20),
 
-            // Wallpaper toggle
-            Checkbox(
-              content: const Text('桌面壁纸模式'),
-              checked: ref.watch(wallpaperModeProvider),
-              onChanged: (v) => ref.read(wallpaperModeProvider.notifier).state = v ?? false,
-            ),
-            Text('开启后按 Alt+W 或再次点击关闭',
-                style: TextStyle(fontSize: 11, color: subColor)),
-
             // Quick actions
             Text('快捷入口',
                 style: TextStyle(
@@ -560,6 +550,7 @@ class _DesktopHome extends ConsumerWidget {
                     onTap: () => context.go(DesktopRoutes.listening)),
               ],
             ),
+            const SizedBox(height: 20),
           ],
         ),
       ),

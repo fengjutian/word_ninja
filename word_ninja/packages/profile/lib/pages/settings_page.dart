@@ -115,6 +115,8 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
               child: const Text('清除'),
             ),
           ),
+          // Wallpaper mode toggle — desktop only
+          _WallpaperToggle(),
           ListTile(
             leading: const Icon(PhosphorIconsRegular.link, color: NinjaColors.info),
             title: const Text('注册浏览器唤起协议'),
@@ -210,6 +212,36 @@ class _DropdownTile extends StatelessWidget {
           visualDensity: VisualDensity.compact,
           textStyle: WidgetStateProperty.all(const TextStyle(fontSize: 12)),
         ),
+      ),
+    );
+  }
+}
+
+// ─── Wallpaper Toggle ───
+
+class _WallpaperToggle extends StatefulWidget {
+  @override
+  State<_WallpaperToggle> createState() => _WallpaperToggleState();
+}
+
+class _WallpaperToggleState extends State<_WallpaperToggle> {
+  bool get _isWallpaper => Preferences.getBool('wallpaper_mode');
+
+  void _toggle(bool v) {
+    Preferences.setBool('wallpaper_mode', v);
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(PhosphorIconsRegular.desktopTower,
+          color: NinjaColors.accentPurple),
+      title: const Text('桌面壁纸模式'),
+      subtitle: const Text('全屏半透明学习面板，双击退出'),
+      trailing: Switch(
+        value: _isWallpaper,
+        onChanged: _toggle,
       ),
     );
   }
