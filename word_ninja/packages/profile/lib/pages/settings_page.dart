@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -112,6 +113,27 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
                 );
               },
               child: const Text('清除'),
+            ),
+          ),
+          ListTile(
+            leading: const Icon(PhosphorIconsRegular.link, color: NinjaColors.info),
+            title: const Text('注册浏览器唤起协议'),
+            subtitle: const Text('使浏览器可以 wordninja:// 唤起本应用'),
+            trailing: TextButton(
+              onPressed: () async {
+                final result = await Process.run('powershell', [
+                  '-Command',
+                  'Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass; & "${Directory.current.path.replaceAll('\\', '\\\\')}\\register_protocol.ps1"'
+                ], runInShell: true);
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(result.exitCode == 0 ? '协议注册成功' : '注册失败，请以管理员运行'),
+                    ),
+                  );
+                }
+              },
+              child: const Text('注册'),
             ),
           ),
           ListTile(

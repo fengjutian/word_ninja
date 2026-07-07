@@ -266,6 +266,15 @@ class DesktopShell extends StatelessWidget {
         selected: _calcIndex(context),
         onChanged: (i) => _navigate(context, i),
         displayMode: PaneDisplayMode.compact,
+        header: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: Text('🥷',
+              style: TextStyle(
+                  fontSize: 28,
+                  color: isDark
+                      ? NinjaColors.textOnDark
+                      : NinjaColors.textPrimary)),
+        ),
         items: [
           PaneItem(
             icon: const Icon(FluentIcons.home),
@@ -477,7 +486,7 @@ class _DesktopHome extends ConsumerWidget {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Word Ninja',
+                  Text('🥷 Word Ninja',
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.w800,
