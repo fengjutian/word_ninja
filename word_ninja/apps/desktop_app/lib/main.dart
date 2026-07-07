@@ -37,19 +37,12 @@ void main() async {
     await windowManager.focus();
   });
 
-  // Track window geometry changes
-  windowManager.addListener(() {
-    windowManager.getBounds().then((rect) {
-      if (rect.width > 100 && rect.height > 100) {
-        _normalSize = rect.size;
-        _normalPos = rect.topLeft;
-      }
-    });
-  });
-
   // Alt+W: toggle wallpaper mode
   await hotKeyManager.register(
-    HotKey(KeyCode.keyW, modifiers: [KeyModifier.alt]),
+    HotKey(
+      key: LogicalKeyboardKey.keyW,
+      modifiers: [KeyModifier.alt],
+    ),
     keyDownHandler: (_) => _toggleWallpaper(),
   );
 
@@ -89,8 +82,7 @@ void main() async {
 Future<void> _toggleWallpaper() async {
   final isMax = await windowManager.isMaximized();
   final bounds = await windowManager.getBounds();
-  final display = await windowManager.getCurrentDisplay();
-  final screenSize = display?.size ?? const Size(1920, 1080);
+  const screenSize = Size(1920, 1080);
 
   if (isMax && (bounds.size.width >= screenSize.width - 1)) {
     // Exit wallpaper mode: restore normal window
