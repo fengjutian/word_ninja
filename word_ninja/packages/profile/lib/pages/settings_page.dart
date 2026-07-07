@@ -121,16 +121,26 @@ class _SettingsPageState extends ConsumerState<SettingsPage> {
             subtitle: const Text('使浏览器可以 wordninja:// 唤起本应用'),
             trailing: TextButton(
               onPressed: () async {
-                final result = await Process.run('powershell', [
-                  '-Command',
-                  'Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass; & "${Directory.current.path.replaceAll('\\', '\\\\')}\\register_protocol.ps1"'
-                ], runInShell: true);
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(result.exitCode == 0 ? '协议注册成功' : '注册失败，请以管理员运行'),
-                    ),
-                  );
+                try {
+                  final result = await Process.run('powershell', [
+                    '-ExecutionPolicy', 'Bypass',
+                    '-File', 'register_protocol.ps1',
+                  ], runInShell: true);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(result.exitCode == 0
+                            ? '协议注册成功！浏览器可 wordninja:// 唤起了'
+                            : '注册失败：${result.stderr}'),
+                      ),
+                    );
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('注册失败: $e')),
+                    );
+                  }
                 }
               },
               child: const Text('注册'),
