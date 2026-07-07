@@ -512,7 +512,7 @@ class _DesktopHome extends ConsumerWidget {
             Checkbox(
               content: const Text('桌面壁纸模式'),
               checked: ref.watch(wallpaperModeProvider),
-              onChanged: (v) => ref.read(wallpaperModeProvider.notifier).state = v,
+              onChanged: (v) => ref.read(wallpaperModeProvider.notifier).state = v ?? false,
             ),
             Text('开启后按 Alt+W 或再次点击关闭',
                 style: TextStyle(fontSize: 11, color: subColor)),
