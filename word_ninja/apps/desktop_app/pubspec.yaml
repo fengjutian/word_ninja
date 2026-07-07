@@ -56,6 +56,16 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  msix: ^3.16.0
 
 flutter:
   uses-material-design: true
+
+msix_config:
+  display_name: Word Ninja
+  publisher_display_name: Word Ninja
+  identity_name: com.wordninja.desktop
+  msix_version: 1.0.0.0
+  logo_path: windows\runner\resources\app_icon.ico
+  capabilities: internetClient
+  protocol_activation: wordninja
