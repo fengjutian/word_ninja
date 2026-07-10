@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ai/ai.dart';
@@ -46,7 +47,22 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
             ),
         ],
       ),
-      body: ListView(
+      body: Stack(
+        children: [
+          // Background SVG
+          Positioned.fill(
+            child: SvgPicture.asset(
+              'assets/analysis_bg.svg',
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Subtle overlay for readability
+          Positioned.fill(
+            child: Container(
+              color: NinjaColors.background.withValues(alpha: 0.85),
+            ),
+          ),
+          ListView(
         padding: const EdgeInsets.all(NinjaSpacing.md),
         children: [
           // ─── 一句话洞察 ───
@@ -115,6 +131,8 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
 
           if (state.report == null && !state.isLoading && state.error == null)
             _EmptyState(onGenerate: _generateReport),
+        ],
+      ),
         ],
       ),
     );
