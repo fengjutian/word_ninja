@@ -49,17 +49,29 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
       ),
       body: Stack(
         children: [
-          // Background SVG
+          // SVG 渐变背景
           Positioned.fill(
-            child: SvgPicture.asset(
-              'assets/analysis_bg.svg',
-              fit: BoxFit.cover,
+            child: ClipRect(
+              child: SvgPicture.asset(
+                'assets/analysis_bg.svg',
+                fit: BoxFit.cover,
+              ),
             ),
           ),
-          // Subtle overlay for readability
+          // 渐变遮罩：顶部透明，底部微遮提高可读性
           Positioned.fill(
             child: Container(
-              color: NinjaColors.background.withValues(alpha: 0.85),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0x00FFFFFF), // 顶部：完全透明
+                    Color(0x66FFFFFF), // 中部：微微白
+                    Color(0xCCFFFFFF), // 底部：较强白，保证文字可读
+                  ],
+                ),
+              ),
             ),
           ),
           ListView(
