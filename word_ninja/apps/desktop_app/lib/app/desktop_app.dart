@@ -17,6 +17,7 @@ import 'package:vocabulary/data/model/vocabulary_stats.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:reading/presentation/pages/reader_page.dart';
 import 'package:ai_tutor/pages/tutor_chat_page.dart';
+import 'package:ai_tutor/pages/analysis_page.dart';
 import 'package:ai/pages/model_config_page.dart';
 import 'package:writing/presentation/pages/writing_page.dart';
 import 'package:study_plan/pages/study_plan_page.dart';
@@ -121,6 +122,7 @@ class DesktopRoutes {
   static const String wordGraph = '/vocabulary/graph';
   static const String reading = '/reading';
   static const String aiTutor = '/ai-tutor';
+  static const String aiAnalysis = '/ai-analysis';
   static const String modelConfig = '/model-config';
   static const String writing = '/writing';
   static const String studyPlan = '/study-plan';
@@ -152,6 +154,9 @@ GoRouter createDesktopRouter() {
           GoRoute(
               path: DesktopRoutes.aiTutor,
               builder: (ctx, state) => const TutorChatPage()),
+          GoRoute(
+              path: DesktopRoutes.aiAnalysis,
+              builder: (ctx, state) => const AnalysisPage()),
           GoRoute(
               path: DesktopRoutes.modelConfig,
               builder: (ctx, state) => const ModelConfigPage()),

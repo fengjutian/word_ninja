@@ -48,6 +48,7 @@ dependencies:
     path: ../../packages/leaderboard
   flutter_riverpod: ^2.6.1
   go_router: ^14.8.1
+  sqflite_common_ffi: ^2.3.0
   window_manager: ^0.4.3
   hotkey_manager: ^0.2.3
   app_links: ^6.0.0

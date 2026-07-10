@@ -8,6 +8,7 @@ import 'package:ai/ai.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
 import '../providers/chat_history_provider.dart';
+import 'analysis_page.dart';
 
 /// AI 导师聊天页 — Sensei Shell
 class TutorChatPage extends ConsumerStatefulWidget {
@@ -299,6 +300,13 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                 tooltip: '重试',
                 onPressed: _retry,
               ),
+            IconButton(
+              icon: Icon(PhosphorIconsRegular.chartBar, size: 18, color: NinjaColors.textOnDark.withValues(alpha: 0.7)),
+              tooltip: '学习分析',
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const AnalysisPage()),
+              ),
+            ),
             IconButton(
               icon: Icon(PhosphorIconsRegular.copy, size: 18, color: NinjaColors.textOnDark.withValues(alpha: 0.7)),
               tooltip: '复制对话',
