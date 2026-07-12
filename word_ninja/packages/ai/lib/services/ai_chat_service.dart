@@ -24,6 +24,24 @@ class AiChatService {
   }
 
   /// 流式聊天 — 逐字返回
+  /// 测试连接 — 返回 (成功, 消息)
+  Future<(bool, String)> testConnection() async {
+    try {
+      final res = await _dio.post('/chat/completions', data: {
+        'model': _modelName,
+        'messages': [
+          {'role': 'user', 'content': 'Hi'},
+        ],
+        'max_tokens': 5,
+      });
+      final content = res.data['choices'][0]['message']['content'] as String;
+      return (true, content);
+    } on DioException catch (e) {
+      log.e('Connection test failed: status=${e.response?.statusCode}, message=${e.message}');
+      return (false, _dioErrorToUserMessage(e));
+    }
+  }
+
   /// 普通聊天（非流式）
   Future<String> chat({
     required String message,

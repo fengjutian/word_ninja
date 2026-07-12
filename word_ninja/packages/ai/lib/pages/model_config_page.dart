@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import '../config/model_config.dart';
 import '../config/config_provider.dart';
+import '../services/ai_chat_service.dart';
 
 /// 大模型配置页面
 class ModelConfigPage extends ConsumerWidget {
@@ -83,6 +84,10 @@ class ModelConfigPage extends ConsumerWidget {
                 ],
               ),
             ),
+
+          const SizedBox(height: NinjaSpacing.md),
+          // ─── 测试连接 ───
+          _TestButton(apiKey: config.apiKey, config: config),
 
           const SizedBox(height: NinjaSpacing.xl),
 
@@ -293,6 +298,104 @@ class _InfoRow extends StatelessWidget {
               )),
         ],
       ),
+    );
+  }
+}
+
+/// API 连接测试按钮
+class _TestButton extends StatefulWidget {
+  final String apiKey;
+  final ModelConfig config;
+
+  const _TestButton({required this.apiKey, required this.config});
+
+  @override
+  State<_TestButton> createState() => _TestButtonState();
+}
+
+class _TestButtonState extends State<_TestButton> {
+  bool _loading = false;
+  String? _result;
+  bool? _success;
+
+  Future<void> _test() async {
+    if (widget.apiKey.isEmpty) {
+      setState(() {
+        _success = false;
+        _result = '请先保存 API 密钥再测试。';
+      });
+      return;
+    }
+    setState(() {
+      _loading = true;
+      _result = null;
+      _success = null;
+    });
+    final service = AiChatService(widget.apiKey, config: widget.config);
+    final (ok, msg) = await service.testConnection();
+    if (!mounted) return;
+    setState(() {
+      _loading = false;
+      _success = ok;
+      _result = msg;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hasResult = _result != null;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        OutlinedButton.icon(
+          onPressed: _loading ? null : _test,
+          icon: _loading
+              ? const SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(strokeWidth: 2),
+                )
+              : Icon(PhosphorIconsRegular.paperPlaneTilt, size: 18),
+          label: Text(_loading ? '测试中…' : '测试连接'),
+        ),
+        if (hasResult)
+          Padding(
+            padding: const EdgeInsets.only(top: NinjaSpacing.sm),
+            child: Card(
+              color: (_success == true
+                      ? NinjaColors.success
+                      : NinjaColors.error)
+                  .withValues(alpha: 0.08),
+              child: Padding(
+                padding: const EdgeInsets.all(NinjaSpacing.md),
+                child: Row(
+                  children: [
+                    Icon(
+                      _success == true
+                          ? PhosphorIconsRegular.checkCircle
+                          : PhosphorIconsRegular.warningCircle,
+                      color: _success == true
+                          ? NinjaColors.success
+                          : NinjaColors.error,
+                      size: 18,
+                    ),
+                    const SizedBox(width: NinjaSpacing.sm),
+                    Expanded(
+                      child: Text(
+                        _result!,
+                        style: NinjaTextStyles.caption.copyWith(
+                          color: _success == true
+                              ? NinjaColors.success
+                              : NinjaColors.error,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
