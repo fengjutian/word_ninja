@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ai/ai.dart';
@@ -49,16 +48,25 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
       ),
       body: Stack(
         children: [
-          // SVG 渐变背景
+          // 多色渐变背景（模拟 SVG 的彩色光晕）
           Positioned.fill(
-            child: ClipRect(
-              child: SvgPicture.asset(
-                'assets/analysis_bg.svg',
-                fit: BoxFit.cover,
+            child: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFCDD3D9), // 浅灰（SVG 底色）
+                    Color(0xFF68BE8D), // 绿色光晕
+                    Color(0xFF008899), // 青蓝色光晕
+                    Color(0xFF274A78), // 深蓝光晕
+                  ],
+                  stops: [0.0, 0.25, 0.6, 1.0],
+                ),
               ),
             ),
           ),
-          // 渐变遮罩：顶部透明，底部微遮提高可读性
+          // 半透明遮罩：保护文字可读性
           Positioned.fill(
             child: Container(
               decoration: const BoxDecoration(
@@ -66,10 +74,11 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0x00FFFFFF), // 顶部：完全透明
-                    Color(0x66FFFFFF), // 中部：微微白
-                    Color(0xCCFFFFFF), // 底部：较强白，保证文字可读
+                    Color(0x00FFFFFF),
+                    Color(0x33FFFFFF),
+                    Color(0x99FFFFFF),
                   ],
+                  stops: [0.0, 0.4, 1.0],
                 ),
               ),
             ),
