@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:ui_kit/ninja_theme/ninja_theme.dart';
 import 'package:ui_kit/ninja_theme/theme_data.dart';
 import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
@@ -20,6 +21,7 @@ class _NavItem {
 }
 
 final _navItems = [
+  _NavItem('网页', ({required double size, required Color color}) => Icon(PhosphorIconsRegular.globe, size: size, color: color), AppRoutes.webReader),
   _NavItem('修炼', ({required double size, required Color color}) => NinjaIcon.shuriken(size: size, color: color), AppRoutes.home),
   _NavItem('单词', ({required double size, required Color color}) => NinjaIcon.scroll(size: size, color: color), AppRoutes.vocabulary),
   _NavItem('AI导师', ({required double size, required Color color}) => NinjaIcon.chatBubble(size: size, color: color), AppRoutes.aiTutor),

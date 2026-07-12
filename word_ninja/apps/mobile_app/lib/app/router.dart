@@ -11,6 +11,7 @@ import 'package:vocabulary/presentation/pages/review_page.dart';
 import 'package:vocabulary/presentation/pages/word_test_page.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:reading/presentation/pages/reader_page.dart';
+import 'package:web_reader/pages/web_reader_page.dart';
 import 'package:listening/presentation/pages/listening_page.dart';
 import 'package:speaking/presentation/pages/speaking_page.dart';
 import 'package:writing/presentation/pages/writing_page.dart';
@@ -37,6 +38,7 @@ class AppRoutes {
   static const String review = '/vocabulary/review';
   static const String wordTest = '/vocabulary/test';
   static const String reading = '/reading';
+  static const String webReader = '/web-reader';
   static const String listening = '/listening';
   static const String speaking = '/speaking';
   static const String writing = '/writing';
@@ -164,6 +166,13 @@ GoRouter createRouter() {
             pageBuilder: (ctx, state) => _slideInFromBottom(
               key: state.pageKey,
               child: const ReaderPage(),
+            ),
+          ),
+          GoRoute(
+            path: AppRoutes.webReader,
+            pageBuilder: (ctx, state) => _slideInFromBottom(
+              key: state.pageKey,
+              child: const WebReaderPage(),
             ),
           ),
           GoRoute(
@@ -344,6 +353,7 @@ class _HomeTab extends StatelessWidget {
               _QuickChip('口语', NinjaIcon.mic(size: 16, color: NinjaColors.primary), AppRoutes.speaking),
               _QuickChip('写作', NinjaIcon.pen(size: 16, color: NinjaColors.primary), AppRoutes.writing),
               _QuickChip('AI导师', NinjaIcon.chatBubble(size: 16, color: NinjaColors.primary), AppRoutes.aiTutor),
+              _QuickChip('网页', const Icon(PhosphorIconsRegular.globe, size: 16, color: NinjaColors.primary), AppRoutes.webReader),
               _QuickChip('计划', NinjaIcon.calendar(size: 16, color: NinjaColors.primary), AppRoutes.studyPlan),
               _QuickChip('商店', NinjaIcon.coin(size: 16, color: NinjaColors.primary), AppRoutes.shop),
             ],

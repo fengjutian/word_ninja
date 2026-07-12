@@ -45,6 +45,8 @@ dependencies:
     path: ../../packages/profile
   sync:
     path: ../../packages/sync
+  web_reader:
+    path: ../../packages/web_reader
   flutter_riverpod: ^2.6.1
   flutter_svg: ^2.0.16
   go_router: ^14.8.1
