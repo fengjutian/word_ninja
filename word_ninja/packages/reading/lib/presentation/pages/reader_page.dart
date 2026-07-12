@@ -9,6 +9,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:core/logger/logger.dart';
 import 'package:archive/archive.dart';
 import 'dart:convert';
+import 'package:http/http.dart' as http;
 import '../widgets/translate_popup.dart';
 
 /// 分类
@@ -164,6 +165,8 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
                     _ImportButton('EPUB', PhosphorIconsRegular.book, onTap: () => _importFile('epub')),
                     const SizedBox(width: NinjaSpacing.md),
                     _ImportButton('TXT', PhosphorIconsRegular.fileText, onTap: () => _importFile('txt')),
+                    const SizedBox(width: NinjaSpacing.md),
+                    _ImportButton('网页', PhosphorIconsRegular.browser, onTap: _showUrlImportDialog),
                   ],
                 ),
               ],
@@ -352,6 +355,129 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       if (stripped.isNotEmpty) buf.writeln(stripped);
     }
     return buf.toString().trim();
+  }
+
+  void _showUrlImportDialog() {
+    final urlController = TextEditingController();
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('导入网页'),
+        content: TextField(
+          controller: urlController,
+          decoration: const InputDecoration(
+            labelText: '网页地址',
+            hintText: 'https://example.com/article',
+          ),
+          keyboardType: TextInputType.url,
+          autofocus: true,
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+          FilledButton(
+            onPressed: () {
+              final url = urlController.text.trim();
+              if (url.isEmpty) return;
+              Navigator.pop(ctx);
+              _fetchWebsite(url);
+            },
+            child: const Text('读取'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _fetchWebsite(String url) async {
+    setState(() => _isLoading = true);
+    try {
+      final uri = Uri.tryParse(url);
+      if (uri == null || !uri.hasScheme) {
+        throw Exception('无效的网址');
+      }
+      final response = await http.get(uri, headers: const {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+      }).timeout(const Duration(seconds: 15));
+
+      if (response.statusCode != 200) {
+        throw Exception('服务器返回 ${response.statusCode}');
+      }
+
+      final html = response.body;
+      final text = _extractHtmlText(html);
+
+      if (text.trim().isEmpty) {
+        throw Exception('未能从网页中提取到文字内容');
+      }
+
+      // Derive a title from the HTML <title> or fall back to the URL host+path
+      final titleMatch = RegExp(r'<title[^>]*>(.*?)</title>', caseSensitive: false, dotAll: true).firstMatch(html);
+      final title = titleMatch?.group(1)?.trim().replaceAll(RegExp(r'\s+'), ' ') ?? uri.host;
+
+      final article = _Article(
+        title: title,
+        level: 'N3',
+        wordCount: text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length,
+        source: '网页',
+        topic: uri.host,
+        category: _ReadingCategory.all,
+        content: text,
+      );
+      setState(() {
+        _articles = [article, ..._articles];
+        _isLoading = false;
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('已读取: $title'), duration: const Duration(seconds: 2)),
+        );
+      }
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('读取网页失败: $e')),
+        );
+      }
+    }
+  }
+
+  String _extractHtmlText(String html) {
+    // Remove scripts, styles, and head elements
+    var cleaned = html
+        .replaceAll(RegExp(r'<script[^>]*>.*?</script>', caseSensitive: false, dotAll: true), ' ')
+        .replaceAll(RegExp(r'<style[^>]*>.*?</style>', caseSensitive: false, dotAll: true), ' ')
+        .replaceAll(RegExp(r'<head[^>]*>.*?</head>', caseSensitive: false, dotAll: true), ' ')
+        .replaceAll(RegExp(r'<noscript[^>]*>.*?</noscript>', caseSensitive: false, dotAll: true), ' ');
+    // Replace common block elements with line breaks
+    cleaned = cleaned
+        .replaceAll(RegExp(r'<(?:br|hr)\s*/?>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</?p[^>]*>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</?div[^>]*>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</?h[1-6][^>]*>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</?li[^>]*>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</?tr[^>]*>', caseSensitive: false), '\n');
+    // Strip all remaining tags
+    cleaned = cleaned.replaceAll(RegExp(r'<[^>]+>'), ' ');
+    // Decode common HTML entities
+    cleaned = cleaned
+        .replaceAll('&nbsp;', ' ')
+        .replaceAll('&amp;', '&')
+        .replaceAll('&lt;', '<')
+        .replaceAll('&gt;', '>')
+        .replaceAll('&quot;', '"')
+        .replaceAll('&#39;', "'")
+        .replaceAll('&rsquo;', "'")
+        .replaceAll('&ldquo;', '"')
+        .replaceAll('&rdquo;', '"')
+        .replaceAll('&mdash;', '—')
+        .replaceAll('&ndash;', '–');
+    // Collapse whitespace
+    cleaned = cleaned
+        .replaceAll(RegExp(r'[ \t]+'), ' ')
+        .replaceAll(RegExp(r'\n{3,}'), '\n\n')
+        .trim();
+    return cleaned;
   }
 }
 
