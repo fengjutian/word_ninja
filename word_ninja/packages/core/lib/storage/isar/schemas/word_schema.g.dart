@@ -32,58 +32,63 @@ const WordSchemaSchema = CollectionSchema(
       name: r'example',
       type: IsarType.string,
     ),
-    r'mastery': PropertySchema(
+    r'focusScore': PropertySchema(
       id: 3,
+      name: r'focusScore',
+      type: IsarType.long,
+    ),
+    r'mastery': PropertySchema(
+      id: 4,
       name: r'mastery',
       type: IsarType.long,
     ),
     r'meaning': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'meaning',
       type: IsarType.string,
     ),
     r'nextReviewDate': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'nextReviewDate',
       type: IsarType.dateTime,
     ),
     r'phonetic': PropertySchema(
-      id: 6,
+      id: 7,
       name: r'phonetic',
       type: IsarType.string,
     ),
     r'reviewCount': PropertySchema(
-      id: 7,
+      id: 8,
       name: r'reviewCount',
       type: IsarType.long,
     ),
     r'source': PropertySchema(
-      id: 8,
+      id: 9,
       name: r'source',
       type: IsarType.string,
     ),
     r'tags': PropertySchema(
-      id: 9,
+      id: 10,
       name: r'tags',
       type: IsarType.stringList,
     ),
     r'updatedAt': PropertySchema(
-      id: 10,
+      id: 11,
       name: r'updatedAt',
       type: IsarType.dateTime,
     ),
     r'userId': PropertySchema(
-      id: 11,
+      id: 12,
       name: r'userId',
       type: IsarType.string,
     ),
     r'word': PropertySchema(
-      id: 12,
+      id: 13,
       name: r'word',
       type: IsarType.string,
     ),
     r'wordId': PropertySchema(
-      id: 13,
+      id: 14,
       name: r'wordId',
       type: IsarType.string,
     )
@@ -158,17 +163,18 @@ void _wordSchemaSerialize(
   writer.writeDateTime(offsets[0], object.createdAt);
   writer.writeLong(offsets[1], object.difficulty);
   writer.writeString(offsets[2], object.example);
-  writer.writeLong(offsets[3], object.mastery);
-  writer.writeString(offsets[4], object.meaning);
-  writer.writeDateTime(offsets[5], object.nextReviewDate);
-  writer.writeString(offsets[6], object.phonetic);
-  writer.writeLong(offsets[7], object.reviewCount);
-  writer.writeString(offsets[8], object.source);
-  writer.writeStringList(offsets[9], object.tags);
-  writer.writeDateTime(offsets[10], object.updatedAt);
-  writer.writeString(offsets[11], object.userId);
-  writer.writeString(offsets[12], object.word);
-  writer.writeString(offsets[13], object.wordId);
+  writer.writeLong(offsets[3], object.focusScore);
+  writer.writeLong(offsets[4], object.mastery);
+  writer.writeString(offsets[5], object.meaning);
+  writer.writeDateTime(offsets[6], object.nextReviewDate);
+  writer.writeString(offsets[7], object.phonetic);
+  writer.writeLong(offsets[8], object.reviewCount);
+  writer.writeString(offsets[9], object.source);
+  writer.writeStringList(offsets[10], object.tags);
+  writer.writeDateTime(offsets[11], object.updatedAt);
+  writer.writeString(offsets[12], object.userId);
+  writer.writeString(offsets[13], object.word);
+  writer.writeString(offsets[14], object.wordId);
 }
 
 WordSchema _wordSchemaDeserialize(
@@ -181,18 +187,19 @@ WordSchema _wordSchemaDeserialize(
   object.createdAt = reader.readDateTimeOrNull(offsets[0]);
   object.difficulty = reader.readLong(offsets[1]);
   object.example = reader.readStringOrNull(offsets[2]);
+  object.focusScore = reader.readLong(offsets[3]);
   object.id = id;
-  object.mastery = reader.readLong(offsets[3]);
-  object.meaning = reader.readString(offsets[4]);
-  object.nextReviewDate = reader.readDateTimeOrNull(offsets[5]);
-  object.phonetic = reader.readStringOrNull(offsets[6]);
-  object.reviewCount = reader.readLong(offsets[7]);
-  object.source = reader.readString(offsets[8]);
-  object.tags = reader.readStringList(offsets[9]) ?? [];
-  object.updatedAt = reader.readDateTimeOrNull(offsets[10]);
-  object.userId = reader.readString(offsets[11]);
-  object.word = reader.readString(offsets[12]);
-  object.wordId = reader.readString(offsets[13]);
+  object.mastery = reader.readLong(offsets[4]);
+  object.meaning = reader.readString(offsets[5]);
+  object.nextReviewDate = reader.readDateTimeOrNull(offsets[6]);
+  object.phonetic = reader.readStringOrNull(offsets[7]);
+  object.reviewCount = reader.readLong(offsets[8]);
+  object.source = reader.readString(offsets[9]);
+  object.tags = reader.readStringList(offsets[10]) ?? [];
+  object.updatedAt = reader.readDateTimeOrNull(offsets[11]);
+  object.userId = reader.readString(offsets[12]);
+  object.word = reader.readString(offsets[13]);
+  object.wordId = reader.readString(offsets[14]);
   return object;
 }
 
@@ -212,24 +219,26 @@ P _wordSchemaDeserializeProp<P>(
     case 3:
       return (reader.readLong(offset)) as P;
     case 4:
-      return (reader.readString(offset)) as P;
-    case 5:
-      return (reader.readDateTimeOrNull(offset)) as P;
-    case 6:
-      return (reader.readStringOrNull(offset)) as P;
-    case 7:
       return (reader.readLong(offset)) as P;
-    case 8:
+    case 5:
       return (reader.readString(offset)) as P;
-    case 9:
-      return (reader.readStringList(offset) ?? []) as P;
-    case 10:
+    case 6:
       return (reader.readDateTimeOrNull(offset)) as P;
-    case 11:
+    case 7:
+      return (reader.readStringOrNull(offset)) as P;
+    case 8:
+      return (reader.readLong(offset)) as P;
+    case 9:
       return (reader.readString(offset)) as P;
+    case 10:
+      return (reader.readStringList(offset) ?? []) as P;
+    case 11:
+      return (reader.readDateTimeOrNull(offset)) as P;
     case 12:
       return (reader.readString(offset)) as P;
     case 13:
+      return (reader.readString(offset)) as P;
+    case 14:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -644,6 +653,61 @@ extension WordSchemaQueryFilter
       return query.addFilterCondition(FilterCondition.greaterThan(
         property: r'example',
         value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition> focusScoreEqualTo(
+      int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'focusScore',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      focusScoreGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'focusScore',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition>
+      focusScoreLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'focusScore',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterFilterCondition> focusScoreBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'focusScore',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -2030,6 +2094,18 @@ extension WordSchemaQuerySortBy
     });
   }
 
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> sortByFocusScore() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'focusScore', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> sortByFocusScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'focusScore', Sort.desc);
+    });
+  }
+
   QueryBuilder<WordSchema, WordSchema, QAfterSortBy> sortByMastery() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'mastery', Sort.asc);
@@ -2190,6 +2266,18 @@ extension WordSchemaQuerySortThenBy
     });
   }
 
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> thenByFocusScore() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'focusScore', Sort.asc);
+    });
+  }
+
+  QueryBuilder<WordSchema, WordSchema, QAfterSortBy> thenByFocusScoreDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'focusScore', Sort.desc);
+    });
+  }
+
   QueryBuilder<WordSchema, WordSchema, QAfterSortBy> thenById() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'id', Sort.asc);
@@ -2345,6 +2433,12 @@ extension WordSchemaQueryWhereDistinct
     });
   }
 
+  QueryBuilder<WordSchema, WordSchema, QDistinct> distinctByFocusScore() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'focusScore');
+    });
+  }
+
   QueryBuilder<WordSchema, WordSchema, QDistinct> distinctByMastery() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'mastery');
@@ -2441,6 +2535,12 @@ extension WordSchemaQueryProperty
   QueryBuilder<WordSchema, String?, QQueryOperations> exampleProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'example');
+    });
+  }
+
+  QueryBuilder<WordSchema, int, QQueryOperations> focusScoreProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'focusScore');
     });
   }
 

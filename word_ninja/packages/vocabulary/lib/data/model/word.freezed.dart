@@ -32,8 +32,15 @@ mixin _$Word {
   List<String> get tags => throw _privateConstructorUsedError;
   DateTime? get createdAt => throw _privateConstructorUsedError;
   DateTime? get updatedAt => throw _privateConstructorUsedError;
+
+  /// 下次复习日期（null = 立即待复习 / 从未复习）
   DateTime? get nextReviewDate => throw _privateConstructorUsedError;
+
+  /// 已复习次数（用于艾宾浩斯间隔计算）
   int get reviewCount => throw _privateConstructorUsedError;
+
+  /// AI 标记的重点分数（0-100），用于强化学习优先调度
+  int get focusScore => throw _privateConstructorUsedError;
 
   /// Serializes this Word to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -63,7 +70,8 @@ abstract class $WordCopyWith<$Res> {
       DateTime? createdAt,
       DateTime? updatedAt,
       DateTime? nextReviewDate,
-      int reviewCount});
+      int reviewCount,
+      int focusScore});
 }
 
 /// @nodoc
@@ -95,6 +103,7 @@ class _$WordCopyWithImpl<$Res, $Val extends Word>
     Object? updatedAt = freezed,
     Object? nextReviewDate = freezed,
     Object? reviewCount = null,
+    Object? focusScore = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -153,6 +162,10 @@ class _$WordCopyWithImpl<$Res, $Val extends Word>
           ? _value.reviewCount
           : reviewCount // ignore: cast_nullable_to_non_nullable
               as int,
+      focusScore: null == focusScore
+          ? _value.focusScore
+          : focusScore // ignore: cast_nullable_to_non_nullable
+              as int,
     ) as $Val);
   }
 }
@@ -178,7 +191,8 @@ abstract class _$$WordImplCopyWith<$Res> implements $WordCopyWith<$Res> {
       DateTime? createdAt,
       DateTime? updatedAt,
       DateTime? nextReviewDate,
-      int reviewCount});
+      int reviewCount,
+      int focusScore});
 }
 
 /// @nodoc
@@ -207,6 +221,7 @@ class __$$WordImplCopyWithImpl<$Res>
     Object? updatedAt = freezed,
     Object? nextReviewDate = freezed,
     Object? reviewCount = null,
+    Object? focusScore = null,
   }) {
     return _then(_$WordImpl(
       id: null == id
@@ -265,6 +280,10 @@ class __$$WordImplCopyWithImpl<$Res>
           ? _value.reviewCount
           : reviewCount // ignore: cast_nullable_to_non_nullable
               as int,
+      focusScore: null == focusScore
+          ? _value.focusScore
+          : focusScore // ignore: cast_nullable_to_non_nullable
+              as int,
     ));
   }
 }
@@ -286,7 +305,8 @@ class _$WordImpl implements _Word {
       this.createdAt,
       this.updatedAt,
       this.nextReviewDate,
-      this.reviewCount = 0})
+      this.reviewCount = 0,
+      this.focusScore = 0})
       : _tags = tags;
 
   factory _$WordImpl.fromJson(Map<String, dynamic> json) =>
@@ -328,15 +348,24 @@ class _$WordImpl implements _Word {
   final DateTime? createdAt;
   @override
   final DateTime? updatedAt;
+
+  /// 下次复习日期（null = 立即待复习 / 从未复习）
   @override
   final DateTime? nextReviewDate;
+
+  /// 已复习次数（用于艾宾浩斯间隔计算）
   @override
   @JsonKey()
   final int reviewCount;
 
+  /// AI 标记的重点分数（0-100），用于强化学习优先调度
+  @override
+  @JsonKey()
+  final int focusScore;
+
   @override
   String toString() {
-    return 'Word(id: $id, userId: $userId, word: $word, meaning: $meaning, phonetic: $phonetic, example: $example, difficulty: $difficulty, mastery: $mastery, source: $source, tags: $tags, createdAt: $createdAt, updatedAt: $updatedAt, nextReviewDate: $nextReviewDate, reviewCount: $reviewCount)';
+    return 'Word(id: $id, userId: $userId, word: $word, meaning: $meaning, phonetic: $phonetic, example: $example, difficulty: $difficulty, mastery: $mastery, source: $source, tags: $tags, createdAt: $createdAt, updatedAt: $updatedAt, nextReviewDate: $nextReviewDate, reviewCount: $reviewCount, focusScore: $focusScore)';
   }
 
   @override
@@ -363,7 +392,9 @@ class _$WordImpl implements _Word {
             (identical(other.nextReviewDate, nextReviewDate) ||
                 other.nextReviewDate == nextReviewDate) &&
             (identical(other.reviewCount, reviewCount) ||
-                other.reviewCount == reviewCount));
+                other.reviewCount == reviewCount) &&
+            (identical(other.focusScore, focusScore) ||
+                other.focusScore == focusScore));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -383,7 +414,8 @@ class _$WordImpl implements _Word {
       createdAt,
       updatedAt,
       nextReviewDate,
-      reviewCount);
+      reviewCount,
+      focusScore);
 
   /// Create a copy of Word
   /// with the given fields replaced by the non-null parameter values.
@@ -416,7 +448,8 @@ abstract class _Word implements Word {
       final DateTime? createdAt,
       final DateTime? updatedAt,
       final DateTime? nextReviewDate,
-      final int reviewCount}) = _$WordImpl;
+      final int reviewCount,
+      final int focusScore}) = _$WordImpl;
 
   factory _Word.fromJson(Map<String, dynamic> json) = _$WordImpl.fromJson;
 
@@ -444,10 +477,18 @@ abstract class _Word implements Word {
   DateTime? get createdAt;
   @override
   DateTime? get updatedAt;
+
+  /// 下次复习日期（null = 立即待复习 / 从未复习）
   @override
   DateTime? get nextReviewDate;
+
+  /// 已复习次数（用于艾宾浩斯间隔计算）
   @override
   int get reviewCount;
+
+  /// AI 标记的重点分数（0-100），用于强化学习优先调度
+  @override
+  int get focusScore;
 
   /// Create a copy of Word
   /// with the given fields replaced by the non-null parameter values.

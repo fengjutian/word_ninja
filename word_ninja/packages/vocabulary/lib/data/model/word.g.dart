@@ -29,6 +29,7 @@ _$WordImpl _$$WordImplFromJson(Map<String, dynamic> json) => _$WordImpl(
           ? null
           : DateTime.parse(json['nextReviewDate'] as String),
       reviewCount: (json['reviewCount'] as num?)?.toInt() ?? 0,
+      focusScore: (json['focusScore'] as num?)?.toInt() ?? 0,
     );
 
 Map<String, dynamic> _$$WordImplToJson(_$WordImpl instance) =>
@@ -47,4 +48,5 @@ Map<String, dynamic> _$$WordImplToJson(_$WordImpl instance) =>
       'updatedAt': instance.updatedAt?.toIso8601String(),
       'nextReviewDate': instance.nextReviewDate?.toIso8601String(),
       'reviewCount': instance.reviewCount,
+      'focusScore': instance.focusScore,
     };

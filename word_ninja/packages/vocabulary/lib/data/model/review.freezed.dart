@@ -25,7 +25,11 @@ mixin _$Review {
   DateTime get reviewTime => throw _privateConstructorUsedError;
   int get score => throw _privateConstructorUsedError;
   bool get isCompleted => throw _privateConstructorUsedError;
+
+  /// 本次复习使用的艾宾浩斯间隔（天），0=首次复习
   int get interval => throw _privateConstructorUsedError;
+
+  /// 本次复习排定日期（对应复习时 word.nextReviewDate）
   DateTime? get scheduledFor => throw _privateConstructorUsedError;
 
   /// Serializes this Review to a JSON map.
@@ -206,9 +210,13 @@ class _$ReviewImpl implements _Review {
   @override
   @JsonKey()
   final bool isCompleted;
+
+  /// 本次复习使用的艾宾浩斯间隔（天），0=首次复习
   @override
   @JsonKey()
   final int interval;
+
+  /// 本次复习排定日期（对应复习时 word.nextReviewDate）
   @override
   final DateTime? scheduledFor;
 
@@ -237,8 +245,8 @@ class _$ReviewImpl implements _Review {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, wordId, reviewTime, score, isCompleted, interval, scheduledFor);
+  int get hashCode => Object.hash(runtimeType, id, wordId, reviewTime, score,
+      isCompleted, interval, scheduledFor);
 
   /// Create a copy of Review
   /// with the given fields replaced by the non-null parameter values.
@@ -278,8 +286,12 @@ abstract class _Review implements Review {
   int get score;
   @override
   bool get isCompleted;
+
+  /// 本次复习使用的艾宾浩斯间隔（天），0=首次复习
   @override
   int get interval;
+
+  /// 本次复习排定日期（对应复习时 word.nextReviewDate）
   @override
   DateTime? get scheduledFor;
 
