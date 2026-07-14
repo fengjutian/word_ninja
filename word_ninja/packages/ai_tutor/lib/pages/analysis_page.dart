@@ -19,11 +19,13 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
       ref.read(analysisProvider.notifier).loadStats();
     });
   }
 
   void _generateReport() {
+    if (!mounted) return;
     final aiService = ref.read(aiChatServiceProvider);
     ref
         .read(analysisProvider.notifier)
@@ -175,7 +177,11 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
             ),
 
           if (state.report != null && !state.isLoading)
-            _ReportCard(report: state.report!, analysisCount: state.analysisCount),
+            _ReportCard(
+              key: ValueKey('report_${state.analysisCount}'),
+              report: state.report!,
+              analysisCount: state.analysisCount,
+            ),
 
           if (state.report == null && !state.isLoading && state.error == null)
             _EmptyState(onGenerate: _generateReport),
@@ -293,7 +299,7 @@ class _StatItem extends StatelessWidget {
 class _ReportCard extends StatelessWidget {
   final String report;
   final int analysisCount;
-  const _ReportCard({required this.report, this.analysisCount = 0});
+  const _ReportCard({super.key, required this.report, this.analysisCount = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -421,7 +427,7 @@ class _EmptyState extends StatelessWidget {
 /// 重点强化词卡片
 class _FocusWordCard extends StatelessWidget {
   final FocusWord focusWord;
-  const _FocusWordCard({required this.focusWord});
+  const _FocusWordCard({super.key, required this.focusWord});
 
   @override
   Widget build(BuildContext context) {
