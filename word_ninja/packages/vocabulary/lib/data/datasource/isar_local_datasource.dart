@@ -258,4 +258,20 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
       learningWords: due,
     );
   }
+
+  /// 将 AI 标记的焦点词分数持久化到 WordSchema
+  static Future<void> persistFocusScores(Map<String, int> focusScores) async {
+    if (focusScores.isEmpty) return;
+    final isar = IsarService.instance;
+    final allSchemas = await isar.wordSchemas.where().findAll();
+    await isar.writeTxn(() async {
+      for (final s in allSchemas) {
+        final score = focusScores[s.word.toLowerCase()];
+        if (score != null) {
+          s.focusScore = score;
+          await isar.wordSchemas.put(s);
+        }
+      }
+    });
+  }
 }

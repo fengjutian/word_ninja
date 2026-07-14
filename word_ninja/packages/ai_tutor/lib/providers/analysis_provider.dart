@@ -2,8 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/logger/logger.dart';
 import 'package:core/storage/sqlite/sqlite_init.dart';
 import 'package:core/storage/sqlite/chat_repository.dart';
-import 'package:core/storage/isar/isar_service.dart';
 import 'package:ai/ai.dart';
+import 'package:vocabulary/data/datasource/isar_local_datasource.dart';
 
 /// 分析状态
 class AnalysisState {
@@ -98,7 +98,11 @@ class AnalysisNotifier extends StateNotifier<AnalysisState> {
       try {
         focusWords = await aiService.extractFocusWords();
         if (focusWords.isNotEmpty) {
-          await _persistFocusScores(focusWords);
+          final scores = <String, int>{};
+          for (final fw in focusWords) {
+            scores[fw.word.toLowerCase()] = fw.score;
+          }
+          await IsarVocabularyLocalDataSource.persistFocusScores(scores);
         }
       } catch (e) {
         log.w('AI focus words extraction failed', e);
@@ -118,32 +122,6 @@ class AnalysisNotifier extends StateNotifier<AnalysisState> {
         isLoading: false,
         error: 'AI 分析生成失败：$e',
       );
-    }
-  }
-
-  /// 将 AI 标记的焦点词分数持久化到 Isar WordSchema
-  Future<void> _persistFocusScores(List<FocusWord> focusWords) async {
-    try {
-      final isar = IsarService.instance;
-      final allSchemas = await isar.wordSchemas.where().limit(2000).findAll();
-      final focusLower = <String, int>{};
-      for (final fw in focusWords) {
-        focusLower[fw.word.toLowerCase()] = fw.score;
-      }
-
-      // 单事务批量写入
-      await isar.writeTxn(() async {
-        for (final s in allSchemas) {
-          final score = focusLower[s.word.toLowerCase()];
-          if (score != null) {
-            s.focusScore = score;
-            await isar.wordSchemas.put(s);
-          }
-        }
-      });
-      log.i('Persisted focus scores for ${focusWords.length} words');
-    } catch (e) {
-      log.w('Failed to persist focus scores', e);
     }
   }
 
