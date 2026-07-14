@@ -38,11 +38,20 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
       appBar: AppBar(
         title: const Text('学习分析', style: TextStyle(color: Colors.white)),
         actions: [
-          if (state.report == null && !state.isLoading)
+          if (!state.isLoading)
             TextButton.icon(
               onPressed: _generateReport,
-              icon: const Icon(PhosphorIconsRegular.sparkle, size: 18, color: NinjaColors.warning),
-              label: const Text('AI 分析', style: TextStyle(color: NinjaColors.warning)),
+              icon: Icon(
+                state.analysisCount > 0
+                    ? PhosphorIconsRegular.arrowsClockwise
+                    : PhosphorIconsRegular.sparkle,
+                size: 18,
+                color: NinjaColors.warning,
+              ),
+              label: Text(
+                state.analysisCount > 0 ? '重新分析' : 'AI 分析',
+                style: const TextStyle(color: NinjaColors.warning),
+              ),
             ),
         ],
       ),
@@ -123,6 +132,24 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
             ),
           ],
 
+          // ─── 🎯 重点强化词 ───
+          if (state.focusWords.isNotEmpty) ...[
+            const SizedBox(height: NinjaSpacing.lg),
+            Row(
+              children: [
+                const Icon(PhosphorIconsRegular.target, size: 18, color: NinjaColors.warning),
+                const SizedBox(width: 6),
+                Text('🎯 重点强化词',
+                    style: NinjaTextStyles.titleMedium.copyWith(color: NinjaColors.warning)),
+              ],
+            ),
+            const SizedBox(height: 4),
+            Text('AI 识别以下词汇需要更多复习（间隔自动缩短 50%）',
+                style: const TextStyle(fontSize: 12, color: NinjaColors.textSecondary)),
+            const SizedBox(height: NinjaSpacing.sm),
+            ...state.focusWords.map((fw) => _FocusWordCard(focusWord: fw)),
+          ],
+
           const SizedBox(height: NinjaSpacing.lg),
 
           // ─── AI 分析报告 ───
@@ -148,7 +175,7 @@ class _AnalysisPageState extends ConsumerState<AnalysisPage> {
             ),
 
           if (state.report != null && !state.isLoading)
-            _ReportCard(report: state.report!),
+            _ReportCard(report: state.report!, analysisCount: state.analysisCount),
 
           if (state.report == null && !state.isLoading && state.error == null)
             _EmptyState(onGenerate: _generateReport),
@@ -265,7 +292,8 @@ class _StatItem extends StatelessWidget {
 /// AI 分析报告卡片
 class _ReportCard extends StatelessWidget {
   final String report;
-  const _ReportCard({required this.report});
+  final int analysisCount;
+  const _ReportCard({required this.report, this.analysisCount = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -285,6 +313,20 @@ class _ReportCard extends StatelessWidget {
               const SizedBox(width: 6),
               const Text('AI 分析报告',
                   style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16)),
+              if (analysisCount > 1) ...[
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: NinjaColors.primary.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Text(
+                    '第 $analysisCount 次',
+                    style: const TextStyle(fontSize: 11, color: NinjaColors.primary),
+                  ),
+                ),
+              ],
             ],
           ),
           const Divider(),
@@ -369,6 +411,92 @@ class _EmptyState extends StatelessWidget {
               backgroundColor: NinjaColors.primary,
               foregroundColor: Colors.white,
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// 重点强化词卡片
+class _FocusWordCard extends StatelessWidget {
+  final FocusWord focusWord;
+  const _FocusWordCard({required this.focusWord});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: NinjaColors.surface,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(
+          color: NinjaColors.warning.withValues(alpha: 0.3),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: NinjaColors.warning.withValues(alpha: 0.08),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // 分数环
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: focusWord.score >= 70
+                    ? NinjaColors.error
+                    : NinjaColors.warning,
+                width: 3,
+              ),
+            ),
+            child: Center(
+              child: Text(
+                '${focusWord.score}',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.bold,
+                  color: focusWord.score >= 70
+                      ? NinjaColors.error
+                      : NinjaColors.warning,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  focusWord.word,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  focusWord.reason,
+                  style: const TextStyle(
+                    fontSize: 12,
+                    color: NinjaColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Icon(
+            PhosphorIconsRegular.lightning,
+            size: 18,
+            color: NinjaColors.warning.withValues(alpha: 0.6),
           ),
         ],
       ),

@@ -9,6 +9,8 @@ class WordEntity {
   final int mastery;
   final String source;
   final List<String> tags;
+  /// AI 标记的重点分数（0-100），用于强化学习优先调度
+  final int focusScore;
 
   const WordEntity({
     required this.id,
@@ -20,6 +22,7 @@ class WordEntity {
     this.mastery = 0,
     this.source = 'manual',
     this.tags = const [],
+    this.focusScore = 0,
   });
 
   /// 掌握度等级

@@ -2,7 +2,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/logger/logger.dart';
 import 'package:core/storage/sqlite/sqlite_init.dart';
 import 'package:core/storage/sqlite/chat_repository.dart';
-import 'package:ai/services/ai_analysis_service.dart';
+import 'package:core/storage/isar/isar_service.dart';
+import 'package:ai/ai.dart';
 
 /// 分析状态
 class AnalysisState {
@@ -12,6 +13,10 @@ class AnalysisState {
   final String? quickInsight;  // 一句话洞察
   final bool isLoading;
   final String? error;
+  /// AI 识别的重点强化词
+  final List<FocusWord> focusWords;
+  /// 已执行分析的次数（支持多次分析）
+  final int analysisCount;
 
   const AnalysisState({
     this.topWords = const [],
@@ -20,6 +25,8 @@ class AnalysisState {
     this.quickInsight,
     this.isLoading = false,
     this.error,
+    this.focusWords = const [],
+    this.analysisCount = 0,
   });
 
   AnalysisState copyWith({
@@ -29,6 +36,8 @@ class AnalysisState {
     String? quickInsight,
     bool? isLoading,
     String? error,
+    List<FocusWord>? focusWords,
+    int? analysisCount,
   }) {
     return AnalysisState(
       topWords: topWords ?? this.topWords,
@@ -37,6 +46,8 @@ class AnalysisState {
       quickInsight: quickInsight ?? this.quickInsight,
       isLoading: isLoading ?? this.isLoading,
       error: error,
+      focusWords: focusWords ?? this.focusWords,
+      analysisCount: analysisCount ?? this.analysisCount,
     );
   }
 }
@@ -61,13 +72,19 @@ class AnalysisNotifier extends StateNotifier<AnalysisState> {
     }
   }
 
-  /// 生成 AI 分析报告
+  /// 生成 AI 分析报告（支持多次调用）
   Future<void> generateReport(AiAnalysisService aiService) async {
     state = state.copyWith(isLoading: true, error: null);
     try {
+      // 每次分析前刷新统计数据
+      try {
+        await loadStats();
+      } catch (_) {}
+
       // 分别 await，避免一个失败导致全部丢弃
       String? report;
       String? insight;
+      List<FocusWord> focusWords = [];
       try {
         report = await aiService.generateReport();
       } catch (e) {
@@ -78,17 +95,55 @@ class AnalysisNotifier extends StateNotifier<AnalysisState> {
       } catch (e) {
         log.w('AI quick insight failed', e);
       }
+      try {
+        focusWords = await aiService.extractFocusWords();
+        if (focusWords.isNotEmpty) {
+          await _persistFocusScores(focusWords);
+        }
+      } catch (e) {
+        log.w('AI focus words extraction failed', e);
+      }
       state = state.copyWith(
         report: report,
         quickInsight: insight,
+        focusWords: focusWords,
         isLoading: false,
-        error: (report == null && insight == null) ? 'AI 分析生成失败' : null,
+        analysisCount: state.analysisCount + 1,
+        error: (report == null && insight == null && focusWords.isEmpty)
+            ? 'AI 分析生成失败'
+            : null,
       );
     } catch (e) {
       state = state.copyWith(
         isLoading: false,
         error: 'AI 分析生成失败：$e',
       );
+    }
+  }
+
+  /// 将 AI 标记的焦点词分数持久化到 Isar WordSchema
+  Future<void> _persistFocusScores(List<FocusWord> focusWords) async {
+    try {
+      final isar = IsarService.instance;
+      final allSchemas = await isar.wordSchemas.where().limit(2000).findAll();
+      final focusLower = <String, int>{};
+      for (final fw in focusWords) {
+        focusLower[fw.word.toLowerCase()] = fw.score;
+      }
+
+      // 单事务批量写入
+      await isar.writeTxn(() async {
+        for (final s in allSchemas) {
+          final score = focusLower[s.word.toLowerCase()];
+          if (score != null) {
+            s.focusScore = score;
+            await isar.wordSchemas.put(s);
+          }
+        }
+      });
+      log.i('Persisted focus scores for ${focusWords.length} words');
+    } catch (e) {
+      log.w('Failed to persist focus scores', e);
     }
   }
 

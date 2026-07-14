@@ -2,6 +2,8 @@ import 'package:vocabulary/data/datasource/vocabulary_local_datasource.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:vocabulary/data/model/review.dart';
 import 'package:vocabulary/data/model/vocabulary_stats.dart';
+import 'package:ai/ai.dart';
+import 'package:core/logger/logger.dart';
 
 /// 内存版本地数据源（开发/演示用，本地持久化后续可用 Isar 替换）
 class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
@@ -58,23 +60,51 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
     _words.removeWhere((w) => w.id == id);
   }
 
-  /// 获取到期复习单词（艾宾浩斯）
+  /// 获取到期复习单词（艾宾浩斯 + 重要性排序）
   /// nextReviewDate 为 null（从未复习）或已到期（<= 当前时间）
   @override
   Future<List<Word>> getDueReviews() async {
     final now = DateTime.now();
-    return _words
+    final due = _words
         .where((w) => w.nextReviewDate == null || w.nextReviewDate!.isBefore(now) || w.nextReviewDate!.isAtSameMomentAs(now))
-        .toList()
-      ..sort((a, b) {
-        // null nextReviewDate（从未复习）排最前面
-        if (a.nextReviewDate == null && b.nextReviewDate != null) return -1;
-        if (a.nextReviewDate != null && b.nextReviewDate == null) return 1;
-        if (a.nextReviewDate == null && b.nextReviewDate == null) {
-          return a.mastery.compareTo(b.mastery);
-        }
-        return a.nextReviewDate!.compareTo(b.nextReviewDate!);
-      });
+        .toList();
+
+    // 尝试加载词频数据用于重要性排序
+    Map<String, int> freqMap = {};
+    try {
+      final importanceService = WordImportanceService();
+      final wordTexts = due.map((w) => w.word).toList();
+      final diffMap = {for (final w in due) w.word: w.difficulty};
+      final mastMap = {for (final w in due) w.word: w.mastery};
+      freqMap = await importanceService.batchImportanceScores(
+        wordTexts,
+        difficultyMap: diffMap,
+        masteryMap: mastMap,
+      );
+    } catch (e) {
+      log.w('Failed to load word importance scores, falling back to mastery sort', e);
+    }
+
+    // 多维度排序：focusScore ↓ → 重要性 ↓ → mastery ↑
+    due.sort((a, b) {
+      final focusCmp = b.focusScore.compareTo(a.focusScore);
+      if (focusCmp != 0) return focusCmp;
+
+      final impA = freqMap[a.word] ?? 0;
+      final impB = freqMap[b.word] ?? 0;
+      final impCmp = impB.compareTo(impA);
+      if (impCmp != 0) return impCmp;
+
+      // null nextReviewDate 排前面
+      if (a.nextReviewDate == null && b.nextReviewDate != null) return -1;
+      if (a.nextReviewDate != null && b.nextReviewDate == null) return 1;
+      if (a.nextReviewDate == null && b.nextReviewDate == null) {
+        return a.mastery.compareTo(b.mastery);
+      }
+      return a.nextReviewDate!.compareTo(b.nextReviewDate!);
+    });
+
+    return due;
   }
 
   /// 保存复习记录，同时应用艾宾浩斯间隔算法更新单词的 mastery 和 nextReviewDate
@@ -94,14 +124,19 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
     // 艾宾浩斯间隔计算
     final currentLevel = word.reviewCount.clamp(0, _ebbinghausIntervals.length - 1);
     final nextLevel = _nextEbbinghausLevel(currentLevel, review.score);
-    final intervalDays = _ebbinghausIntervals[nextLevel];
-    final nextReview = now.add(Duration(days: intervalDays));
+    var intervalDays = _ebbinghausIntervals[nextLevel];
     // reviewCount 追踪间隔等级：score>=5 递增，score>=3 保持，score<3 重置为1
     final newReviewCount = review.score >= 5
         ? (word.reviewCount + 1).clamp(1, _ebbinghausIntervals.length)
         : review.score >= 3
             ? word.reviewCount
             : 1;
+
+    // 强化学习：AI 标记的焦点词间隔减半（最短 1 天），增加复习频率
+    if (word.focusScore > 0) {
+      intervalDays = (intervalDays ~/ 2).clamp(1, 120);
+    }
+    final nextReview = now.add(Duration(days: intervalDays));
 
     _words[index] = word.copyWith(
       mastery: newMastery,

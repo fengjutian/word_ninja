@@ -6,6 +6,8 @@ import 'package:vocabulary/data/datasource/vocabulary_local_datasource.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:vocabulary/data/model/review.dart';
 import 'package:vocabulary/data/model/vocabulary_stats.dart';
+import 'package:ai/ai.dart';
+import 'package:core/logger/logger.dart';
 import 'package:isar/isar.dart';
 
 /// Isar 本地持久化数据源
@@ -32,6 +34,7 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
         updatedAt: s.updatedAt,
         nextReviewDate: s.nextReviewDate,
         reviewCount: s.reviewCount,
+        focusScore: s.focusScore,
       );
 
   static WordSchema _wordToSchema(Word w) {
@@ -49,7 +52,8 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
       ..createdAt = w.createdAt ?? DateTime.now()
       ..updatedAt = w.updatedAt ?? DateTime.now()
       ..nextReviewDate = w.nextReviewDate
-      ..reviewCount = w.reviewCount;
+      ..reviewCount = w.reviewCount
+      ..focusScore = w.focusScore;
     return s;
   }
 
@@ -127,8 +131,40 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
     final due = all.where((s) {
       if (s.nextReviewDate == null) return true;
       return !s.nextReviewDate!.isAfter(now);
-    }).toList()
-      ..sort((a, b) => (a.mastery).compareTo(b.mastery));
+    }).toList();
+
+    // 尝试加载词频数据用于重要性排序
+    Map<String, int> freqMap = {};
+    try {
+      final importanceService = WordImportanceService();
+      final wordTexts = due.map((s) => s.word).toList();
+      final diffMap = {for (final s in due) s.word: s.difficulty};
+      final mastMap = {for (final s in due) s.word: s.mastery};
+      freqMap = await importanceService.batchImportanceScores(
+        wordTexts,
+        difficultyMap: diffMap,
+        masteryMap: mastMap,
+      );
+    } catch (e) {
+      log.w('Failed to load word importance scores, falling back to mastery sort', e);
+    }
+
+    // 多维度排序：focusScore ↓ → 重要性 ↓ → mastery ↑
+    due.sort((a, b) {
+      // 1. AI 标记的焦点词排最前
+      final focusCmp = b.focusScore.compareTo(a.focusScore);
+      if (focusCmp != 0) return focusCmp;
+
+      // 2. 综合重要性降序
+      final impA = freqMap[a.word] ?? 0;
+      final impB = freqMap[b.word] ?? 0;
+      final impCmp = impB.compareTo(impA);
+      if (impCmp != 0) return impCmp;
+
+      // 3. 掌握度升序（掌握低的优先）
+      return a.mastery.compareTo(b.mastery);
+    });
+
     return due.map(_wordFromSchema).toList();
   }
 
@@ -158,12 +194,17 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
 
     final currentLevel = oldCount.clamp(0, _ebbinghausIntervals.length - 1);
     final nextLevel = _nextEbbinghausLevel(currentLevel, review.score);
-    final intervalDays = _ebbinghausIntervals[nextLevel];
+    var intervalDays = _ebbinghausIntervals[nextLevel];
     final newCount = review.score >= 5
         ? (oldCount + 1).clamp(1, _ebbinghausIntervals.length)
         : review.score >= 3
             ? oldCount
             : 1;
+
+    // 强化学习：AI 标记的焦点词间隔减半（最短 1 天），增加复习频率
+    if (existing.focusScore > 0) {
+      intervalDays = (intervalDays ~/ 2).clamp(1, 120);
+    }
 
     existing.mastery = newMastery;
     existing.reviewCount = newCount;

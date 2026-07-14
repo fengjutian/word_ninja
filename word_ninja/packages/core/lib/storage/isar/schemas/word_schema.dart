@@ -22,4 +22,6 @@ class WordSchema {
   DateTime? updatedAt;
   DateTime? nextReviewDate;
   int reviewCount = 0;
+  /// AI 标记的重点分数（0-100），用于强化学习优先调度，默认 0 表示普通词
+  int focusScore = 0;
 }

@@ -22,6 +22,8 @@ class Word with _$Word {
     DateTime? nextReviewDate,
     /// 已复习次数（用于艾宾浩斯间隔计算）
     @Default(0) int reviewCount,
+    /// AI 标记的重点分数（0-100），用于强化学习优先调度
+    @Default(0) int focusScore,
   }) = _Word;
 
   factory Word.fromJson(Map<String, dynamic> json) => _$WordFromJson(json);

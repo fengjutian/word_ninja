@@ -1,6 +1,7 @@
 import 'package:core/storage/sqlite/chat_repository.dart';
 import 'package:core/storage/sqlite/sqlite_init.dart';
 import 'ai_chat_service.dart';
+import 'focus_word.dart';
 
 /// AI 学习分析服务 — 查询 SQLite 数据，喂给 LLM 生成洞察
 class AiAnalysisService {
@@ -45,5 +46,55 @@ class AiAnalysisService {
 
     final prompt = '用户最近最常问的词是：${tops.map((w) => w.word).join('、')}。用一句话（15字以内）幽默地评价用户的学习偏好。';
     return _ai.chat(message: prompt, systemPrompt: '你是幽默的英语学习助手，回复极简。');
+  }
+
+  /// 提取重点强化词（结构化输出）
+  ///
+  /// 基于用户词频数据，让 AI 判断哪些词最需要强化学习，
+  /// 返回 [FocusWord] 列表，包含单词、原因和评分。
+  Future<List<FocusWord>> extractFocusWords({int days = 30}) async {
+    final topWords = await _repo.userWordFrequency(days: days, limit: 20);
+    if (topWords.isEmpty) return [];
+
+    final wordList = topWords
+        .map((w) => '${w.word}(查询${w.count}次)')
+        .join('、');
+
+    final prompt = '''
+你是英语学习分析专家。以下是用户近 $days 天高频查询的词汇：
+$wordList
+
+请从中选出 3-5 个用户最需要「强化学习」的词汇（即需要更频繁复习才能掌握的）。
+返回纯 JSON 数组（不要 Markdown 代码块），格式：
+[{"word":"xxx","reason":"选这个词的原因（中文，15字内）","score":85}]
+score 是 0-100 的重要性评分，越高表示越需要强化。''';
+
+    final response = await _ai.chat(
+      message: prompt,
+      systemPrompt: '你是英语学习分析专家。只返回 JSON 数组，不要任何额外文字。',
+    );
+
+    return _parseFocusWordsResponse(response);
+  }
+
+  /// 解析 AI 返回的焦点词 JSON
+  List<FocusWord> _parseFocusWordsResponse(String response) {
+    try {
+      // 清理可能的 Markdown 代码块包装
+      var json = response.trim();
+      if (json.startsWith('```')) {
+        final start = json.indexOf('[');
+        final end = json.lastIndexOf(']');
+        if (start >= 0 && end > start) {
+          json = json.substring(start, end + 1);
+        }
+      }
+      final list = AiChatService.parseJsonList(json, []);
+      return list
+          .map((e) => FocusWord.fromJson(e as Map<String, dynamic>))
+          .toList();
+    } catch (e) {
+      return [];
+    }
   }
 }
