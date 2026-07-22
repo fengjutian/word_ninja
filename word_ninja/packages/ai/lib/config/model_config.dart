@@ -31,7 +31,7 @@ class ModelConfig {
     this.baseUrl = 'https://api.deepseek.com/v1',
     this.apiKey = '',
     this.temperature = 0.7,
-    this.maxTokens = 1000,
+    this.maxTokens = 4096,
   });
 
   /// DeepSeek V4 Pro 默认配置
@@ -40,7 +40,7 @@ class ModelConfig {
     modelName: 'deepseek-v4-pro',
     baseUrl: 'https://api.deepseek.com/v1',
     temperature: 0.7,
-    maxTokens: 2000,
+    maxTokens: 4096,
   );
 
   /// DeepSeek V4 Flash 默认配置 — 更快响应，适合简单任务
@@ -49,7 +49,7 @@ class ModelConfig {
     modelName: 'deepseek-v4-flash',
     baseUrl: 'https://api.deepseek.com/v1',
     temperature: 0.5,
-    maxTokens: 512,
+    maxTokens: 1024,
   );
 
   /// OpenAI 默认配置
@@ -58,7 +58,7 @@ class ModelConfig {
     modelName: 'gpt-4o-mini',
     baseUrl: 'https://api.openai.com/v1',
     temperature: 0.7,
-    maxTokens: 1000,
+    maxTokens: 4096,
   );
 
   ModelConfig copyWith({
@@ -96,6 +96,6 @@ class ModelConfig {
         baseUrl: json['baseUrl'] as String? ?? 'https://api.deepseek.com/v1',
         apiKey: json['apiKey'] as String? ?? '',
         temperature: (json['temperature'] as num?)?.toDouble() ?? 0.7,
-        maxTokens: json['maxTokens'] as int? ?? 2000,
+        maxTokens: json['maxTokens'] as int? ?? 4096,
       );
 }

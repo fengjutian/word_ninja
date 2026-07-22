@@ -88,11 +88,6 @@ class ProfilePage extends ConsumerWidget {
             },
           ),
           _MenuItem(
-            const Icon(PhosphorIconsRegular.trophy, size: 20, color: NinjaColors.primary),
-            '成就中心',
-            () => context.push('/achievement'),
-          ),
-          _MenuItem(
             const Icon(PhosphorIconsRegular.info, size: 20, color: NinjaColors.primary),
             '关于 Word Ninja',
             () => _showAboutDialog(context),

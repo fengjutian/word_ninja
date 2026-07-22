@@ -17,7 +17,6 @@ import 'package:speaking/presentation/pages/speaking_page.dart';
 import 'package:writing/presentation/pages/writing_page.dart';
 import 'package:ai_tutor/pages/tutor_chat_page.dart';
 import 'package:study_plan/pages/study_plan_page.dart';
-import 'package:achievement/pages/achievement_page.dart';
 import 'package:shop/pages/shop_page.dart';
 import 'package:leaderboard/pages/leaderboard_page.dart';
 import 'package:profile/pages/profile_page.dart';
@@ -44,7 +43,6 @@ class AppRoutes {
   static const String writing = '/writing';
   static const String aiTutor = '/ai-tutor';
   static const String studyPlan = '/study-plan';
-  static const String achievement = '/achievement';
   static const String shop = '/shop';
   static const String leaderboard = '/leaderboard';
   static const String profile = '/profile';
@@ -246,13 +244,6 @@ GoRouter createRouter() {
         ),
       ),
       GoRoute(
-        path: AppRoutes.achievement,
-        pageBuilder: (ctx, state) => _slideInFromRight(
-          key: state.pageKey,
-          child: const AchievementPage(),
-        ),
-      ),
-      GoRoute(
         path: AppRoutes.shop,
         pageBuilder: (ctx, state) => _slideInFromRight(
           key: state.pageKey,
@@ -300,11 +291,6 @@ class _HomeTab extends StatelessWidget {
           ],
         ),
         actions: [
-          IconButton(
-            icon: const Icon(PhosphorIconsRegular.trophy),
-            tooltip: '成就',
-            onPressed: () => context.push(AppRoutes.achievement),
-          ),
           IconButton(
             icon: const Icon(PhosphorIconsRegular.medal),
             tooltip: '排行榜',

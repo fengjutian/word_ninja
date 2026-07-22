@@ -21,7 +21,6 @@ import 'package:ai_tutor/pages/analysis_page.dart';
 import 'package:ai/pages/model_config_page.dart';
 import 'package:writing/presentation/pages/writing_page.dart';
 import 'package:study_plan/pages/study_plan_page.dart';
-import 'package:achievement/pages/achievement_page.dart';
 import 'package:shop/pages/shop_page.dart';
 import 'package:leaderboard/pages/leaderboard_page.dart';
 import 'package:profile/pages/profile_page.dart';
@@ -130,7 +129,6 @@ class DesktopRoutes {
   static const String settings = '/settings';
   static const String listening = '/listening';
   static const String speaking = '/speaking';
-  static const String achievement = '/achievement';
   static const String shop = '/shop';
   static const String leaderboard = '/leaderboard';
 }
@@ -178,9 +176,6 @@ GoRouter createDesktopRouter() {
           GoRoute(
               path: DesktopRoutes.speaking,
               builder: (ctx, state) => const SpeakingPage()),
-          GoRoute(
-              path: DesktopRoutes.achievement,
-              builder: (ctx, state) => const AchievementPage()),
           GoRoute(
               path: DesktopRoutes.shop,
               builder: (ctx, state) => const ShopPage()),
@@ -339,11 +334,6 @@ class DesktopShell extends StatelessWidget {
         ],
         footerItems: [
           PaneItem(
-            icon: const Icon(FluentIcons.trophy),
-            title: const Text('Achievements'),
-            body: const SizedBox.shrink(),
-          ),
-          PaneItem(
             icon: const Icon(FluentIcons.shop),
             title: const Text('Shop'),
             body: const SizedBox.shrink(),
@@ -461,12 +451,11 @@ class DesktopShell extends StatelessWidget {
     if (uri.startsWith(DesktopRoutes.aiTutor)) return 5;
     if (uri.startsWith(DesktopRoutes.writing)) return 6;
     if (uri.startsWith(DesktopRoutes.studyPlan)) return 7;
-    if (uri.startsWith(DesktopRoutes.achievement)) return 8;
-    if (uri.startsWith(DesktopRoutes.shop)) return 9;
-    if (uri.startsWith(DesktopRoutes.leaderboard)) return 10;
-    if (uri.startsWith(DesktopRoutes.modelConfig)) return 11;
+    if (uri.startsWith(DesktopRoutes.shop)) return 8;
+    if (uri.startsWith(DesktopRoutes.leaderboard)) return 9;
+    if (uri.startsWith(DesktopRoutes.modelConfig)) return 10;
     if (uri.startsWith(DesktopRoutes.profile) ||
-        uri.startsWith(DesktopRoutes.settings)) return 12;
+        uri.startsWith(DesktopRoutes.settings)) return 11;
     return 0;
   }
 
@@ -480,11 +469,10 @@ class DesktopShell extends StatelessWidget {
       case 5: context.go(DesktopRoutes.aiTutor);
       case 6: context.go(DesktopRoutes.writing);
       case 7: context.go(DesktopRoutes.studyPlan);
-      case 8: context.go(DesktopRoutes.achievement);
-      case 9: context.go(DesktopRoutes.shop);
-      case 10: context.go(DesktopRoutes.leaderboard);
-      case 11: context.go(DesktopRoutes.modelConfig);
-      case 12: context.go(DesktopRoutes.profile);
+      case 8: context.go(DesktopRoutes.shop);
+      case 9: context.go(DesktopRoutes.leaderboard);
+      case 10: context.go(DesktopRoutes.modelConfig);
+      case 11: context.go(DesktopRoutes.profile);
     }
   }
 }

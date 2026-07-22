@@ -111,8 +111,7 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
     } catch (e) {
       if (!mounted) return;
       final notifier = ref.read(chatHistoryProvider.notifier);
-      notifier.removeLast();
-      notifier.addMessage(ChatMessage('抱歉，暂时无法连接AI。请稍后再试。', isUser: false, isError: true));
+      notifier.finishStream(); // 保存已接收的部分内容
       setState(() {
         _lastChatError = e.toString();
         _isChatLoading = false;

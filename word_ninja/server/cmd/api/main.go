@@ -84,7 +84,6 @@ func main() {
 			authorized.GET("/auth/me", authHandler.Me)
 			authorized.PUT("/users/me", authHandler.UpdateMe)
 			authorized.GET("/users/me/stats", authHandler.Stats)
-			authorized.GET("/users/me/achievements", authHandler.Achievements)
 
 			// 单词
 			authorized.GET("/words", vocabHandler.List)

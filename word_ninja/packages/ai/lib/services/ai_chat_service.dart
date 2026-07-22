@@ -14,7 +14,7 @@ class AiChatService {
   AiChatService(this._apiKey, {ModelConfig? config})
       : _modelName = config?.modelName ?? 'gpt-4o-mini',
         _temperature = config?.temperature ?? 0.7,
-        _maxTokens = config?.maxTokens ?? 1000,
+        _maxTokens = config?.maxTokens ?? 4096,
         _dio = Dio(BaseOptions(
           baseUrl: config?.baseUrl ?? 'https://api.openai.com/v1',
           connectTimeout: const Duration(seconds: 30),
@@ -113,7 +113,8 @@ class AiChatService {
       log.e('AI stream error: status=${e.response?.statusCode}, message=${e.message}');
       log.e('  Request URL: ${_dio.options.baseUrl}/chat/completions');
       log.e('  Model: $_modelName, Key length: ${_apiKey.length}');
-      yield _dioErrorToUserMessage(e);
+      // 流式中断：已经 yield 了部分内容，现在抛出异常让调用方处理
+      throw Exception(_dioErrorToUserMessage(e));
     }
   }
 

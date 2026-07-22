@@ -130,14 +130,3 @@ func (h *Handler) Stats(c *gin.Context) {
 	stats := vocabulary.GetUserStats(h.DB, userID)
 	c.JSON(http.StatusOK, gin.H{"data": stats})
 }
-
-// Achievements 获取用户成就列表
-func (h *Handler) Achievements(c *gin.Context) {
-	userID := c.GetString("user_id")
-	achievements, err := vocabulary.GetUserAchievements(h.DB, userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取成就失败"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": achievements})
-}

@@ -35,8 +35,6 @@ dependencies:
     path: ../../packages/writing
   study_plan:
     path: ../../packages/study_plan
-  achievement:
-    path: ../../packages/achievement
   shop:
     path: ../../packages/shop
   leaderboard:

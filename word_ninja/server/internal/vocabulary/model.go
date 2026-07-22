@@ -32,19 +32,6 @@ type Review struct {
 	CreatedAt  time.Time `json:"created_at"`
 }
 
-// Achievement 成就模型
-type Achievement struct {
-	ID         string     `gorm:"primaryKey;type:uuid;default:gen_random_uuid()" json:"id"`
-	UserID     string     `gorm:"not null;index" json:"user_id"`
-	Type       string     `gorm:"not null;size:50" json:"type"`
-	Title      string     `gorm:"not null;size:200" json:"title"`
-	Progress   int        `gorm:"default:0" json:"progress"`
-	Target     int        `gorm:"not null" json:"target"`
-	IsUnlocked bool       `gorm:"default:false" json:"is_unlocked"`
-	UnlockedAt *time.Time `json:"unlocked_at"`
-	CreatedAt  time.Time  `json:"created_at"`
-}
-
 // StudyPlan 学习计划模型
 type StudyPlan struct {
 	ID         string    `gorm:"primaryKey;type:uuid;default:gen_random_uuid()" json:"id"`
@@ -257,15 +244,6 @@ func GetUserStats(db *gorm.DB, userID string) *UserStats {
 	db.Model(&Review{}).Where("user_id = ?", userID).Count(&stats.TotalReviews)
 	db.Model(&Word{}).Where("user_id = ? AND mastery >= 80", userID).Count(&stats.MasteredWords)
 	return stats
-}
-
-// GetUserAchievements 获取用户成就
-func GetUserAchievements(db *gorm.DB, userID string) ([]Achievement, error) {
-	var achievements []Achievement
-	if err := db.Where("user_id = ?", userID).Order("created_at DESC").Find(&achievements).Error; err != nil {
-		return nil, err
-	}
-	return achievements, nil
 }
 
 // ─── Graph API ───
