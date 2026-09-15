@@ -25,16 +25,16 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
               header: true,
               child: Text('AI听力课程', style: AppTextStyles.heading2)),
           const SizedBox(height: AppSpacing.md),
-          _LevelCard('N1', '高级 · 学术讲座、辩论', PhosphorIconsRegular.brain,
-              AppColors.levelMaster, () => _openLevel(context, 'N1')),
-          _LevelCard('N2', '中高级 · 新闻、演讲', PhosphorIconsRegular.trendUp,
-              AppColors.levelAdvanced, () => _openLevel(context, 'N2')),
-          _LevelCard('N3', '中级 · 日常对话、故事', PhosphorIconsRegular.equals,
-              AppColors.levelIntermediate, () => _openLevel(context, 'N3')),
-          _LevelCard('N4', '初级 · 简单对话', PhosphorIconsRegular.trendDown,
-              AppColors.levelBeginner, () => _openLevel(context, 'N4')),
-          _LevelCard('N5', '入门 · 基础听力', PhosphorIconsRegular.star,
-              AppColors.info, () => _openLevel(context, 'N5')),
+          _LevelCard('C1', '高级 · 学术讲座、辩论', PhosphorIconsRegular.brain,
+              AppColors.levelMaster, () => _openLevel(context, 'C1')),
+          _LevelCard('B2', '中高级 · 新闻、演讲', PhosphorIconsRegular.trendUp,
+              AppColors.levelAdvanced, () => _openLevel(context, 'B2')),
+          _LevelCard('B1', '中级 · 日常对话、故事', PhosphorIconsRegular.equals,
+              AppColors.levelIntermediate, () => _openLevel(context, 'B1')),
+          _LevelCard('A2', '初级 · 简单对话', PhosphorIconsRegular.trendDown,
+              AppColors.levelBeginner, () => _openLevel(context, 'A2')),
+          _LevelCard('A1', '入门 · 基础听力', PhosphorIconsRegular.star,
+              AppColors.info, () => _openLevel(context, 'A1')),
           const SizedBox(height: AppSpacing.xl),
           Semantics(
               header: true, child: Text('练习模式', style: AppTextStyles.heading2)),
@@ -115,15 +115,15 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
 
   String _getSampleText(String level) {
     switch (level) {
-      case 'N1':
+      case 'C1':
         return 'The professor delivered an insightful lecture on renewable energy sources, emphasizing the importance of sustainable development.';
-      case 'N2':
+      case 'B2':
         return 'According to the latest news report, the government plans to invest heavily in public transportation infrastructure.';
-      case 'N3':
+      case 'B1':
         return 'Yesterday I went to the bookstore and bought a new novel. The story seems really interesting so far.';
-      case 'N4':
+      case 'A2':
         return 'Hello, my name is John. I enjoy playing basketball and listening to music in my free time.';
-      case 'N5':
+      case 'A1':
         return 'Hello! How are you? My name is Anna. I like music and movies.';
       default:
         return 'Welcome to WordFlow listening practice.';

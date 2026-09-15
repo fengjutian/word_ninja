@@ -50,7 +50,7 @@ class User {
     if (level >= 30) return '熟练';
     if (level >= 20) return '进阶';
     if (level >= 10) return '入门';
-    return '学徒龟';
+    return '初学者';
   }
 
   User copyWith({

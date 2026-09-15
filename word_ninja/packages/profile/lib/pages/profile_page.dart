@@ -20,7 +20,7 @@ class ProfilePage extends ConsumerWidget {
     final level = user?.level ?? 1;
     final exp = user?.exp ?? 0;
     final nickname = user?.nickname ?? '学习者';
-    final rank = user?.rank ?? '学徒龟';
+    final rank = user?.rank ?? '初学者';
 
     // 使用 User 实体自带的经验值计算
     final maxExp = user?.expToNextLevel ?? 1000;

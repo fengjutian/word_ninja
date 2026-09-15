@@ -49,7 +49,7 @@ class _Article {
 const _defaultArticles = [
   _Article(
       title: 'The Art of Learning',
-      level: 'N2',
+      level: 'B2',
       wordCount: 328,
       source: 'AI生成',
       topic: 'learning',
@@ -58,7 +58,7 @@ const _defaultArticles = [
           'Learning is a lifelong journey. Every day presents new opportunities to grow and develop our skills...'),
   _Article(
       title: 'Technology Trends',
-      level: 'N3',
+      level: 'B1',
       wordCount: 512,
       source: '新闻',
       topic: 'technology',
@@ -67,7 +67,7 @@ const _defaultArticles = [
           'The world of technology is rapidly evolving. From artificial intelligence to quantum computing...'),
   _Article(
       title: 'A Journey Through Time',
-      level: 'N2',
+      level: 'B2',
       wordCount: 420,
       source: 'AI生成',
       topic: 'time travel',
@@ -76,7 +76,7 @@ const _defaultArticles = [
           'The old clock tower struck midnight as Sarah stepped through the ancient doorway...'),
   _Article(
       title: 'The Future of AI',
-      level: 'N3',
+      level: 'B1',
       wordCount: 450,
       source: '科技',
       topic: 'artificial intelligence',
@@ -85,7 +85,7 @@ const _defaultArticles = [
           'Artificial intelligence has transformed the way we live and work...'),
   _Article(
       title: 'Chinese Tea Culture',
-      level: 'N1',
+      level: 'C1',
       wordCount: 380,
       source: '文化',
       topic: 'tea culture',
@@ -94,7 +94,7 @@ const _defaultArticles = [
           'Tea has been an integral part of Chinese culture for thousands of years...'),
   _Article(
       title: 'How to Study Effectively',
-      level: 'N4',
+      level: 'A2',
       wordCount: 280,
       source: '教育',
       topic: 'study methods',
@@ -366,7 +366,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
 
       final article = _Article(
         title: rawName,
-        level: 'N3',
+        level: 'B1',
         wordCount:
             content.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length,
         source: '导入',
@@ -500,7 +500,7 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
 
       final article = _Article(
         title: title,
-        level: 'N3',
+        level: 'B1',
         wordCount: text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length,
         source: '网页',
         topic: uri.host,
