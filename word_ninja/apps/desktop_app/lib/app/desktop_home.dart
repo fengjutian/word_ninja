@@ -103,8 +103,8 @@ class _ContinueCard extends StatelessWidget {
             SizedBox(height: 6),
             Text('利用间隔重复巩固记忆，预计用时 10 分钟', style: TextStyle(color: Color(0xFFE7E7FF), fontSize: 13)),
           ])),
-          FilledButton.icon(
-            style: FilledButton.styleFrom(backgroundColor: Colors.white, foregroundColor: AppThemeCatalog.indigo.seed, padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12)),
+          mt.FilledButton.icon(
+            style: mt.FilledButton.styleFrom(backgroundColor: mt.Colors.white, foregroundColor: AppThemeCatalog.indigo.seed, padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12)),
             onPressed: () => context.go(DesktopRoutes.vocabulary),
             icon: const Icon(FluentIcons.play, size: 14),
             label: const Text('继续学习'),
@@ -130,7 +130,7 @@ class _StatsGrid extends StatelessWidget {
     return LayoutBuilder(builder: (context, constraints) {
       final width = (constraints.maxWidth - 36) / 4;
       return Wrap(spacing: 12, runSpacing: 12, children: values.map((item) => Container(
-        width: width.clamp(210, constraints.maxWidth),
+        width: width.clamp(210, constraints.maxWidth).toDouble(),
         padding: const EdgeInsets.all(18),
         decoration: BoxDecoration(color: tokens.sidebar, border: Border.all(color: tokens.border), borderRadius: BorderRadius.circular(12)),
         child: Row(children: [

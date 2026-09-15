@@ -55,6 +55,26 @@ class ModelConfigNotifier extends StateNotifier<ModelConfig> {
     await updateConfig(state.copyWith(apiKey: apiKey));
   }
 
+  Future<void> updateEndpoint({
+    required String modelName,
+    required String baseUrl,
+  }) async {
+    await updateConfig(state.copyWith(
+      modelName: modelName.trim(),
+      baseUrl: baseUrl.trim(),
+    ));
+  }
+
+  Future<void> updateGeneration({
+    required double temperature,
+    required int maxTokens,
+  }) async {
+    await updateConfig(state.copyWith(
+      temperature: temperature,
+      maxTokens: maxTokens,
+    ));
+  }
+
   Future<void> selectProvider(ModelProvider provider) async {
     switch (provider) {
       case ModelProvider.deepSeek:

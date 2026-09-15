@@ -11,14 +11,14 @@ class AppColors {
   AppColors._();
 
   // 主色调
-  static const Color primary = Color(0xFFE53935); // 活力红
-  static const Color primaryLight = Color(0xFFFF6F60);
-  static const Color primaryDark = Color(0xFFAB000D);
+  static const Color primary = Color(0xFF5B5BD6); // 静谧靛蓝
+  static const Color primaryLight = Color(0xFF818CF8);
+  static const Color primaryDark = Color(0xFF4338CA);
 
   // 辅助色
-  static const Color secondary = Color(0xFF1976D2); // 知识蓝
-  static const Color accentGold = Color(0xFFFFB300); // 金币金
-  static const Color accentPurple = Color(0xFF7B1FA2); // 神秘紫
+  static const Color secondary = Color(0xFF3178C6);
+  static const Color accentGold = Color(0xFFB7791F);
+  static const Color accentPurple = Color(0xFF7C5CC4);
 
   // 等级色（与功能色/主色区分，形成完整渐变）
   static const Color levelBeginner = Color(0xFF388E3C); // 学徒绿
@@ -34,15 +34,15 @@ class AppColors {
   static const Color info = Color(0xFF039BE5);
 
   // 中性色
-  static const Color background = Color(0xFFF5F5F5);
+  static const Color background = Color(0xFFF7F8FA);
   static const Color surface = Color(0xFFFFFFFF);
-  static const Color surfaceDark = Color(0xFF1E1E2E);
-  static const Color surfaceContainerDark = Color(0xFF2A2A3E);
-  static const Color textPrimary = Color(0xFF212121);
-  static const Color textSecondary = Color(0xFF757575);
-  static const Color textOnDark = Color(0xFFE0E0E0);
-  static const Color divider = Color(0xFFBDBDBD);
-  static const Color dividerDark = Color(0xFF424242);
+  static const Color surfaceDark = Color(0xFF111318);
+  static const Color surfaceContainerDark = Color(0xFF1C1F26);
+  static const Color textPrimary = Color(0xFF18181B);
+  static const Color textSecondary = Color(0xFF71717A);
+  static const Color textOnDark = Color(0xFFF4F4F5);
+  static const Color divider = Color(0xFFE5E7EB);
+  static const Color dividerDark = Color(0xFF30343D);
 }
 
 // ─── 文字样式 ───
