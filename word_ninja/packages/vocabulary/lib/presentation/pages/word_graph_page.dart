@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
+import 'package:ui_kit/app_theme/design_tokens.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'dart:math' as math;
@@ -19,13 +20,15 @@ class WordGraphPage extends ConsumerStatefulWidget {
 
 class _WordGraphPageState extends ConsumerState<WordGraphPage> {
   int _centerIndex = 0;
-  late List<_GraphNode> _nodes;
-  late List<_GraphEdge> _edges;
+  List<_GraphNode> _nodes = [];
+  List<_GraphEdge> _edges = [];
 
   @override
   void initState() {
     super.initState();
-    _centerIndex = widget.initialIndex.clamp(0, widget.words.length - 1);
+    if (widget.words.isNotEmpty) {
+      _centerIndex = widget.initialIndex.clamp(0, widget.words.length - 1);
+    }
     _buildGraph();
   }
 
@@ -112,9 +115,28 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+    if (widget.words.isEmpty) {
+      return Scaffold(
+        backgroundColor: colors.canvas,
+        appBar: AppBar(title: const Text('知识图谱')),
+        body: Center(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+            Icon(Icons.hub_outlined, size: 48, color: colors.mutedText),
+            const SizedBox(height: 16),
+            Text('还没有可关联的单词', style: Theme.of(context).textTheme.titleMedium),
+            const SizedBox(height: 6),
+            Text('添加至少两个单词后，这里会展示它们的关系',
+                style: TextStyle(fontSize: 12, color: colors.mutedText)),
+          ]),
+        ),
+      );
+    }
+    final center = widget.words[_centerIndex];
     return Scaffold(
+      backgroundColor: colors.canvas,
       appBar: AppBar(
-        title: Text('单词图谱 · ${widget.words[_centerIndex].word}'),
+        title: const Text('知识图谱'),
         actions: widget.words.length > 1
             ? [
                 if (_centerIndex > 0)
@@ -140,16 +162,90 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
               ]
             : null,
       ),
-      body: _nodes.isEmpty
-          ? const Center(child: Text('请先添加单词'))
-          : Column(
-              children: [
-                Expanded(
-                    child: _GraphCanvas(
-                        nodes: _nodes, edges: _edges, onNodeTap: _selectNode)),
-                _NodeLegend(),
-              ],
-            ),
+      body: Padding(
+        padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Container(
+                width: 42,
+                height: 42,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(11)),
+                child: Icon(Icons.hub_outlined,
+                    color: Theme.of(context).colorScheme.primary)),
+            const SizedBox(width: 12),
+            Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                  Text(center.word,
+                      style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 2),
+                  Text(center.meaning.isEmpty ? '点击其他节点切换中心词' : center.meaning,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 12, color: colors.mutedText))
+                ])),
+            _GraphMetric(
+                label: '关联节点', value: '${_nodes.length - 1}', colors: colors),
+            const SizedBox(width: 10),
+            _GraphMetric(
+                label: '关系数量', value: '${_edges.length}', colors: colors),
+          ]),
+          const SizedBox(height: 16),
+          Expanded(
+              child: Container(
+            clipBehavior: Clip.antiAlias,
+            decoration: BoxDecoration(
+                color: colors.sidebar,
+                border: Border.all(color: colors.border),
+                borderRadius: BorderRadius.circular(14)),
+            child: Stack(children: [
+              Positioned.fill(
+                  child: _GraphCanvas(
+                      nodes: _nodes, edges: _edges, onNodeTap: _selectNode)),
+              Positioned(left: 14, bottom: 12, child: _NodeLegend()),
+              Positioned(
+                  right: 14,
+                  bottom: 12,
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 7),
+                      decoration: BoxDecoration(
+                          color: colors.subtleSurface,
+                          borderRadius: BorderRadius.circular(8)),
+                      child: Text('点击节点可重新聚焦',
+                          style: TextStyle(
+                              fontSize: 11, color: colors.mutedText)))),
+            ]),
+          )),
+        ]),
+      ),
     );
   }
+}
+
+class _GraphMetric extends StatelessWidget {
+  const _GraphMetric(
+      {required this.label, required this.value, required this.colors});
+  final String label, value;
+  final AppColorTokens colors;
+  @override
+  Widget build(BuildContext context) => Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+          color: colors.sidebar,
+          border: Border.all(color: colors.border),
+          borderRadius: BorderRadius.circular(9)),
+      child: Row(children: [
+        Text(value,
+            style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: Theme.of(context).colorScheme.primary)),
+        const SizedBox(width: 6),
+        Text(label, style: TextStyle(fontSize: 11, color: colors.mutedText))
+      ]));
 }

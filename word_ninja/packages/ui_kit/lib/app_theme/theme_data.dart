@@ -22,6 +22,7 @@ class AppTheme {
       scaffoldBackgroundColor: tokens.canvas,
       extensions: [tokens],
       cardTheme: base.cardTheme.copyWith(
+        color: tokens.sidebar,
         elevation: 0,
         margin: EdgeInsets.zero,
         surfaceTintColor: Colors.transparent,

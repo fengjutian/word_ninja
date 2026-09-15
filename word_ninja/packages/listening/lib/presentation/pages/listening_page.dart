@@ -74,9 +74,11 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
                               () => _openLevel(context, 'A1')),
                         ]
                             .map((item) => SizedBox(
-                                width: box.maxWidth > 760
-                                    ? (box.maxWidth - 12) / 2
-                                    : box.maxWidth,
+                                width: box.maxWidth >= 1000
+                                    ? (box.maxWidth - 48) / 5
+                                    : box.maxWidth > 680
+                                        ? (box.maxWidth - 12) / 2
+                                        : box.maxWidth,
                                 child: item))
                             .toList(),
                       )),

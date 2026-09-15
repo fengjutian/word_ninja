@@ -24,14 +24,19 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
     if (mounted) setState(() => _isPlaying = false);
   }
 
-  void _toggleRecording() {
-    if (_isPlaying) return;
-    setState(() => _isRecording = !_isRecording);
-    if (_isRecording) {
-      // Windows STT not yet available — play the sentence via TTS instead
-      _playSentence('The quick brown fox jumps over the lazy dog.');
-      setState(() => _isRecording = false);
-    }
+  Future<void> _toggleRecording() async {
+    if (_isPlaying || _isRecording) return;
+    setState(() {
+      _isRecording = true;
+      _isPlaying = true;
+    });
+    final tts = ref.read(ttsServiceProvider);
+    await tts.speak('The quick brown fox jumps over the lazy dog.', rate: 0.8);
+    if (!mounted) return;
+    setState(() {
+      _isRecording = false;
+      _isPlaying = false;
+    });
   }
 
   void _openScene(String scene) {
@@ -122,152 +127,141 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
     final colors = context.appColors;
     return Scaffold(
       backgroundColor: colors.canvas,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.fromLTRB(32, 28, 32, 40),
-        child: Center(
-          child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 1120),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(children: [
-                      Container(
-                          width: 44,
-                          height: 44,
-                          alignment: Alignment.center,
-                          decoration: BoxDecoration(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .primaryContainer,
-                              borderRadius: BorderRadius.circular(12)),
-                          child: Icon(PhosphorIconsRegular.microphone,
-                              color: Theme.of(context).colorScheme.primary,
-                              size: 22)),
-                      const SizedBox(width: 14),
-                      Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+      body: Center(
+        child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1120),
+            child: ListView(
+                padding: const EdgeInsets.fromLTRB(32, 28, 32, 40),
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    Container(
+                        width: 44,
+                        height: 44,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            color:
+                                Theme.of(context).colorScheme.primaryContainer,
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Icon(PhosphorIconsRegular.microphone,
+                            color: Theme.of(context).colorScheme.primary,
+                            size: 22)),
+                    const SizedBox(width: 14),
+                    Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('口语训练',
+                              style: Theme.of(context).textTheme.headlineSmall),
+                          const SizedBox(height: 3),
+                          Text('用真实场景练表达，用标准发音练流利度',
+                              style: TextStyle(
+                                  fontSize: 13, color: colors.mutedText))
+                        ])
+                  ]),
+                  const SizedBox(height: 30),
+                  Text('AI 陪练场景',
+                      style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 14),
+                  LayoutBuilder(
+                      builder: (context, box) => Wrap(
+                          spacing: 12,
+                          runSpacing: 12,
                           children: [
-                            Text('口语训练',
-                                style:
-                                    Theme.of(context).textTheme.headlineSmall),
-                            const SizedBox(height: 3),
-                            Text('用真实场景练表达，用标准发音练流利度',
+                            _SceneCard('旅游', PhosphorIconsRegular.airplane,
+                                '机场、酒店与问路', () => _openScene('旅游')),
+                            _SceneCard('面试', PhosphorIconsRegular.briefcase,
+                                '英文面试与自我介绍', () => _openScene('面试')),
+                            _SceneCard('商务会议', PhosphorIconsRegular.usersThree,
+                                '商务谈判与演讲', () => _openScene('商务会议')),
+                            _SceneCard('日常聊天', PhosphorIconsRegular.chats,
+                                '自然的日常对话', () => _openScene('日常聊天')),
+                          ]
+                              .map((item) => SizedBox(
+                                  width: box.maxWidth > 760
+                                      ? (box.maxWidth - 12) / 2
+                                      : box.maxWidth,
+                                  child: item))
+                              .toList())),
+                  const SizedBox(height: 30),
+                  Text('发音练习', style: Theme.of(context).textTheme.titleLarge),
+                  const SizedBox(height: 14),
+                  Card(
+                    child: Padding(
+                      padding: const EdgeInsets.all(24),
+                      child: Column(
+                        children: [
+                          Row(children: [
+                            Icon(PhosphorIconsRegular.waveform,
+                                color: Theme.of(context).colorScheme.primary),
+                            const SizedBox(width: 10),
+                            const Text('今日发音句',
                                 style: TextStyle(
-                                    fontSize: 13, color: colors.mutedText))
-                          ])
-                    ]),
-                    const SizedBox(height: 30),
-                    Text('AI 陪练场景',
-                        style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 14),
-                    LayoutBuilder(
-                        builder: (context, box) => Wrap(
-                            spacing: 12,
-                            runSpacing: 12,
-                            children: [
-                              _SceneCard('旅游', PhosphorIconsRegular.airplane,
-                                  '机场、酒店与问路', () => _openScene('旅游')),
-                              _SceneCard('面试', PhosphorIconsRegular.briefcase,
-                                  '英文面试与自我介绍', () => _openScene('面试')),
-                              _SceneCard(
-                                  '商务会议',
-                                  PhosphorIconsRegular.usersThree,
-                                  '商务谈判与演讲',
-                                  () => _openScene('商务会议')),
-                              _SceneCard('日常聊天', PhosphorIconsRegular.chats,
-                                  '自然的日常对话', () => _openScene('日常聊天')),
-                            ]
-                                .map((item) => SizedBox(
-                                    width: box.maxWidth > 760
-                                        ? (box.maxWidth - 12) / 2
-                                        : box.maxWidth,
-                                    child: item))
-                                .toList())),
-                    const SizedBox(height: 30),
-                    Text('发音练习', style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 14),
-                    Card(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Column(
-                          children: [
-                            Row(children: [
-                              Icon(PhosphorIconsRegular.waveform,
-                                  color: Theme.of(context).colorScheme.primary),
-                              const SizedBox(width: 10),
-                              const Text('今日发音句',
-                                  style: TextStyle(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w600)),
-                              const Spacer(),
-                              Text('预计 2 分钟',
-                                  style: TextStyle(
-                                      fontSize: 11, color: colors.mutedText))
-                            ]),
-                            const SizedBox(height: 18),
-                            Container(
-                              width: double.infinity,
-                              padding: const EdgeInsets.symmetric(
-                                  horizontal: 20, vertical: 24),
-                              decoration: BoxDecoration(
-                                color: colors.subtleSurface,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: const Text(
-                                '"The quick brown fox jumps over the lazy dog."',
+                                    fontSize: 14, fontWeight: FontWeight.w600)),
+                            const Spacer(),
+                            Text('预计 2 分钟',
                                 style: TextStyle(
-                                    fontSize: 18, fontStyle: FontStyle.italic),
-                                textAlign: TextAlign.center,
-                              ),
+                                    fontSize: 11, color: colors.mutedText))
+                          ]),
+                          const SizedBox(height: 18),
+                          Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 24),
+                            decoration: BoxDecoration(
+                              color: colors.subtleSurface,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                            const SizedBox(height: AppSpacing.lg),
-                            Row(children: [
-                              Expanded(
-                                  child: FilledButton.icon(
-                                onPressed: _isPlaying
-                                    ? null
-                                    : () => _playSentence(
-                                        'The quick brown fox jumps over the lazy dog.'),
-                                icon: Icon(_isPlaying
-                                    ? PhosphorIconsRegular.hourglass
-                                    : PhosphorIconsRegular.play),
-                                label: Text(_isPlaying ? '播放中...' : '播放发音'),
-                              )),
-                              const SizedBox(width: 10),
-                              Semantics(
-                                label: _isRecording ? '停止录音' : '开始录音',
-                                child: OutlinedButton.icon(
-                                  onPressed:
-                                      _isPlaying ? null : _toggleRecording,
-                                  icon: Icon(_isRecording
-                                      ? PhosphorIconsRegular.microphone
-                                      : PhosphorIconsRegular.microphone),
-                                  label:
-                                      Text(_isRecording ? '正在录音...' : '开始跟读'),
-                                ),
-                              )
-                            ]),
-                            if (_isRecording) ...[
-                              const SizedBox(height: AppSpacing.md),
-                              const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(PhosphorIconsRegular.info,
-                                      size: 14, color: AppColors.info),
-                                  SizedBox(width: 6),
-                                  Text('Windows STT 语音识别开发中，当前通过 TTS 播放示范',
-                                      style: TextStyle(
-                                          color: AppColors.textSecondary,
-                                          fontSize: 12)),
-                                ],
+                            child: const Text(
+                              '"The quick brown fox jumps over the lazy dog."',
+                              style: TextStyle(
+                                  fontSize: 18, fontStyle: FontStyle.italic),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          Row(children: [
+                            Expanded(
+                                child: FilledButton.icon(
+                              onPressed: _isPlaying
+                                  ? null
+                                  : () => _playSentence(
+                                      'The quick brown fox jumps over the lazy dog.'),
+                              icon: Icon(_isPlaying
+                                  ? PhosphorIconsRegular.hourglass
+                                  : PhosphorIconsRegular.play),
+                              label: Text(_isPlaying ? '播放中...' : '播放发音'),
+                            )),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _isPlaying ? null : _toggleRecording,
+                                icon: Icon(_isRecording
+                                    ? PhosphorIconsRegular.microphone
+                                    : PhosphorIconsRegular.microphone),
+                                label: Text(_isRecording ? '正在录音...' : '开始跟读'),
                               ),
-                            ],
+                            )
+                          ]),
+                          if (_isRecording) ...[
+                            const SizedBox(height: AppSpacing.md),
+                            const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(PhosphorIconsRegular.info,
+                                    size: 14, color: AppColors.info),
+                                SizedBox(width: 6),
+                                Text('Windows STT 语音识别开发中，当前通过 TTS 播放示范',
+                                    style: TextStyle(
+                                        color: AppColors.textSecondary,
+                                        fontSize: 12)),
+                              ],
+                            ),
                           ],
-                        ),
+                        ],
                       ),
                     ),
-                  ])),
-        ),
+                  ),
+                ])),
       ),
     );
   }
