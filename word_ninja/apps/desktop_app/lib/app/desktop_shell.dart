@@ -51,9 +51,7 @@ class _DesktopShellState extends State<DesktopShell> {
             Expanded(
               child: Row(
                 children: [
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 180),
-                    curve: Curves.easeOutCubic,
+                  Container(
                     width: _expanded ? 220 : 58,
                     decoration: BoxDecoration(
                       color: tokens.sidebar,
@@ -306,7 +304,7 @@ class _NavButton extends StatelessWidget {
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                     color: selected
                         ? primary
-                              : mt.Theme.of(context).colorScheme.onSurface,
+                        : mt.Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
