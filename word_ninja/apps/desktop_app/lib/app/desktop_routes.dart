@@ -37,6 +37,25 @@ GoRouter createDesktopRouter() {
             builder: (ctx, state) => const VocabularyPage(),
           ),
           GoRoute(
+            path: DesktopRoutes.wordGraph,
+            builder: (ctx, state) => Consumer(
+              builder: (context, ref, _) {
+                final words = ref.watch(wordListProvider);
+                if (words.words.isEmpty && !words.isLoading) {
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    ref
+                        .read(wordListProvider.notifier)
+                        .loadWords(refresh: true);
+                  });
+                }
+                if (words.isLoading && words.words.isEmpty) {
+                  return const Center(child: mt.CircularProgressIndicator());
+                }
+                return WordGraphPage(words: words.words);
+              },
+            ),
+          ),
+          GoRoute(
             path: DesktopRoutes.reading,
             builder: (ctx, state) => const ReaderPage(),
           ),
@@ -125,22 +144,6 @@ GoRouter createDesktopRouter() {
           return mt.MaterialPage(
             key: state.pageKey,
             child: WordTestPage(words: []),
-          );
-        },
-      ),
-      GoRoute(
-        path: DesktopRoutes.wordGraph,
-        pageBuilder: (ctx, state) {
-          final extra = state.extra;
-          if (extra is List<Word>) {
-            return mt.MaterialPage(
-              key: state.pageKey,
-              child: WordGraphPage(words: extra),
-            );
-          }
-          return mt.MaterialPage(
-            key: state.pageKey,
-            child: WordGraphPage(words: []),
           );
         },
       ),

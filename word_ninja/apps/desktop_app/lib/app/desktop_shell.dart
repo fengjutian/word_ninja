@@ -11,8 +11,10 @@ class DesktopShell extends StatelessWidget {
       titleBar: _buildTitleBar(context, isDark),
       paneBodyBuilder: (item, body) {
         return mt.Theme(
-          data: AppTheme.build(AppThemeCatalog.indigo,
-              isDark ? Brightness.dark : Brightness.light),
+          data: AppTheme.build(
+            AppThemeCatalog.indigo,
+            isDark ? Brightness.dark : Brightness.light,
+          ),
           child: Builder(
             builder: (ctx) =>
                 mt.Material(child: mt.ScaffoldMessenger(child: child)),
@@ -42,6 +44,11 @@ class DesktopShell extends StatelessWidget {
           PaneItem(
             icon: const Icon(FluentIcons.bookmarks),
             title: const Text('单词'),
+            body: const SizedBox.shrink(),
+          ),
+          PaneItem(
+            icon: const Icon(FluentIcons.share),
+            title: const Text('知识图谱'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
@@ -117,7 +124,14 @@ class DesktopShell extends StatelessWidget {
                       color: AppThemeCatalog.indigo.seed,
                       borderRadius: BorderRadius.circular(6),
                     ),
-                    child: const Text('W', style: TextStyle(color: mt.Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                    child: const Text(
+                      'W',
+                      style: TextStyle(
+                        color: mt.Colors.white,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -197,17 +211,18 @@ class DesktopShell extends StatelessWidget {
 
   int _calcIndex(BuildContext context) {
     final uri = GoRouterState.of(context).uri.toString();
+    if (uri.startsWith(DesktopRoutes.wordGraph)) return 2;
     if (uri.startsWith(DesktopRoutes.vocabulary)) return 1;
-    if (uri.startsWith(DesktopRoutes.reading)) return 2;
-    if (uri.startsWith(DesktopRoutes.listening)) return 3;
-    if (uri.startsWith(DesktopRoutes.speaking)) return 4;
-    if (uri.startsWith(DesktopRoutes.aiTutor)) return 5;
-    if (uri.startsWith(DesktopRoutes.writing)) return 6;
-    if (uri.startsWith(DesktopRoutes.studyPlan)) return 7;
-    if (uri.startsWith(DesktopRoutes.modelConfig)) return 8;
+    if (uri.startsWith(DesktopRoutes.reading)) return 3;
+    if (uri.startsWith(DesktopRoutes.listening)) return 4;
+    if (uri.startsWith(DesktopRoutes.speaking)) return 5;
+    if (uri.startsWith(DesktopRoutes.aiTutor)) return 6;
+    if (uri.startsWith(DesktopRoutes.writing)) return 7;
+    if (uri.startsWith(DesktopRoutes.studyPlan)) return 8;
+    if (uri.startsWith(DesktopRoutes.modelConfig)) return 9;
     if (uri.startsWith(DesktopRoutes.profile) ||
         uri.startsWith(DesktopRoutes.settings))
-      return 9;
+      return 10;
     return 0;
   }
 
@@ -218,20 +233,22 @@ class DesktopShell extends StatelessWidget {
       case 1:
         context.go(DesktopRoutes.vocabulary);
       case 2:
-        context.go(DesktopRoutes.reading);
+        context.go(DesktopRoutes.wordGraph);
       case 3:
-        context.go(DesktopRoutes.listening);
+        context.go(DesktopRoutes.reading);
       case 4:
-        context.go(DesktopRoutes.speaking);
+        context.go(DesktopRoutes.listening);
       case 5:
-        context.go(DesktopRoutes.aiTutor);
+        context.go(DesktopRoutes.speaking);
       case 6:
-        context.go(DesktopRoutes.writing);
+        context.go(DesktopRoutes.aiTutor);
       case 7:
-        context.go(DesktopRoutes.studyPlan);
+        context.go(DesktopRoutes.writing);
       case 8:
-        context.go(DesktopRoutes.modelConfig);
+        context.go(DesktopRoutes.studyPlan);
       case 9:
+        context.go(DesktopRoutes.modelConfig);
+      case 10:
         context.go(DesktopRoutes.profile);
     }
   }
