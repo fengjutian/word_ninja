@@ -24,7 +24,7 @@ class DesktopShell extends StatelessWidget {
       pane: NavigationPane(
         selected: _calcIndex(context),
         onChanged: (i) => _navigate(context, i),
-        displayMode: PaneDisplayMode.open,
+        displayMode: PaneDisplayMode.auto,
         header: Padding(
           padding: const EdgeInsets.fromLTRB(12, 14, 12, 10),
           child: Text(

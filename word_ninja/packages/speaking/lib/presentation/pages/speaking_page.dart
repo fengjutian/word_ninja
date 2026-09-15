@@ -132,7 +132,6 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
             constraints: const BoxConstraints(maxWidth: 1120),
             child: ListView(
                 padding: const EdgeInsets.fromLTRB(32, 28, 32, 40),
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: [
                     Container(
