@@ -136,43 +136,28 @@ class _MessageBubble extends StatelessWidget {
     final bgColor = message.isError
         ? AppColors.error.withValues(alpha: 0.1)
         : message.isUser
-            ? scheme.primary
-            : colors.sidebar;
-    final textColor = message.isError
-        ? AppColors.error
-        : message.isUser
-            ? Colors.white
-            : scheme.onSurface;
+            ? colors.subtleSurface
+            : Colors.transparent;
+    final textColor = message.isError ? AppColors.error : scheme.onSurface;
 
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: const BoxConstraints(maxWidth: 820),
-        margin: const EdgeInsets.only(bottom: 14),
+        constraints: BoxConstraints(maxWidth: message.isUser ? 620 : 780),
+        margin: const EdgeInsets.only(bottom: 20),
         child: GestureDetector(
           onTap: onTap,
           onLongPress: onDelete,
           child: Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: message.isUser
+                ? const EdgeInsets.symmetric(horizontal: 14, vertical: 10)
+                : const EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
               color: bgColor,
-              borderRadius: BorderRadius.only(
-                topLeft: const Radius.circular(16),
-                topRight: const Radius.circular(16),
-                bottomLeft: message.isUser
-                    ? const Radius.circular(16)
-                    : const Radius.circular(4),
-                bottomRight: message.isUser
-                    ? const Radius.circular(4)
-                    : const Radius.circular(16),
-              ),
-              border: Border.all(
-                color: message.isError
-                    ? AppColors.error.withValues(alpha: 0.3)
-                    : message.isUser
-                        ? scheme.primary
-                        : colors.border,
-              ),
+              borderRadius: BorderRadius.circular(12),
+              border: message.isError
+                  ? Border.all(color: AppColors.error.withValues(alpha: 0.3))
+                  : null,
             ),
             child: message.isLoading
                 ? Row(mainAxisSize: MainAxisSize.min, children: [
@@ -192,29 +177,22 @@ class _MessageBubble extends StatelessWidget {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Row(children: [
-                            Container(
-                                width: 24,
-                                height: 24,
-                                alignment: Alignment.center,
-                                decoration: BoxDecoration(
-                                    color: scheme.primaryContainer,
-                                    borderRadius: BorderRadius.circular(7)),
-                                child: Icon(PhosphorIconsRegular.sparkle,
-                                    size: 12, color: scheme.primary)),
-                            const SizedBox(width: 8),
-                            Text('WordFlow AI',
+                            Icon(PhosphorIconsRegular.sparkle,
+                                size: 14, color: scheme.primary),
+                            const SizedBox(width: 7),
+                            Text('WordFlow',
                                 style: TextStyle(
-                                    fontSize: 11,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.w600,
                                     color: colors.mutedText)),
                           ]),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: 8),
                           MarkdownBody(
                             data: message.text,
                             selectable: true,
                             styleSheet: MarkdownStyleSheet(
                               p: TextStyle(
-                                  color: textColor, fontSize: 15, height: 1.5),
+                                  color: textColor, fontSize: 14, height: 1.65),
                               code: TextStyle(
                                 color: AppColors.accentPurple,
                                 backgroundColor: AppColors.background,

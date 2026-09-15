@@ -393,49 +393,53 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
-            decoration: BoxDecoration(
-              color: colors.sidebar,
-              border: Border(top: BorderSide(color: colors.border)),
-            ),
+            padding: const EdgeInsets.fromLTRB(24, 10, 24, 18),
+            color: colors.canvas,
             child: SafeArea(
               child: Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 920),
-                  child: Row(
-                    children: [
-                      IconButton(
-                        icon: const Icon(PhosphorIconsRegular.microphone,
-                            color: AppColors.primary),
-                        tooltip: '语音输入（即将上线）',
-                        onPressed: () {},
-                      ),
-                      Expanded(
-                        child: TextField(
-                          controller: _msgCtrl,
-                          decoration: InputDecoration(
-                            hintText: '询问单词、语法、写作或口语问题…',
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 10),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: colors.sidebar,
+                      border: Border.all(color: colors.border),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: const [
+                        BoxShadow(
+                            color: Color(0x0A000000),
+                            blurRadius: 18,
+                            offset: Offset(0, 5))
+                      ],
+                    ),
+                    child: TextField(
+                      controller: _msgCtrl,
+                      minLines: 1,
+                      maxLines: 4,
+                      decoration: InputDecoration(
+                        hintText: '询问单词、语法、写作或口语问题…',
+                        prefixIcon: IconButton(
+                          icon: Icon(PhosphorIconsRegular.microphone,
+                              size: 19, color: colors.mutedText),
+                          tooltip: '语音输入（即将上线）',
+                          onPressed: () {},
+                        ),
+                        suffixIcon: Padding(
+                          padding: const EdgeInsets.all(5),
+                          child: IconButton.filled(
+                            icon: const Icon(PhosphorIconsRegular.arrowUp,
+                                size: 17),
+                            onPressed: _isLoading ? null : _sendMessage,
                           ),
-                          onSubmitted: (_) => _sendMessage(),
                         ),
+                        border: InputBorder.none,
+                        enabledBorder: InputBorder.none,
+                        focusedBorder: InputBorder.none,
+                        filled: false,
+                        contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 12, vertical: 14),
                       ),
-                      const SizedBox(width: AppSpacing.sm),
-                      CircleAvatar(
-                        backgroundColor: _isLoading
-                            ? AppColors.textSecondary
-                            : AppColors.primary,
-                        child: IconButton(
-                          icon: Icon(PhosphorIconsRegular.paperPlaneTilt,
-                              color: Colors.white, size: 18),
-                          onPressed: _isLoading ? null : _sendMessage,
-                        ),
-                      ),
-                    ],
+                      onSubmitted: (_) => _sendMessage(),
+                    ),
                   ),
                 ),
               ),
