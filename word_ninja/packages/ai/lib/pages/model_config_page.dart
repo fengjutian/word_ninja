@@ -120,7 +120,7 @@ class _ProviderPanel extends StatelessWidget {
             title: 'DeepSeek V4 Pro',
             subtitle: '复杂任务与深度分析',
             selected: config.provider == ModelProvider.deepSeek &&
-                config.maxTokens >= 1000,
+                config.modelName == ModelConfig.deepSeekV4Pro.modelName,
             onTap: () => notifier.selectProvider(ModelProvider.deepSeek),
           ),
           const SizedBox(height: 10),
@@ -129,7 +129,7 @@ class _ProviderPanel extends StatelessWidget {
             title: 'DeepSeek V4 Flash',
             subtitle: '快速响应与日常对话',
             selected: config.provider == ModelProvider.deepSeek &&
-                config.maxTokens < 1000,
+                config.modelName == ModelConfig.deepSeekV4Flash.modelName,
             onTap: notifier.selectDeepSeekFlash,
           ),
           const SizedBox(height: 10),
