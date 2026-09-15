@@ -22,6 +22,7 @@ import 'package:profile/pages/settings_page.dart';
 import 'package:profile/pages/membership_page.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/ui_kit.dart' show AppIcon;
+import 'theme.dart';
 
 /// 路由路径常量
 class AppRoutes {
