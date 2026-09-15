@@ -2,6 +2,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
+import 'package:ui_kit/app_theme/design_tokens.dart';
 import 'package:ai/providers/ai_providers.dart' show aiReadingServiceProvider;
 import 'package:listening/providers/tts_provider.dart';
 
@@ -16,36 +17,99 @@ class ListeningPage extends ConsumerStatefulWidget {
 class _ListeningPageState extends ConsumerState<ListeningPage> {
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Scaffold(
-      appBar: AppBar(title: const Text('听力训练')),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          Semantics(
-              header: true,
-              child: Text('AI听力课程', style: AppTextStyles.heading2)),
-          const SizedBox(height: AppSpacing.md),
-          _LevelCard('C1', '高级 · 学术讲座、辩论', PhosphorIconsRegular.brain,
-              AppColors.levelMaster, () => _openLevel(context, 'C1')),
-          _LevelCard('B2', '中高级 · 新闻、演讲', PhosphorIconsRegular.trendUp,
-              AppColors.levelAdvanced, () => _openLevel(context, 'B2')),
-          _LevelCard('B1', '中级 · 日常对话、故事', PhosphorIconsRegular.equals,
-              AppColors.levelIntermediate, () => _openLevel(context, 'B1')),
-          _LevelCard('A2', '初级 · 简单对话', PhosphorIconsRegular.trendDown,
-              AppColors.levelBeginner, () => _openLevel(context, 'A2')),
-          _LevelCard('A1', '入门 · 基础听力', PhosphorIconsRegular.star,
-              AppColors.info, () => _openLevel(context, 'A1')),
-          const SizedBox(height: AppSpacing.xl),
-          Semantics(
-              header: true, child: Text('练习模式', style: AppTextStyles.heading2)),
-          const SizedBox(height: AppSpacing.md),
-          _ModeCard('精听', '逐句播放，理解每一句', PhosphorIconsRegular.ear,
-              AppColors.secondary, () => _openMode(context, '精听')),
-          _ModeCard('听写', '听音频填写缺失内容', PhosphorIconsRegular.notePencil,
-              AppColors.accentPurple, () => _openMode(context, '听写')),
-          _ModeCard('跟读', '边听边读，录音后AI评分', PhosphorIconsRegular.microphoneStage,
-              AppColors.success, () => _openMode(context, '跟读')),
-        ],
+      backgroundColor: colors.canvas,
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(32, 28, 32, 40),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 1120),
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              _TrainingHeader(
+                  icon: PhosphorIconsRegular.headphones,
+                  title: '听力训练',
+                  subtitle: '选择适合你的难度，通过真实语境提升听力理解'),
+              const SizedBox(height: 30),
+              Text('选择课程', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 4),
+              Text('按照 CEFR 难度循序渐进',
+                  style: TextStyle(color: colors.mutedText, fontSize: 12)),
+              const SizedBox(height: 14),
+              LayoutBuilder(
+                  builder: (context, box) => Wrap(
+                        spacing: 12,
+                        runSpacing: 12,
+                        children: [
+                          _LevelCard(
+                              'C1',
+                              '高级',
+                              '学术讲座、辩论',
+                              PhosphorIconsRegular.brain,
+                              () => _openLevel(context, 'C1')),
+                          _LevelCard(
+                              'B2',
+                              '中高级',
+                              '新闻、演讲',
+                              PhosphorIconsRegular.trendUp,
+                              () => _openLevel(context, 'B2')),
+                          _LevelCard(
+                              'B1',
+                              '中级',
+                              '日常对话、故事',
+                              PhosphorIconsRegular.equals,
+                              () => _openLevel(context, 'B1')),
+                          _LevelCard(
+                              'A2',
+                              '初级',
+                              '简短对话',
+                              PhosphorIconsRegular.trendDown,
+                              () => _openLevel(context, 'A2')),
+                          _LevelCard(
+                              'A1',
+                              '入门',
+                              '基础听力',
+                              PhosphorIconsRegular.star,
+                              () => _openLevel(context, 'A1')),
+                        ]
+                            .map((item) => SizedBox(
+                                width: box.maxWidth > 760
+                                    ? (box.maxWidth - 12) / 2
+                                    : box.maxWidth,
+                                child: item))
+                            .toList(),
+                      )),
+              const SizedBox(height: 30),
+              Text('专项练习', style: Theme.of(context).textTheme.titleLarge),
+              const SizedBox(height: 14),
+              LayoutBuilder(
+                  builder: (context, box) => Wrap(
+                      spacing: 12,
+                      runSpacing: 12,
+                      children: [
+                        _ModeCard('精听', '逐句播放，理解每一句', PhosphorIconsRegular.ear,
+                            () => _openMode(context, '精听')),
+                        _ModeCard(
+                            '听写',
+                            '听音频填写缺失内容',
+                            PhosphorIconsRegular.notePencil,
+                            () => _openMode(context, '听写')),
+                        _ModeCard(
+                            '跟读',
+                            '边听边读，校准发音',
+                            PhosphorIconsRegular.microphoneStage,
+                            () => _openMode(context, '跟读')),
+                      ]
+                          .map((item) => SizedBox(
+                              width: box.maxWidth > 760
+                                  ? (box.maxWidth - 24) / 3
+                                  : box.maxWidth,
+                              child: item))
+                          .toList())),
+            ]),
+          ),
+        ),
       ),
     );
   }
@@ -174,31 +238,61 @@ class _ListeningPageState extends ConsumerState<ListeningPage> {
   }
 }
 
-class _LevelCard extends StatelessWidget {
-  final String level, desc;
+class _TrainingHeader extends StatelessWidget {
+  const _TrainingHeader(
+      {required this.icon, required this.title, required this.subtitle});
   final IconData icon;
-  final Color color;
+  final String title, subtitle;
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.primaryContainer,
+                borderRadius: BorderRadius.circular(12)),
+            child: Icon(icon,
+                color: Theme.of(context).colorScheme.primary, size: 22)),
+        const SizedBox(width: 14),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title, style: Theme.of(context).textTheme.headlineSmall),
+          const SizedBox(height: 3),
+          Text(subtitle,
+              style:
+                  TextStyle(fontSize: 13, color: context.appColors.mutedText))
+        ])
+      ]);
+}
+
+class _LevelCard extends StatelessWidget {
+  final String level, title, desc;
+  final IconData icon;
   final VoidCallback onTap;
 
-  const _LevelCard(this.level, this.desc, this.icon, this.color, this.onTap);
+  const _LevelCard(this.level, this.title, this.desc, this.icon, this.onTap);
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final primary = Theme.of(context).colorScheme.primary;
     return Card(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
-          width: 48,
-          height: 48,
+          width: 42,
+          height: 42,
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(12),
-          ),
-          child: Icon(icon, color: color),
+              color: primary.withValues(alpha: 0.09),
+              borderRadius: BorderRadius.circular(10)),
+          child: Icon(icon, color: primary, size: 20),
         ),
-        title: Text('$level · $desc', style: AppTextStyles.heading3),
-        trailing:
-            const Icon(PhosphorIconsFill.playCircle, color: AppColors.primary),
+        title: Text('$level · $title',
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        subtitle:
+            Text(desc, style: TextStyle(fontSize: 12, color: colors.mutedText)),
+        trailing: Icon(PhosphorIconsRegular.caretRight,
+            color: colors.mutedText, size: 16),
         onTap: onTap,
       ),
     );
@@ -208,20 +302,22 @@ class _LevelCard extends StatelessWidget {
 class _ModeCard extends StatelessWidget {
   final String title, subtitle;
   final IconData icon;
-  final Color color;
   final VoidCallback onTap;
 
-  const _ModeCard(this.title, this.subtitle, this.icon, this.color, this.onTap);
+  const _ModeCard(this.title, this.subtitle, this.icon, this.onTap);
 
   @override
   Widget build(BuildContext context) {
+    final colors = context.appColors;
     return Card(
-      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: ListTile(
-        leading: Icon(icon, color: color, size: 32),
-        title: Text(title, style: AppTextStyles.heading3),
-        subtitle: Text(subtitle, style: AppTextStyles.bodySmall),
-        trailing: const Icon(PhosphorIconsRegular.caretRight, size: 16),
+        contentPadding: const EdgeInsets.all(16),
+        leading:
+            Icon(icon, color: Theme.of(context).colorScheme.primary, size: 24),
+        title: Text(title,
+            style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+        subtitle: Text(subtitle,
+            style: TextStyle(fontSize: 11, color: colors.mutedText)),
         onTap: onTap,
       ),
     );
