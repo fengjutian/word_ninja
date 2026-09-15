@@ -28,6 +28,18 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   bool _isLoading = false;
   String? _lastError;
 
+  bool get _hasApiKey {
+    final configuredKey = ref.read(modelConfigProvider).apiKey.trim();
+    const environmentKey = String.fromEnvironment('OPENAI_API_KEY');
+    return configuredKey.isNotEmpty || environmentKey.trim().isNotEmpty;
+  }
+
+  Future<void> _openModelConfig() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ModelConfigPage()),
+    );
+  }
+
   @override
   void dispose() {
     _msgCtrl.dispose();
@@ -38,6 +50,15 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   void _sendMessage() {
     final text = _msgCtrl.text.trim();
     if (text.isEmpty || _isLoading) return;
+    if (!_hasApiKey) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('请先配置 API Key，再发送消息'),
+          action: SnackBarAction(label: '去配置', onPressed: _openModelConfig),
+        ),
+      );
+      return;
+    }
     final notifier = ref.read(chatHistoryProvider.notifier);
     notifier.addMessage(ChatMessage(text, isUser: true));
     notifier.addMessage(ChatMessage('思考中...', isUser: false, isLoading: true));
@@ -410,6 +431,43 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
               },
             ),
           ),
+          if (_lastError != null)
+            Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 880),
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(32, 0, 32, 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  decoration: BoxDecoration(
+                    color: scheme.errorContainer,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        PhosphorIconsRegular.warningCircle,
+                        size: 18,
+                        color: scheme.onErrorContainer,
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          _lastError!.replaceFirst('Exception: ', ''),
+                          style: TextStyle(color: scheme.onErrorContainer),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: _openModelConfig,
+                        child: const Text('模型配置'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           Container(
             padding: const EdgeInsets.fromLTRB(32, 12, 32, 24),
             color: colors.canvas,
