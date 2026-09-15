@@ -1,9 +1,44 @@
 import 'package:flutter/material.dart';
 import 'app_theme.dart';
+import 'design_tokens.dart';
 
 /// 生成 WordFlow 完整 ThemeData（浅色模式）
 class AppTheme {
-  static ThemeData get light => ThemeData(
+  static ThemeData get light => build(AppThemeCatalog.indigo, Brightness.light);
+  static ThemeData get dark => build(AppThemeCatalog.indigo, Brightness.dark);
+
+  static ThemeData build(AppThemePreset preset, Brightness brightness) {
+    final base = brightness == Brightness.dark ? _dark : _light;
+    final tokens = AppColorTokens.forPreset(preset, brightness);
+    final scheme = ColorScheme.fromSeed(
+      seedColor: preset.seed,
+      brightness: brightness,
+      surface: base.colorScheme.surface,
+      error: base.colorScheme.error,
+    );
+    return base.copyWith(
+      colorScheme: scheme,
+      primaryColor: preset.seed,
+      scaffoldBackgroundColor: tokens.canvas,
+      extensions: [tokens],
+      cardTheme: base.cardTheme.copyWith(
+        elevation: 0,
+        margin: EdgeInsets.zero,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
+          side: BorderSide(color: tokens.border),
+        ),
+      ),
+      appBarTheme: base.appBarTheme.copyWith(
+        backgroundColor: tokens.canvas,
+        foregroundColor: scheme.onSurface,
+        centerTitle: false,
+      ),
+    );
+  }
+
+  static ThemeData get _light => ThemeData(
         useMaterial3: true,
         brightness: Brightness.light,
         primaryColor: AppColors.primary,
@@ -155,7 +190,7 @@ class AppTheme {
       );
 
   /// 暗色模式（完整组件主题化）
-  static ThemeData get dark => ThemeData(
+  static ThemeData get _dark => ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
         primaryColor: AppColors.primary,

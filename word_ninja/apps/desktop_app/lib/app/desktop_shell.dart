@@ -11,7 +11,8 @@ class DesktopShell extends StatelessWidget {
       titleBar: _buildTitleBar(context, isDark),
       paneBodyBuilder: (item, body) {
         return mt.Theme(
-          data: isDark ? AppTheme.dark : AppTheme.light,
+          data: AppTheme.build(AppThemeCatalog.indigo,
+              isDark ? Brightness.dark : Brightness.light),
           child: Builder(
             builder: (ctx) =>
                 mt.Material(child: mt.ScaffoldMessenger(child: child)),
@@ -35,42 +36,42 @@ class DesktopShell extends StatelessWidget {
         items: [
           PaneItem(
             icon: const Icon(FluentIcons.home),
-            title: const Text('Home'),
+            title: const Text('首页'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.bookmarks),
-            title: const Text('Vocab'),
+            title: const Text('单词'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.reading_mode),
-            title: const Text('Reading'),
+            title: const Text('阅读'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.headset),
-            title: const Text('Listening'),
+            title: const Text('听力'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.microphone),
-            title: const Text('Speaking'),
+            title: const Text('口语'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.chat),
-            title: const Text('AI Tutor'),
+            title: const Text('AI 导师'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.design),
-            title: const Text('Writing'),
+            title: const Text('写作'),
             body: const SizedBox.shrink(),
           ),
           PaneItem(
             icon: const Icon(FluentIcons.task_list),
-            title: const Text('Study Plan'),
+            title: const Text('学习计划'),
             body: const SizedBox.shrink(),
           ),
         ],
@@ -82,7 +83,7 @@ class DesktopShell extends StatelessWidget {
           ),
           PaneItem(
             icon: const Icon(FluentIcons.contact),
-            title: const Text('Profile'),
+            title: const Text('我的'),
             body: const SizedBox.shrink(),
           ),
         ],
@@ -108,14 +109,15 @@ class DesktopShell extends StatelessWidget {
                 children: [
                   const PaneToggleButton(),
                   const SizedBox(width: 4),
-                  Text(
-                    '\u{1F977}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: isDark
-                          ? AppColors.textOnDark
-                          : AppColors.textPrimary,
+                  Container(
+                    width: 22,
+                    height: 22,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: AppThemeCatalog.indigo.seed,
+                      borderRadius: BorderRadius.circular(6),
                     ),
+                    child: const Text('W', style: TextStyle(color: mt.Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
                   ),
                   const SizedBox(width: 8),
                   Text(

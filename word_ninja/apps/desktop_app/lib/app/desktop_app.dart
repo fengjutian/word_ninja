@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/app_theme/theme_data.dart';
+import 'package:ui_kit/app_theme/design_tokens.dart';
 import 'package:ui_kit/ui_kit.dart' show AppIcon;
 import 'package:vocabulary/presentation/pages/word_graph_page.dart';
 import 'package:vocabulary/presentation/pages/vocabulary_page.dart';
@@ -43,8 +44,8 @@ class WordFlowDesktopApp extends StatelessWidget {
     return FluentApp.router(
       title: 'WordFlow',
       debugShowCheckedModeBanner: false,
-      theme: _appFluentTheme(Brightness.light),
-      darkTheme: _appFluentTheme(Brightness.dark),
+      theme: _appFluentTheme(AppThemeCatalog.indigo, Brightness.light),
+      darkTheme: _appFluentTheme(AppThemeCatalog.indigo, Brightness.dark),
       themeMode: Preferences.getBool('dark_mode')
           ? ThemeMode.dark
           : ThemeMode.light,
@@ -54,25 +55,25 @@ class WordFlowDesktopApp extends StatelessWidget {
   }
 
   /// Build a FluentThemeData from AppColors
-  static FluentThemeData _appFluentTheme(Brightness brightness) {
+  static FluentThemeData _appFluentTheme(AppThemePreset preset, Brightness brightness) {
     final isDark = brightness == Brightness.dark;
+    final tokens = AppColorTokens.forPreset(preset, brightness);
+    final accent = preset.seed;
     return FluentThemeData(
       brightness: brightness,
       accentColor: AccentColor('normal', {
-        'darkest': Color(0xFFAB000D),
-        'darker': Color(0xFFC62828),
-        'dark': Color(0xFFD32F2F),
-        'normal': AppColors.primary,
-        'light': AppColors.primaryLight,
-        'lighter': Color(0xFFFF8A80),
-        'lightest': Color(0xFFFFCDD2),
+        'darkest': Color.lerp(accent, const Color(0xFF000000), 0.45)!,
+        'darker': Color.lerp(accent, const Color(0xFF000000), 0.30)!,
+        'dark': Color.lerp(accent, const Color(0xFF000000), 0.15)!,
+        'normal': accent,
+        'light': Color.lerp(accent, const Color(0xFFFFFFFF), 0.18)!,
+        'lighter': Color.lerp(accent, const Color(0xFFFFFFFF), 0.38)!,
+        'lightest': Color.lerp(accent, const Color(0xFFFFFFFF), 0.72)!,
       }),
-      scaffoldBackgroundColor: isDark
-          ? AppColors.surfaceDark
-          : AppColors.background,
+      scaffoldBackgroundColor: tokens.canvas,
       navigationPaneTheme: NavigationPaneThemeData(
-        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
-        highlightColor: AppColors.primary.withValues(alpha: 0.08),
+        backgroundColor: tokens.sidebar,
+        highlightColor: accent.withValues(alpha: isDark ? 0.18 : 0.10),
       ),
     );
   }
