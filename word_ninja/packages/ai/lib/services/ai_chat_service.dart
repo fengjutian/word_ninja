@@ -164,12 +164,7 @@ class AiChatService {
 不要包含其他文字，只返回 JSON。
 ''';
     final response = await chat(message: prompt, systemPrompt: '你是一个英语教学助手。');
-    return parseJsonMap(response, {
-      'meaning': '解析失败',
-      'phonetic': '',
-      'example': '',
-      'collocations': '',
-    });
+    return parseJsonMap(response, const {});
   }
 
   // ─── JSON 解析工具 ───

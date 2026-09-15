@@ -83,7 +83,20 @@ class WordListNotifier extends StateNotifier<WordListState> {
   }
 
   Future<void> addWord(Word word) async {
-    await _repo.addWord(word);
+    Word? existing;
+    for (final item in state.words) {
+      if (item.word.trim().toLowerCase() == word.word.trim().toLowerCase()) {
+        existing = item;
+        break;
+      }
+    }
+    if (existing == null) {
+      await _repo.addWord(word);
+    } else {
+      await _repo.updateWord(
+        word.copyWith(id: existing.id, createdAt: existing.createdAt),
+      );
+    }
     await loadWords(refresh: true);
   }
 

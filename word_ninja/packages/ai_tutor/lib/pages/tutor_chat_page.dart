@@ -199,8 +199,11 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     }
 
     try {
-      final meaning = (data['meaning'] as String?)?.trim().isNotEmpty == true
-          ? data['meaning'] as String
+      final parsedMeaning = (data['meaning'] as String?)?.trim();
+      final meaning = parsedMeaning != null &&
+              parsedMeaning.isNotEmpty &&
+              parsedMeaning != '解析失败'
+          ? parsedMeaning
           : _extractFirstLine(aiAnswer);
       final example = (data['example'] as String?)?.trim().isNotEmpty == true
           ? data['example'] as String
