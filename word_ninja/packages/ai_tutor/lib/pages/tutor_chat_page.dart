@@ -155,21 +155,16 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     );
   }
 
-  void _addAiResponseToVocabulary(int index, List<ChatMessage> messages) {
+  Future<void> _addAiResponseToVocabulary(
+    int index,
+    List<ChatMessage> messages,
+  ) async {
     String? word;
     for (int j = index - 1; j >= 0; j--) {
       if (messages[j].isUser) {
         final matches =
             RegExp(r"[a-zA-Z]{3,}(?:-[a-zA-Z]+)*").allMatches(messages[j].text);
-        const ignored = {
-          'nan',
-          'null',
-          'undefined',
-          'out',
-          'the',
-          'and',
-          'you'
-        };
+        const ignored = {'null', 'undefined'};
         for (final match in matches) {
           final candidate = match.group(0)!.toLowerCase();
           if (!ignored.contains(candidate)) {
@@ -180,29 +175,41 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
         break;
       }
     }
-    if (word == null || word.isEmpty) return;
+    if (word == null || word.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('没有在上一条问题中识别到可添加的英文单词')),
+      );
+      return;
+    }
 
+    final targetWord = word;
     final aiAnswer = messages[index].text; // AI 的回答内容
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: Text('正在查询「$word」的释义...'),
+          content: Text('正在查询「$targetWord」的释义...'),
           duration: const Duration(seconds: 1)),
     );
 
-    final aiService = ref.read(aiChatServiceProvider);
-    aiService.explainWord(word).then((data) {
-      if (!mounted) return;
-      final meaning =
-          (data['meaning'] as String?) ?? _extractFirstLine(aiAnswer);
-      final example = (data['example'] as String?)?.isNotEmpty == true
+    Map<String, dynamic> data = const {};
+    try {
+      data = await ref.read(aiChatServiceProvider).explainWord(targetWord);
+    } catch (_) {
+      // AI enrichment is optional; the word can still be stored locally.
+    }
+
+    try {
+      final meaning = (data['meaning'] as String?)?.trim().isNotEmpty == true
+          ? data['meaning'] as String
+          : _extractFirstLine(aiAnswer);
+      final example = (data['example'] as String?)?.trim().isNotEmpty == true
           ? data['example'] as String
           : aiAnswer;
-      ref.read(wordListProvider.notifier).addWord(
+      await ref.read(wordListProvider.notifier).addWord(
             Word(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
               userId: 'local',
-              word: word!,
+              word: targetWord,
               meaning: meaning,
               phonetic: (data['phonetic'] as String?) ?? '',
               example: example,
@@ -211,30 +218,21 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
               createdAt: DateTime.now(),
             ),
           );
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-            content: Text('已加入单词本（含释义、音标、例句、搭配）'),
-            duration: Duration(seconds: 2)),
-      );
-    }).catchError((_) {
+      ref.invalidate(vocabularyStatsProvider);
+      ref.invalidate(dueReviewProvider);
       if (!mounted) return;
-      ref.read(wordListProvider.notifier).addWord(
-            Word(
-              id: DateTime.now().millisecondsSinceEpoch.toString(),
-              userId: 'local',
-              word: word!,
-              meaning: _extractFirstLine(aiAnswer),
-              example: aiAnswer,
-              source: 'ai_tutor',
-              createdAt: DateTime.now(),
-            ),
-          );
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-            content: Text('「$word」已加入单词本'),
-            duration: const Duration(seconds: 1)),
+          content: Text('「$targetWord」已加入单词本'),
+          duration: const Duration(seconds: 2),
+        ),
       );
-    });
+    } catch (error) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('添加失败：$error')),
+      );
+    }
   }
 
   /// 提取文本第一段纯文字作为简要释义

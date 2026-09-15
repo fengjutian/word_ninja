@@ -6,7 +6,6 @@ import 'package:go_router/go_router.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/app_theme/theme_data.dart';
 import 'package:ui_kit/app_theme/design_tokens.dart';
-import 'package:ui_kit/ui_kit.dart' show AppIcon;
 import 'package:vocabulary/presentation/pages/word_graph_page.dart';
 import 'package:vocabulary/presentation/pages/vocabulary_page.dart';
 import 'package:vocabulary/presentation/pages/word_detail_page.dart';
