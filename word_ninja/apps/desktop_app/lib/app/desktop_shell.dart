@@ -313,9 +313,6 @@ class _NavButton extends StatelessWidget {
         ),
       ),
     );
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 3),
-      child: expanded ? content : mt.Tooltip(message: label, child: content),
-    );
+    return Padding(padding: const EdgeInsets.only(bottom: 3), child: content);
   }
 }

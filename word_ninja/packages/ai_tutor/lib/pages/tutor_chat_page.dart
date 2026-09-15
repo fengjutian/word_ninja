@@ -290,6 +290,12 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   Widget build(BuildContext context) {
     final sessionsState = ref.watch(chatHistoryProvider);
     final messages = sessionsState.current.messages;
+    final visibleMessages = messages.indexed
+        .where((entry) =>
+            entry.$2.isLoading ||
+            entry.$2.isError ||
+            entry.$2.text.trim().isNotEmpty)
+        .toList(growable: false);
     final colors = context.appColors;
     final scheme = Theme.of(context).colorScheme;
 
@@ -304,7 +310,12 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
         onNew: _newAndClose,
       ),
       appBar: AppBar(
-        toolbarHeight: 62,
+        toolbarHeight: 72,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        backgroundColor: colors.sidebar,
+        surfaceTintColor: Colors.transparent,
+        shape: Border(bottom: BorderSide(color: colors.border)),
         leading: IconButton(
           icon: const Icon(PhosphorIconsRegular.sidebarSimple),
           tooltip: '会话记录',
@@ -365,13 +376,15 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
           Expanded(
             child: ListView.builder(
               controller: _scrollCtrl,
-              padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
-              itemCount: messages.length,
+              padding: const EdgeInsets.fromLTRB(32, 32, 32, 28),
+              itemCount: visibleMessages.length,
               itemBuilder: (ctx, i) {
-                final msg = messages[i];
+                final messageEntry = visibleMessages[i];
+                final messageIndex = messageEntry.$1;
+                final msg = messageEntry.$2;
                 return Center(
                   child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 920),
+                    constraints: const BoxConstraints(maxWidth: 880),
                     child: _MessageBubble(
                       msg,
                       onTap: msg.isUser
@@ -381,11 +394,15 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                                   offset: msg.text.length);
                             }
                           : null,
-                      onDelete: msg.isLoading ? null : () => _deleteMessage(i),
-                      onAddToVocab:
-                          !msg.isUser && !msg.isLoading && !msg.isError
-                              ? () => _addAiResponseToVocabulary(i, messages)
-                              : null,
+                      onDelete: msg.isLoading
+                          ? null
+                          : () => _deleteMessage(messageIndex),
+                      onAddToVocab: !msg.isUser &&
+                              !msg.isLoading &&
+                              !msg.isError
+                          ? () =>
+                              _addAiResponseToVocabulary(messageIndex, messages)
+                          : null,
                     ),
                   ),
                 );
@@ -393,22 +410,22 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
             ),
           ),
           Container(
-            padding: const EdgeInsets.fromLTRB(24, 10, 24, 18),
+            padding: const EdgeInsets.fromLTRB(32, 12, 32, 24),
             color: colors.canvas,
             child: SafeArea(
               child: Center(
                 child: ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 920),
+                  constraints: const BoxConstraints(maxWidth: 880),
                   child: Container(
                     decoration: BoxDecoration(
                       color: colors.sidebar,
                       border: Border.all(color: colors.border),
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(18),
                       boxShadow: const [
                         BoxShadow(
-                            color: Color(0x0A000000),
-                            blurRadius: 18,
-                            offset: Offset(0, 5))
+                            color: Color(0x10000000),
+                            blurRadius: 24,
+                            offset: Offset(0, 8))
                       ],
                     ),
                     child: TextField(

@@ -126,73 +126,127 @@ class _MessageBubble extends StatelessWidget {
   final VoidCallback? onDelete;
   final VoidCallback? onAddToVocab;
 
-  const _MessageBubble(this.message,
-      {this.onTap, this.onDelete, this.onAddToVocab});
+  const _MessageBubble(
+    this.message, {
+    this.onTap,
+    this.onDelete,
+    this.onAddToVocab,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
     final scheme = Theme.of(context).colorScheme;
-    final bgColor = message.isError
-        ? AppColors.error.withValues(alpha: 0.1)
+    final background = message.isError
+        ? AppColors.error.withValues(alpha: 0.08)
         : message.isUser
-            ? colors.subtleSurface
-            : Colors.transparent;
+            ? scheme.primary.withValues(alpha: 0.10)
+            : colors.sidebar;
     final textColor = message.isError ? AppColors.error : scheme.onSurface;
 
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: BoxConstraints(maxWidth: message.isUser ? 620 : 780),
-        margin: const EdgeInsets.only(bottom: 20),
+        constraints: BoxConstraints(maxWidth: message.isUser ? 560 : 760),
+        margin: const EdgeInsets.only(bottom: 24),
         child: GestureDetector(
           onTap: onTap,
           onLongPress: onDelete,
           child: Container(
             padding: message.isUser
-                ? const EdgeInsets.symmetric(horizontal: 14, vertical: 10)
-                : const EdgeInsets.symmetric(vertical: 4),
+                ? const EdgeInsets.symmetric(horizontal: 16, vertical: 12)
+                : const EdgeInsets.fromLTRB(18, 16, 18, 14),
             decoration: BoxDecoration(
-              color: bgColor,
-              borderRadius: BorderRadius.circular(12),
+              color: background,
+              borderRadius: message.isUser
+                  ? const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(5),
+                      bottomLeft: Radius.circular(16),
+                      bottomRight: Radius.circular(16),
+                    )
+                  : BorderRadius.circular(16),
               border: message.isError
                   ? Border.all(color: AppColors.error.withValues(alpha: 0.3))
-                  : null,
+                  : message.isUser
+                      ? null
+                      : Border.all(color: colors.border),
+              boxShadow: message.isUser
+                  ? null
+                  : const [
+                      BoxShadow(
+                        color: Color(0x08000000),
+                        blurRadius: 12,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
             ),
             child: message.isLoading
-                ? Row(mainAxisSize: MainAxisSize.min, children: [
-                    const SizedBox(
+                ? Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const SizedBox(
                         width: 16,
                         height: 16,
-                        child: CircularProgressIndicator(strokeWidth: 2)),
-                    const SizedBox(width: 8),
-                    Text(message.text,
-                        style: TextStyle(color: textColor, fontSize: 15)),
-                  ])
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        message.text,
+                        style: TextStyle(color: textColor, fontSize: 14),
+                      ),
+                    ],
+                  )
                 : message.isUser
-                    ? Text(message.text,
-                        style: TextStyle(color: textColor, fontSize: 15))
+                    ? Text(
+                        message.text,
+                        style: TextStyle(
+                          color: textColor,
+                          fontSize: 15,
+                          height: 1.5,
+                        ),
+                      )
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Row(children: [
-                            Icon(PhosphorIconsRegular.sparkle,
-                                size: 14, color: scheme.primary),
-                            const SizedBox(width: 7),
-                            Text('WordFlow',
+                          Row(
+                            children: [
+                              Container(
+                                width: 28,
+                                height: 28,
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  color: scheme.primaryContainer,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Icon(
+                                  PhosphorIconsRegular.sparkle,
+                                  size: 14,
+                                  color: scheme.primary,
+                                ),
+                              ),
+                              const SizedBox(width: 9),
+                              Text(
+                                'WordFlow AI',
                                 style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: colors.mutedText)),
-                          ]),
-                          const SizedBox(height: 8),
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w700,
+                                  color: colors.mutedText,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 12),
                           MarkdownBody(
                             data: message.text,
                             selectable: true,
                             styleSheet: MarkdownStyleSheet(
                               p: TextStyle(
-                                  color: textColor, fontSize: 14, height: 1.65),
+                                color: textColor,
+                                fontSize: 15,
+                                height: 1.7,
+                              ),
                               code: TextStyle(
                                 color: AppColors.accentPurple,
                                 backgroundColor: AppColors.background,
@@ -204,25 +258,26 @@ class _MessageBubble extends StatelessWidget {
                               ),
                             ),
                           ),
-                          if (onAddToVocab != null)
-                            GestureDetector(
-                              onTap: onAddToVocab,
-                              child: Padding(
-                                padding: const EdgeInsets.only(top: 6),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(PhosphorIconsRegular.bookmarkSimple,
-                                        size: 12, color: scheme.primary),
-                                    const SizedBox(width: 2),
-                                    Text('加入单词本',
-                                        style: TextStyle(
-                                            fontSize: 11,
-                                            color: scheme.primary)),
-                                  ],
+                          if (onAddToVocab != null) ...[
+                            const SizedBox(height: 10),
+                            Divider(height: 1, color: colors.border),
+                            const SizedBox(height: 8),
+                            TextButton.icon(
+                              onPressed: onAddToVocab,
+                              icon: const Icon(
+                                PhosphorIconsRegular.bookmarkSimple,
+                                size: 14,
+                              ),
+                              label: const Text('加入单词本'),
+                              style: TextButton.styleFrom(
+                                visualDensity: VisualDensity.compact,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 6,
                                 ),
                               ),
                             ),
+                          ],
                         ],
                       ),
           ),
