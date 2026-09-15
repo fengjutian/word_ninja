@@ -276,7 +276,7 @@ class _NavButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tokens = context.appColors;
-    final primary = Theme.of(context).colorScheme.primary;
+    final primary = mt.Theme.of(context).colorScheme.primary;
     final content = mt.InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
@@ -306,7 +306,7 @@ class _NavButton extends StatelessWidget {
                     fontWeight: selected ? FontWeight.w600 : FontWeight.w400,
                     color: selected
                         ? primary
-                        : Theme.of(context).colorScheme.onSurface,
+                              : mt.Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
               ),
