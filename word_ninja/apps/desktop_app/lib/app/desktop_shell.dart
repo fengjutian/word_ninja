@@ -1,13 +1,21 @@
 part of 'desktop_app.dart';
 
-class DesktopShell extends StatelessWidget {
+class DesktopShell extends StatefulWidget {
   final Widget child;
   const DesktopShell({super.key, required this.child});
+
+  @override
+  State<DesktopShell> createState() => _DesktopShellState();
+}
+
+class _DesktopShellState extends State<DesktopShell> {
+  final _navigationKey = GlobalKey<NavigationViewState>();
 
   @override
   Widget build(BuildContext context) {
     final isDark = FluentTheme.of(context).brightness == Brightness.dark;
     return NavigationView(
+      key: _navigationKey,
       titleBar: _buildTitleBar(context, isDark),
       paneBodyBuilder: (item, body) {
         return mt.Theme(
@@ -17,14 +25,15 @@ class DesktopShell extends StatelessWidget {
           ),
           child: Builder(
             builder: (ctx) =>
-                mt.Material(child: mt.ScaffoldMessenger(child: child)),
+                mt.Material(child: mt.ScaffoldMessenger(child: widget.child)),
           ),
         );
       },
       pane: NavigationPane(
         selected: _calcIndex(context),
         onChanged: (i) => _navigate(context, i),
-        displayMode: PaneDisplayMode.auto,
+        displayMode: PaneDisplayMode.compact,
+        toggleButton: null,
         header: Padding(
           padding: const EdgeInsets.fromLTRB(12, 14, 12, 10),
           child: Text(
@@ -117,7 +126,9 @@ class DesktopShell extends StatelessWidget {
               padding: const EdgeInsets.only(left: 8),
               child: Row(
                 children: [
-                  const PaneToggleButton(),
+                  PaneToggleButton(
+                    onPressed: () => _navigationKey.currentState?.togglePane(),
+                  ),
                   const SizedBox(width: 4),
                   Container(
                     width: 22,
