@@ -131,20 +131,6 @@ func (h *Handler) Graph(c *gin.Context) {
 	c.JSON(http.StatusOK, result)
 }
 
-// Leaderboard 获取排行榜
-func (h *Handler) Leaderboard(c *gin.Context) {
-	limit := 20
-	if l, err := strconv.Atoi(c.DefaultQuery("limit", "20")); err == nil && l > 0 && l <= 100 {
-		limit = l
-	}
-	entries, err := GetLeaderboard(h.DB, limit)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "获取排行榜失败"})
-		return
-	}
-	c.JSON(http.StatusOK, gin.H{"data": entries})
-}
-
 // ─── Study Plan ───
 
 // ListPlans 获取学习计划列表

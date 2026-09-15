@@ -57,9 +57,4 @@ class ApiClient {
     return res.data as Map<String, dynamic>;
   }
 
-  // ─── Leaderboard ───
-  Future<List<dynamic>> getLeaderboard(String range) async {
-    final res = await _client.get('/api/v1/leaderboard', queryParameters: {'range': range});
-    return res.data['data'] as List<dynamic>;
-  }
 }

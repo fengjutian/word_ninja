@@ -35,7 +35,6 @@ func main() {
 		&auth.User{},
 		&vocabulary.Word{},
 		&vocabulary.Review{},
-		&vocabulary.Achievement{},
 		&vocabulary.StudyPlan{},
 		&vocabulary.ChatMessage{},
 		&vocabulary.Membership{},
@@ -117,9 +116,6 @@ func main() {
 	r.GET("/health", func(c *gin.Context) {
 		c.JSON(200, gin.H{"status": "ok", "service": "word-ninja"})
 	})
-
-	// 排行榜（公开）
-	r.GET("/api/v1/leaderboard", vocabHandler.Leaderboard)
 
 	// ─── 启动服务器 ───
 	srv := &http.Server{

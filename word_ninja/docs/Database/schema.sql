@@ -40,19 +40,6 @@ CREATE TABLE word_reviews (
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
--- 成就表
-CREATE TABLE achievements (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
-    type VARCHAR(50) NOT NULL,
-    title VARCHAR(200) NOT NULL,
-    progress INTEGER DEFAULT 0,
-    target INTEGER NOT NULL,
-    is_unlocked BOOLEAN DEFAULT FALSE,
-    unlocked_at TIMESTAMPTZ,
-    created_at TIMESTAMPTZ DEFAULT NOW()
-);
-
 -- 学习计划表
 CREATE TABLE study_plans (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),

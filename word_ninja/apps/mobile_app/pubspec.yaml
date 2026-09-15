@@ -35,10 +35,6 @@ dependencies:
     path: ../../packages/writing
   study_plan:
     path: ../../packages/study_plan
-  shop:
-    path: ../../packages/shop
-  leaderboard:
-    path: ../../packages/leaderboard
   profile:
     path: ../../packages/profile
   sync:

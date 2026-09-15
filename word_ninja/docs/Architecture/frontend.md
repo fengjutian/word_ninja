@@ -31,9 +31,6 @@ mobile_app
   ├─ speaking    → core + ui_kit
   ├─ writing     → core + ui_kit + ai
   ├─ study_plan  → core + ai
-  ├─ achievement → core + ui_kit
-  ├─ shop        → core + ui_kit
-  ├─ leaderboard → core + ui_kit
   ├─ profile     → core + ui_kit
   ├─ sync        → core
   └─ common_widgets → core + ui_kit

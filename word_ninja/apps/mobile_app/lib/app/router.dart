@@ -17,8 +17,6 @@ import 'package:speaking/presentation/pages/speaking_page.dart';
 import 'package:writing/presentation/pages/writing_page.dart';
 import 'package:ai_tutor/pages/tutor_chat_page.dart';
 import 'package:study_plan/pages/study_plan_page.dart';
-import 'package:shop/pages/shop_page.dart';
-import 'package:leaderboard/pages/leaderboard_page.dart';
 import 'package:profile/pages/profile_page.dart';
 import 'package:profile/pages/settings_page.dart';
 import 'package:profile/pages/membership_page.dart';
@@ -43,8 +41,6 @@ class AppRoutes {
   static const String writing = '/writing';
   static const String aiTutor = '/ai-tutor';
   static const String studyPlan = '/study-plan';
-  static const String shop = '/shop';
-  static const String leaderboard = '/leaderboard';
   static const String profile = '/profile';
   static const String settings = '/settings';
   static const String membership = '/membership';
@@ -244,20 +240,6 @@ GoRouter createRouter() {
         ),
       ),
       GoRoute(
-        path: AppRoutes.shop,
-        pageBuilder: (ctx, state) => _slideInFromRight(
-          key: state.pageKey,
-          child: const ShopPage(),
-        ),
-      ),
-      GoRoute(
-        path: AppRoutes.leaderboard,
-        pageBuilder: (ctx, state) => _slideInFromRight(
-          key: state.pageKey,
-          child: const LeaderboardPage(),
-        ),
-      ),
-      GoRoute(
         path: AppRoutes.settings,
         pageBuilder: (ctx, state) => _slideInFromRight(
           key: state.pageKey,
@@ -290,13 +272,6 @@ class _HomeTab extends StatelessWidget {
             Text('Word Ninja'),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(PhosphorIconsRegular.medal),
-            tooltip: '排行榜',
-            onPressed: () => context.push(AppRoutes.leaderboard),
-          ),
-        ],
       ),
       body: ListView(
         padding: const EdgeInsets.all(NinjaSpacing.lg),
@@ -341,7 +316,6 @@ class _HomeTab extends StatelessWidget {
               _QuickChip('AI导师', NinjaIcon.chatBubble(size: 16, color: NinjaColors.primary), AppRoutes.aiTutor),
               _QuickChip('网页', const Icon(PhosphorIconsRegular.globe, size: 16, color: NinjaColors.primary), AppRoutes.webReader),
               _QuickChip('计划', NinjaIcon.calendar(size: 16, color: NinjaColors.primary), AppRoutes.studyPlan),
-              _QuickChip('商店', NinjaIcon.coin(size: 16, color: NinjaColors.primary), AppRoutes.shop),
             ],
           ),
         ],

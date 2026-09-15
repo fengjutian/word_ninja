@@ -36,4 +36,3 @@
 | GET | /users/me | 当前用户信息 |
 | PUT | /users/me | 更新资料 |
 | GET | /users/me/stats | 学习统计 |
-| GET | /users/me/achievements | 成就列表 |
