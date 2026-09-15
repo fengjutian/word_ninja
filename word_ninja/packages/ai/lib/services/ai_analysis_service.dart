@@ -18,9 +18,7 @@ class AiAnalysisService {
     final sessionCount = (await _repo.getAllSessions()).length;
 
     // 2. 构建 prompt
-    final wordList = topWords
-        .map((w) => '${w.word}(${w.count}次)')
-        .join('、');
+    final wordList = topWords.map((w) => '${w.word}(${w.count}次)').join('、');
 
     final prompt = '''
 你是英语学习分析专家。以下是用户近 $days 天的学习数据：
@@ -42,9 +40,10 @@ class AiAnalysisService {
   /// 快速洞察：一句话总结
   Future<String> quickInsight() async {
     final tops = await _repo.topWords(limit: 5);
-    if (tops.isEmpty) return '还没有足够的数据，快去跟 Sensei 聊聊天吧！';
+    if (tops.isEmpty) return '还没有足够的数据，快去跟 Tutor 聊聊天吧！';
 
-    final prompt = '用户最近最常问的词是：${tops.map((w) => w.word).join('、')}。用一句话（15字以内）幽默地评价用户的学习偏好。';
+    final prompt =
+        '用户最近最常问的词是：${tops.map((w) => w.word).join('、')}。用一句话（15字以内）幽默地评价用户的学习偏好。';
     return _ai.chat(message: prompt, systemPrompt: '你是幽默的英语学习助手，回复极简。');
   }
 
@@ -56,9 +55,7 @@ class AiAnalysisService {
     final topWords = await _repo.userWordFrequency(days: days, limit: 20);
     if (topWords.isEmpty) return [];
 
-    final wordList = topWords
-        .map((w) => '${w.word}(查询${w.count}次)')
-        .join('、');
+    final wordList = topWords.map((w) => '${w.word}(查询${w.count}次)').join('、');
 
     final prompt = '''
 你是英语学习分析专家。以下是用户近 $days 天高频查询的词汇：

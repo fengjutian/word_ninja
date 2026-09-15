@@ -20,7 +20,10 @@ String generateId() {
 /// 计算连续学习天数
 int calculateStreak(List<DateTime> dates) {
   if (dates.isEmpty) return 0;
-  final sorted = dates.map((d) => DateTime(d.year, d.month, d.day)).toSet().toList()
+  final sorted = dates
+      .map((d) => DateTime(d.year, d.month, d.day))
+      .toSet()
+      .toList()
     ..sort((a, b) => b.compareTo(a));
 
   int streak = 1;

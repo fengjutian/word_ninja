@@ -1,7 +1,7 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:ai/providers/ai_providers.dart';
@@ -47,18 +47,60 @@ class _Article {
 
 /// 内置文章数据（作为离线后备）
 const _defaultArticles = [
-  _Article(title: 'The Art of Learning', level: 'N2', wordCount: 328, source: 'AI生成', topic: 'learning', category: _ReadingCategory.all,
-      content: 'Learning is a lifelong journey. Every day presents new opportunities to grow and develop our skills...'),
-  _Article(title: 'Technology Trends', level: 'N3', wordCount: 512, source: '新闻', topic: 'technology', category: _ReadingCategory.news,
-      content: 'The world of technology is rapidly evolving. From artificial intelligence to quantum computing...'),
-  _Article(title: 'A Journey Through Time', level: 'N2', wordCount: 420, source: 'AI生成', topic: 'time travel', category: _ReadingCategory.fiction,
-      content: 'The old clock tower struck midnight as Sarah stepped through the ancient doorway...'),
-  _Article(title: 'The Future of AI', level: 'N3', wordCount: 450, source: '科技', topic: 'artificial intelligence', category: _ReadingCategory.tech,
-      content: 'Artificial intelligence has transformed the way we live and work...'),
-  _Article(title: 'Chinese Tea Culture', level: 'N1', wordCount: 380, source: '文化', topic: 'tea culture', category: _ReadingCategory.culture,
-      content: 'Tea has been an integral part of Chinese culture for thousands of years...'),
-  _Article(title: 'How to Study Effectively', level: 'N4', wordCount: 280, source: '教育', topic: 'study methods', category: _ReadingCategory.education,
-      content: 'Effective study habits are essential for academic success. Research shows that...'),
+  _Article(
+      title: 'The Art of Learning',
+      level: 'N2',
+      wordCount: 328,
+      source: 'AI生成',
+      topic: 'learning',
+      category: _ReadingCategory.all,
+      content:
+          'Learning is a lifelong journey. Every day presents new opportunities to grow and develop our skills...'),
+  _Article(
+      title: 'Technology Trends',
+      level: 'N3',
+      wordCount: 512,
+      source: '新闻',
+      topic: 'technology',
+      category: _ReadingCategory.news,
+      content:
+          'The world of technology is rapidly evolving. From artificial intelligence to quantum computing...'),
+  _Article(
+      title: 'A Journey Through Time',
+      level: 'N2',
+      wordCount: 420,
+      source: 'AI生成',
+      topic: 'time travel',
+      category: _ReadingCategory.fiction,
+      content:
+          'The old clock tower struck midnight as Sarah stepped through the ancient doorway...'),
+  _Article(
+      title: 'The Future of AI',
+      level: 'N3',
+      wordCount: 450,
+      source: '科技',
+      topic: 'artificial intelligence',
+      category: _ReadingCategory.tech,
+      content:
+          'Artificial intelligence has transformed the way we live and work...'),
+  _Article(
+      title: 'Chinese Tea Culture',
+      level: 'N1',
+      wordCount: 380,
+      source: '文化',
+      topic: 'tea culture',
+      category: _ReadingCategory.culture,
+      content:
+          'Tea has been an integral part of Chinese culture for thousands of years...'),
+  _Article(
+      title: 'How to Study Effectively',
+      level: 'N4',
+      wordCount: 280,
+      source: '教育',
+      topic: 'study methods',
+      category: _ReadingCategory.education,
+      content:
+          'Effective study habits are essential for academic success. Research shows that...'),
 ];
 
 /// 阅读主页
@@ -114,59 +156,75 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : ListView(
-              padding: const EdgeInsets.all(NinjaSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               children: [
-                Text('今日推荐', style: NinjaTextStyles.heading2),
-                const SizedBox(height: NinjaSpacing.md),
+                Text('今日推荐', style: AppTextStyles.heading2),
+                const SizedBox(height: AppSpacing.md),
                 if (articles.isNotEmpty)
-                  _ArticleCard(article: articles.first, onTap: () => _openArticle(articles.first))
+                  _ArticleCard(
+                      article: articles.first,
+                      onTap: () => _openArticle(articles.first))
                 else
                   Card(
                     child: Padding(
-                      padding: const EdgeInsets.all(NinjaSpacing.xl),
-                      child: Center(child: Text('暂无文章', style: NinjaTextStyles.bodyLarge)),
+                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      child: Center(
+                          child: Text('暂无文章', style: AppTextStyles.bodyLarge)),
                     ),
                   ),
-                const SizedBox(height: NinjaSpacing.lg),
-                Text('分类阅读', style: NinjaTextStyles.heading2),
-                const SizedBox(height: NinjaSpacing.md),
+                const SizedBox(height: AppSpacing.lg),
+                Text('分类阅读', style: AppTextStyles.heading2),
+                const SizedBox(height: AppSpacing.md),
                 Wrap(
-                  spacing: NinjaSpacing.sm,
-                  runSpacing: NinjaSpacing.sm,
+                  spacing: AppSpacing.sm,
+                  runSpacing: AppSpacing.sm,
                   children: _ReadingCategory.values.map((cat) {
                     final meta = _categoryMeta[cat]!;
                     final isSelected = cat == _selectedCategory;
                     return ActionChip(
                       avatar: Icon(
-                        isSelected ? PhosphorIconsRegular.checkCircle : PhosphorIconsRegular.circle,
+                        isSelected
+                            ? PhosphorIconsRegular.checkCircle
+                            : PhosphorIconsRegular.circle,
                         size: 16,
-                        color: isSelected ? NinjaColors.primary : NinjaColors.textSecondary,
+                        color: isSelected
+                            ? AppColors.primary
+                            : AppColors.textSecondary,
                       ),
                       label: Text(meta.$1),
                       onPressed: () => setState(() => _selectedCategory = cat),
-                      backgroundColor: isSelected ? NinjaColors.primary.withValues(alpha: 0.08) : null,
-                      side: isSelected ? const BorderSide(color: NinjaColors.primary) : null,
+                      backgroundColor: isSelected
+                          ? AppColors.primary.withValues(alpha: 0.08)
+                          : null,
+                      side: isSelected
+                          ? const BorderSide(color: AppColors.primary)
+                          : null,
                     );
                   }).toList(),
                 ),
-                const SizedBox(height: NinjaSpacing.lg),
+                const SizedBox(height: AppSpacing.lg),
                 if (articles.length > 1) ...[
-                  Text('更多文章', style: NinjaTextStyles.heading2),
-                  const SizedBox(height: NinjaSpacing.md),
-                  ...articles.skip(1).map((a) => _ArticleCard(article: a, onTap: () => _openArticle(a))),
+                  Text('更多文章', style: AppTextStyles.heading2),
+                  const SizedBox(height: AppSpacing.md),
+                  ...articles.skip(1).map((a) =>
+                      _ArticleCard(article: a, onTap: () => _openArticle(a))),
                 ],
-                const SizedBox(height: NinjaSpacing.lg),
-                Text('导入阅读', style: NinjaTextStyles.heading2),
-                const SizedBox(height: NinjaSpacing.md),
+                const SizedBox(height: AppSpacing.lg),
+                Text('导入阅读', style: AppTextStyles.heading2),
+                const SizedBox(height: AppSpacing.md),
                 Row(
                   children: [
-                    _ImportButton('PDF', PhosphorIconsRegular.filePdf, onTap: () => _importFile('pdf')),
-                    const SizedBox(width: NinjaSpacing.md),
-                    _ImportButton('EPUB', PhosphorIconsRegular.book, onTap: () => _importFile('epub')),
-                    const SizedBox(width: NinjaSpacing.md),
-                    _ImportButton('TXT', PhosphorIconsRegular.fileText, onTap: () => _importFile('txt')),
-                    const SizedBox(width: NinjaSpacing.md),
-                    _ImportButton('网页', PhosphorIconsRegular.browser, onTap: _showUrlImportDialog),
+                    _ImportButton('PDF', PhosphorIconsRegular.filePdf,
+                        onTap: () => _importFile('pdf')),
+                    const SizedBox(width: AppSpacing.md),
+                    _ImportButton('EPUB', PhosphorIconsRegular.book,
+                        onTap: () => _importFile('epub')),
+                    const SizedBox(width: AppSpacing.md),
+                    _ImportButton('TXT', PhosphorIconsRegular.fileText,
+                        onTap: () => _importFile('txt')),
+                    const SizedBox(width: AppSpacing.md),
+                    _ImportButton('网页', PhosphorIconsRegular.browser,
+                        onTap: _showUrlImportDialog),
                   ],
                 ),
               ],
@@ -192,22 +250,28 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
                   hintText: '例如: climate change, cooking, travel...',
                 ),
               ),
-              const SizedBox(height: NinjaSpacing.lg),
+              const SizedBox(height: AppSpacing.lg),
               Row(
                 children: [
                   const Text('难度等级: '),
-                  const SizedBox(width: NinjaSpacing.sm),
+                  const SizedBox(width: AppSpacing.sm),
                   DropdownButton<int>(
                     value: selectedLevel,
-                    items: List.generate(5, (i) => DropdownMenuItem(value: i + 1, child: Text('N${i + 1}'))),
-                    onChanged: (v) { if (v != null) setDialogState(() => selectedLevel = v); },
+                    items: List.generate(
+                        5,
+                        (i) => DropdownMenuItem(
+                            value: i + 1, child: Text('N${i + 1}'))),
+                    onChanged: (v) {
+                      if (v != null) setDialogState(() => selectedLevel = v);
+                    },
                   ),
                 ],
               ),
             ],
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+            TextButton(
+                onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
             FilledButton(
               onPressed: () {
                 final topic = topicController.text.trim();
@@ -226,7 +290,9 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
   Future<void> _generateArticle(String topic, int level) async {
     setState(() => _isLoading = true);
     try {
-      final content = await ref.read(aiReadingServiceProvider).generateArticle(topic: topic, level: level);
+      final content = await ref
+          .read(aiReadingServiceProvider)
+          .generateArticle(topic: topic, level: level);
       final article = _Article(
         title: topic,
         level: 'N$level',
@@ -242,7 +308,8 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('AI 文章已生成'), duration: Duration(seconds: 1)),
+          const SnackBar(
+              content: Text('AI 文章已生成'), duration: Duration(seconds: 1)),
         );
       }
     } catch (e) {
@@ -263,7 +330,11 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
 
   Future<void> _importFile(String format) async {
     try {
-      final extensions = format == 'pdf' ? ['pdf'] : format == 'epub' ? ['epub'] : ['txt'];
+      final extensions = format == 'pdf'
+          ? ['pdf']
+          : format == 'epub'
+              ? ['epub']
+              : ['txt'];
       final result = await FilePicker.pickFiles(
         type: FileType.custom,
         allowedExtensions: extensions,
@@ -296,7 +367,8 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       final article = _Article(
         title: rawName,
         level: 'N3',
-        wordCount: content.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length,
+        wordCount:
+            content.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length,
         source: '导入',
         topic: rawName,
         category: _ReadingCategory.all,
@@ -305,7 +377,9 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       setState(() => _articles = [article, ..._articles]);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('已导入: $rawName (${format.toUpperCase()})'), duration: const Duration(seconds: 2)),
+          SnackBar(
+              content: Text('已导入: $rawName (${format.toUpperCase()})'),
+              duration: const Duration(seconds: 2)),
         );
       }
     } catch (e) {
@@ -335,7 +409,9 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
           if (codeUnit > 31 && codeUnit < 127) chars.add(codeUnit);
         }
         if (chars.isNotEmpty) buf.writeln(String.fromCharCodes(chars));
-      } catch (e) { log.w('PDF hex decode failed', e); }
+      } catch (e) {
+        log.w('PDF hex decode failed', e);
+      }
     }
     return buf.toString().trim();
   }
@@ -343,7 +419,9 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
   String _extractEpubText(List<int> bytes) {
     final archive = ZipDecoder().decodeBytes(bytes);
     final xhtmlFiles = archive.files.where((f) =>
-        f.name.endsWith('.xhtml') || f.name.endsWith('.html') || f.name.endsWith('.htm'));
+        f.name.endsWith('.xhtml') ||
+        f.name.endsWith('.html') ||
+        f.name.endsWith('.htm'));
     final buf = StringBuffer();
     for (final file in xhtmlFiles) {
       final content = utf8.decode(file.content as List<int>);
@@ -373,7 +451,8 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
           autofocus: true,
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx), child: const Text('取消')),
           FilledButton(
             onPressed: () {
               final url = urlController.text.trim();
@@ -396,7 +475,8 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
         throw Exception('无效的网址');
       }
       final response = await http.get(uri, headers: const {
-        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+        'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
       }).timeout(const Duration(seconds: 15));
 
       if (response.statusCode != 200) {
@@ -411,8 +491,12 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       }
 
       // Derive a title from the HTML <title> or fall back to the URL host+path
-      final titleMatch = RegExp(r'<title[^>]*>(.*?)</title>', caseSensitive: false, dotAll: true).firstMatch(html);
-      final title = titleMatch?.group(1)?.trim().replaceAll(RegExp(r'\s+'), ' ') ?? uri.host;
+      final titleMatch = RegExp(r'<title[^>]*>(.*?)</title>',
+              caseSensitive: false, dotAll: true)
+          .firstMatch(html);
+      final title =
+          titleMatch?.group(1)?.trim().replaceAll(RegExp(r'\s+'), ' ') ??
+              uri.host;
 
       final article = _Article(
         title: title,
@@ -429,7 +513,9 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('已读取: $title'), duration: const Duration(seconds: 2)),
+          SnackBar(
+              content: Text('已读取: $title'),
+              duration: const Duration(seconds: 2)),
         );
       }
     } catch (e) {
@@ -445,10 +531,22 @@ class _ReaderPageState extends ConsumerState<ReaderPage> {
   String _extractHtmlText(String html) {
     // Remove scripts, styles, and head elements
     var cleaned = html
-        .replaceAll(RegExp(r'<script[^>]*>.*?</script>', caseSensitive: false, dotAll: true), ' ')
-        .replaceAll(RegExp(r'<style[^>]*>.*?</style>', caseSensitive: false, dotAll: true), ' ')
-        .replaceAll(RegExp(r'<head[^>]*>.*?</head>', caseSensitive: false, dotAll: true), ' ')
-        .replaceAll(RegExp(r'<noscript[^>]*>.*?</noscript>', caseSensitive: false, dotAll: true), ' ');
+        .replaceAll(
+            RegExp(r'<script[^>]*>.*?</script>',
+                caseSensitive: false, dotAll: true),
+            ' ')
+        .replaceAll(
+            RegExp(r'<style[^>]*>.*?</style>',
+                caseSensitive: false, dotAll: true),
+            ' ')
+        .replaceAll(
+            RegExp(r'<head[^>]*>.*?</head>',
+                caseSensitive: false, dotAll: true),
+            ' ')
+        .replaceAll(
+            RegExp(r'<noscript[^>]*>.*?</noscript>',
+                caseSensitive: false, dotAll: true),
+            ' ');
     // Replace common block elements with line breaks
     cleaned = cleaned
         .replaceAll(RegExp(r'<(?:br|hr)\s*/?>', caseSensitive: false), '\n')
@@ -491,7 +589,6 @@ class _ArticleReaderView extends StatefulWidget {
   State<_ArticleReaderView> createState() => _ArticleReaderViewState();
 }
 
-
 class _ArticleReaderViewState extends State<_ArticleReaderView> {
   OverlayEntry? _popupOverlay;
   String _selectedText = '';
@@ -529,36 +626,38 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
             elevation: 0,
             color: Colors.transparent,
             child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              TranslatePopup(
-                word: word,
-                onAddToVocabulary: (meaning, example, phonetic) {
-                  ref.read(wordListProvider.notifier).addWord(
-                    Word(
-                      id: DateTime.now().millisecondsSinceEpoch.toString(),
-                      userId: 'local',
-                      word: word,
-                      meaning: meaning.isNotEmpty ? meaning : '待补充',
-                      phonetic: phonetic,
-                      example: example,
-                      source: 'reading',
-                      createdAt: DateTime.now(),
-                    ),
-                  );
-                  _removePopup();
-                },
-              ),
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: _removePopup,
-                  child: const Text('关闭'),
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                TranslatePopup(
+                  word: word,
+                  onAddToVocabulary: (meaning, example, phonetic) {
+                    ref.read(wordListProvider.notifier).addWord(
+                          Word(
+                            id: DateTime.now()
+                                .millisecondsSinceEpoch
+                                .toString(),
+                            userId: 'local',
+                            word: word,
+                            meaning: meaning.isNotEmpty ? meaning : '待补充',
+                            phonetic: phonetic,
+                            example: example,
+                            source: 'reading',
+                            createdAt: DateTime.now(),
+                          ),
+                        );
+                    _removePopup();
+                  },
                 ),
-              ),
-            ],
-          ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _removePopup,
+                    child: const Text('关闭'),
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
@@ -574,25 +673,31 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
     return Scaffold(
       appBar: AppBar(title: Text(widget.article.title)),
       body: ListView(
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           Row(
             children: [
-              Chip(label: Text(widget.article.level, style: const TextStyle(fontSize: 11))),
-              const SizedBox(width: NinjaSpacing.sm),
-              Flexible(child: Text('${widget.article.wordCount} 词 · ${widget.article.source}', style: NinjaTextStyles.caption)),
+              Chip(
+                  label: Text(widget.article.level,
+                      style: const TextStyle(fontSize: 11))),
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(
+                  child: Text(
+                      '${widget.article.wordCount} 词 · ${widget.article.source}',
+                      style: AppTextStyles.caption)),
             ],
           ),
-          const SizedBox(height: NinjaSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
           SelectableText(
             content,
-            style: NinjaTextStyles.bodyLarge,
+            style: AppTextStyles.bodyLarge,
             contextMenuBuilder: (menuContext, editableTextState) {
               // Get the selected text
               final selection = editableTextState.textEditingValue.selection;
               String selected;
               if (selection.isValid && !selection.isCollapsed) {
-                selected = selection.textInside(editableTextState.textEditingValue.text);
+                selected = selection
+                    .textInside(editableTextState.textEditingValue.text);
               } else {
                 selected = '';
               }
@@ -622,21 +727,21 @@ class _ArticleReaderViewState extends State<_ArticleReaderView> {
               );
             },
           ),
-          const SizedBox(height: NinjaSpacing.xl),
+          const SizedBox(height: AppSpacing.xl),
           // 操作提示
           Container(
-            padding: const EdgeInsets.all(NinjaSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: NinjaColors.info.withValues(alpha: 0.08),
-              borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+              color: AppColors.info.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
             ),
             child: const Row(
               children: [
-                Icon(PhosphorIconsRegular.handTap, color: NinjaColors.info),
-                SizedBox(width: NinjaSpacing.sm),
+                Icon(PhosphorIconsRegular.handTap, color: AppColors.info),
+                SizedBox(width: AppSpacing.sm),
                 Expanded(
                   child: Text('选中文字后可查看翻译、加入单词本、AI解析',
-                      style: TextStyle(fontSize: 12, color: NinjaColors.info)),
+                      style: TextStyle(fontSize: 12, color: AppColors.info)),
                 ),
               ],
             ),
@@ -656,22 +761,24 @@ class _ArticleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: ListTile(
-        contentPadding: const EdgeInsets.all(NinjaSpacing.lg),
-        title: Text(article.title, style: NinjaTextStyles.heading3),
+        contentPadding: const EdgeInsets.all(AppSpacing.lg),
+        title: Text(article.title, style: AppTextStyles.heading3),
         subtitle: Padding(
-          padding: const EdgeInsets.only(top: NinjaSpacing.sm),
+          padding: const EdgeInsets.only(top: AppSpacing.sm),
           child: Row(
             children: [
               Chip(
-                label: Text(article.level, style: const TextStyle(fontSize: 11)),
-                backgroundColor: NinjaColors.primary.withValues(alpha: 0.08),
+                label:
+                    Text(article.level, style: const TextStyle(fontSize: 11)),
+                backgroundColor: AppColors.primary.withValues(alpha: 0.08),
               ),
-              const SizedBox(width: NinjaSpacing.sm),
-              Text('${article.wordCount} 词', style: NinjaTextStyles.bodySmall),
-              const SizedBox(width: NinjaSpacing.sm),
-              Flexible(child: Text(article.source, style: NinjaTextStyles.caption)),
+              const SizedBox(width: AppSpacing.sm),
+              Text('${article.wordCount} 词', style: AppTextStyles.bodySmall),
+              const SizedBox(width: AppSpacing.sm),
+              Flexible(
+                  child: Text(article.source, style: AppTextStyles.caption)),
             ],
           ),
         ),

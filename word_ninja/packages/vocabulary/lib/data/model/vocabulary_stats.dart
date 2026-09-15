@@ -15,8 +15,7 @@ class VocabularyStats {
   });
 
   /// 掌握率
-  double get masteryRate =>
-      totalWords > 0 ? masteredWords / totalWords : 0.0;
+  double get masteryRate => totalWords > 0 ? masteredWords / totalWords : 0.0;
 
   /// 待复习数
   int get dueReviewCount => todayReview;

@@ -20,8 +20,8 @@ import 'package:study_plan/pages/study_plan_page.dart';
 import 'package:profile/pages/profile_page.dart';
 import 'package:profile/pages/settings_page.dart';
 import 'package:profile/pages/membership_page.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
-import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
+import 'package:ui_kit/app_theme/app_theme.dart';
+import 'package:ui_kit/ui_kit.dart' show AppIcon;
 
 /// 路由路径常量
 class AppRoutes {
@@ -186,7 +186,8 @@ GoRouter createRouter() {
           final id = state.pathParameters['id'] ?? '';
           return _slideInFromRight(
             key: state.pageKey,
-            child: WordDetailPage(word: Word(id: id, userId: '', word: '', meaning: '')),
+            child: WordDetailPage(
+                word: Word(id: id, userId: '', word: '', meaning: '')),
           );
         },
       ),
@@ -264,58 +265,84 @@ class _HomeTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: NinjaColors.background,
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Word Ninja'),
+            Text('WordFlow'),
           ],
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           // 等级卡片 — 带有渐变背景
           _LevelCard(),
-          const SizedBox(height: NinjaSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
 
           // 今日任务
-          SectionHeader(title: '今日任务', icon: const Icon(PhosphorIconsRegular.checkSquare, size: 18, color: NinjaColors.primary)),
-          const SizedBox(height: NinjaSpacing.sm),
+          SectionHeader(
+              title: '今日任务',
+              icon: const Icon(PhosphorIconsRegular.checkSquare,
+                  size: 18, color: AppColors.primary)),
+          const SizedBox(height: AppSpacing.sm),
           _TaskItem(
-            icon: NinjaIcon.scroll(size: 20, color: NinjaColors.primary),
+            icon: AppIcon.scroll(size: 20, color: AppColors.primary),
             title: '学习 20 个单词',
             route: AppRoutes.vocabulary,
           ),
           _TaskItem(
-            icon: NinjaIcon.scroll(size: 20, color: NinjaColors.primary),
+            icon: AppIcon.scroll(size: 20, color: AppColors.primary),
             title: '阅读 1 篇文章',
             route: AppRoutes.reading,
           ),
           _TaskItem(
-            icon: NinjaIcon.chatBubble(size: 20, color: NinjaColors.primary),
+            icon: AppIcon.chatBubble(size: 20, color: AppColors.primary),
             title: 'AI 对话 10 分钟',
             route: AppRoutes.aiTutor,
           ),
 
-          const SizedBox(height: NinjaSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
 
           // 快捷入口
-          SectionHeader(title: '忍者修炼', icon: NinjaIcon.sword(size: 20, color: NinjaColors.primary)),
-          const SizedBox(height: NinjaSpacing.sm),
+          SectionHeader(
+              title: '学习成长',
+              icon: AppIcon.practice(size: 20, color: AppColors.primary)),
+          const SizedBox(height: AppSpacing.sm),
           Wrap(
-            spacing: NinjaSpacing.sm,
-            runSpacing: NinjaSpacing.sm,
+            spacing: AppSpacing.sm,
+            runSpacing: AppSpacing.sm,
             children: [
-              _QuickChip('单词', NinjaIcon.scroll(size: 16, color: NinjaColors.primary), AppRoutes.vocabulary),
-              _QuickChip('阅读', NinjaIcon.scroll(size: 16, color: NinjaColors.primary), AppRoutes.reading),
-              _QuickChip('听力', NinjaIcon.headphone(size: 16, color: NinjaColors.primary), AppRoutes.listening),
-              _QuickChip('口语', NinjaIcon.mic(size: 16, color: NinjaColors.primary), AppRoutes.speaking),
-              _QuickChip('写作', NinjaIcon.pen(size: 16, color: NinjaColors.primary), AppRoutes.writing),
-              _QuickChip('AI导师', NinjaIcon.chatBubble(size: 16, color: NinjaColors.primary), AppRoutes.aiTutor),
-              _QuickChip('网页', const Icon(PhosphorIconsRegular.globe, size: 16, color: NinjaColors.primary), AppRoutes.webReader),
-              _QuickChip('计划', NinjaIcon.calendar(size: 16, color: NinjaColors.primary), AppRoutes.studyPlan),
+              _QuickChip(
+                  '单词',
+                  AppIcon.scroll(size: 16, color: AppColors.primary),
+                  AppRoutes.vocabulary),
+              _QuickChip(
+                  '阅读',
+                  AppIcon.scroll(size: 16, color: AppColors.primary),
+                  AppRoutes.reading),
+              _QuickChip(
+                  '听力',
+                  AppIcon.headphone(size: 16, color: AppColors.primary),
+                  AppRoutes.listening),
+              _QuickChip('口语', AppIcon.mic(size: 16, color: AppColors.primary),
+                  AppRoutes.speaking),
+              _QuickChip('写作', AppIcon.pen(size: 16, color: AppColors.primary),
+                  AppRoutes.writing),
+              _QuickChip(
+                  'AI导师',
+                  AppIcon.chatBubble(size: 16, color: AppColors.primary),
+                  AppRoutes.aiTutor),
+              _QuickChip(
+                  '网页',
+                  const Icon(PhosphorIconsRegular.globe,
+                      size: 16, color: AppColors.primary),
+                  AppRoutes.webReader),
+              _QuickChip(
+                  '计划',
+                  AppIcon.calendar(size: 16, color: AppColors.primary),
+                  AppRoutes.studyPlan),
             ],
           ),
         ],
@@ -328,7 +355,7 @@ class _HomeTab extends StatelessWidget {
 class _LevelCard extends StatelessWidget {
   // 模拟数据，后续接入真实数据
   static const _level = 18;
-  static const _rank = '下忍';
+  static const _rank = '入门';
   static const _currentExp = 1250;
   static const _maxExp = 1500;
 
@@ -337,23 +364,23 @@ class _LevelCard extends StatelessWidget {
     final progress = _currentExp / _maxExp;
     return Card(
       margin: EdgeInsets.zero,
-      color: NinjaColors.surface,
+      color: AppColors.surface,
       surfaceTintColor: Colors.transparent,
       clipBehavior: Clip.antiAlias,
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              NinjaColors.primary.withValues(alpha: 0.08),
-              NinjaColors.accentGold.withValues(alpha: 0.05),
-              NinjaColors.surface,
+              AppColors.primary.withValues(alpha: 0.08),
+              AppColors.accentGold.withValues(alpha: 0.05),
+              AppColors.surface,
             ],
           ),
         ),
-        padding: const EdgeInsets.all(NinjaSpacing.xl),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Column(
           children: [
             Row(
@@ -366,13 +393,14 @@ class _LevelCard extends StatelessWidget {
                     shape: BoxShape.circle,
                     gradient: const RadialGradient(
                       colors: [
-                        NinjaColors.levelIntermediate,
-                        NinjaColors.levelIntermediate,
+                        AppColors.levelIntermediate,
+                        AppColors.levelIntermediate,
                       ],
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: NinjaColors.levelIntermediate.withValues(alpha: 0.4),
+                        color:
+                            AppColors.levelIntermediate.withValues(alpha: 0.4),
                         blurRadius: 8,
                         spreadRadius: 1,
                       ),
@@ -389,7 +417,7 @@ class _LevelCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(width: NinjaSpacing.md),
+                const SizedBox(width: AppSpacing.md),
                 // 等级信息
                 Expanded(
                   child: Column(
@@ -397,45 +425,47 @@ class _LevelCard extends StatelessWidget {
                     children: [
                       Text(
                         'Lv.$_level · $_rank',
-                        style: NinjaTextStyles.titleMedium,
+                        style: AppTextStyles.titleMedium,
                       ),
-                      const SizedBox(height: NinjaSpacing.xxs),
+                      const SizedBox(height: AppSpacing.xxs),
                       Text(
                         '距离升级还需 ${_maxExp - _currentExp} EXP',
-                        style: NinjaTextStyles.caption,
+                        style: AppTextStyles.caption,
                       ),
                     ],
                   ),
                 ),
-                NinjaIcon.mountain(size: 32, color: NinjaColors.accentGold.withValues(alpha: 0.3)),
+                AppIcon.mountain(
+                    size: 32,
+                    color: AppColors.accentGold.withValues(alpha: 0.3)),
               ],
             ),
-            const SizedBox(height: NinjaSpacing.md),
+            const SizedBox(height: AppSpacing.md),
             // 经验条
             ClipRRect(
               borderRadius: BorderRadius.circular(6),
               child: LinearProgressIndicator(
                 value: progress,
                 minHeight: 10,
-                backgroundColor: NinjaColors.divider.withValues(alpha: 0.3),
+                backgroundColor: AppColors.divider.withValues(alpha: 0.3),
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  NinjaColors.accentGold,
+                  AppColors.accentGold,
                 ),
               ),
             ),
-            const SizedBox(height: NinjaSpacing.sm),
+            const SizedBox(height: AppSpacing.sm),
             // EXP 数字
             Align(
               alignment: Alignment.centerRight,
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  NinjaIcon.coin(size: 14, color: NinjaColors.accentGold),
-                  const SizedBox(width: NinjaSpacing.xxs),
+                  AppIcon.coin(size: 14, color: AppColors.accentGold),
+                  const SizedBox(width: AppSpacing.xxs),
                   Text(
                     '$_currentExp / $_maxExp',
-                    style: NinjaTextStyles.caption.copyWith(
-                      color: NinjaColors.accentGold,
+                    style: AppTextStyles.caption.copyWith(
+                      color: AppColors.accentGold,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -465,8 +495,8 @@ class SectionHeader extends StatelessWidget {
     return Row(
       children: [
         icon,
-        const SizedBox(width: NinjaSpacing.sm),
-        Text(title, style: NinjaTextStyles.heading3),
+        const SizedBox(width: AppSpacing.sm),
+        Text(title, style: AppTextStyles.heading3),
       ],
     );
   }
@@ -488,7 +518,8 @@ class _TaskItem extends StatefulWidget {
   State<_TaskItem> createState() => _TaskItemState();
 }
 
-class _TaskItemState extends State<_TaskItem> with SingleTickerProviderStateMixin {
+class _TaskItemState extends State<_TaskItem>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animController;
   late Animation<double> _scaleAnim;
 
@@ -526,21 +557,22 @@ class _TaskItemState extends State<_TaskItem> with SingleTickerProviderStateMixi
           child: child,
         ),
         child: Card(
-          margin: const EdgeInsets.only(bottom: NinjaSpacing.xs),
-          color: NinjaColors.surface,
+          margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+          color: AppColors.surface,
           surfaceTintColor: Colors.transparent,
           child: ListTile(
             leading: Container(
               width: 36,
               height: 36,
               decoration: BoxDecoration(
-                color: NinjaColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(NinjaSpacing.sm),
+                color: AppColors.primary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.sm),
               ),
               child: Center(child: widget.icon),
             ),
-            title: Text(widget.title, style: NinjaTextStyles.bodyMedium),
-            trailing: const Icon(PhosphorIconsRegular.caretRight, size: 18, color: NinjaColors.textSecondary),
+            title: Text(widget.title, style: AppTextStyles.bodyMedium),
+            trailing: const Icon(PhosphorIconsRegular.caretRight,
+                size: 18, color: AppColors.textSecondary),
             onTap: () => context.push(widget.route),
           ),
         ),
@@ -561,9 +593,9 @@ class _QuickChip extends StatelessWidget {
   Widget build(BuildContext context) {
     return ActionChip(
       avatar: icon,
-      label: Text(label, style: NinjaTextStyles.bodySmall),
+      label: Text(label, style: AppTextStyles.bodySmall),
       onPressed: () => context.push(route),
-      backgroundColor: NinjaColors.primary.withValues(alpha: 0.08),
+      backgroundColor: AppColors.primary.withValues(alpha: 0.08),
       side: BorderSide.none,
     );
   }

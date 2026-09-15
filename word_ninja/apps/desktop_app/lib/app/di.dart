@@ -10,7 +10,7 @@ import 'package:auth/presentation/providers/auth_provider.dart';
 import 'package:auth/domain/repository/auth_repository.dart';
 import 'package:auth/domain/entities/user.dart';
 
-/// Word Ninja Desktop dependency injection
+/// WordFlow Desktop dependency injection
 /// Returns ProviderScope overrides list
 final desktopOverrides = <Override>[
   authRepositoryProvider.overrideWithProvider(
@@ -35,7 +35,7 @@ class _StubAuthRepository implements AuthRepository {
 
   @override
   Future<User> login(String email, String password) async {
-    _user = User(id: 'desktop', email: email, nickname: 'Ninja');
+    _user = User(id: 'desktop', email: email, nickname: 'Learner');
     return _user!;
   }
 
@@ -63,12 +63,20 @@ class _StubRemoteDataSource implements VocabularyRemoteDataSource {
   Future<List<Word>> fetchWords({int page = 1, int size = 20}) async => [];
 
   @override
-  Future<Word> createWord(Map<String, dynamic> data) async =>
-      Word(id: 'stub', userId: '', word: data['word'] ?? '', meaning: data['meaning'] ?? '');
+  Future<Word> createWord(Map<String, dynamic> data) async => Word(
+    id: 'stub',
+    userId: '',
+    word: data['word'] ?? '',
+    meaning: data['meaning'] ?? '',
+  );
 
   @override
-  Future<Word> updateWord(String id, Map<String, dynamic> data) async =>
-      Word(id: id, userId: '', word: data['word'] ?? '', meaning: data['meaning'] ?? '');
+  Future<Word> updateWord(String id, Map<String, dynamic> data) async => Word(
+    id: id,
+    userId: '',
+    word: data['word'] ?? '',
+    meaning: data['meaning'] ?? '',
+  );
 
   @override
   Future<void> deleteWord(String id) async {}

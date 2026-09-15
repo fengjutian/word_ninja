@@ -5,8 +5,8 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/word-ninja/server/internal/vocabulary"
-	"github.com/word-ninja/server/pkg/jwt"
+	"github.com/word-flow/server/internal/vocabulary"
+	"github.com/word-flow/server/pkg/jwt"
 	"gorm.io/gorm"
 )
 

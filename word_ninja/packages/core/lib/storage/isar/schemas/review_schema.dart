@@ -11,7 +11,7 @@ class ReviewSchema {
 
   late String wordId;
   late DateTime reviewTime;
-  late int score;      // 1-5
+  late int score; // 1-5
   late bool isCompleted;
   DateTime? createdAt;
 }

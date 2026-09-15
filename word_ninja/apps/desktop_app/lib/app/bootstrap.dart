@@ -35,6 +35,6 @@ class AppBootstrap {
     }
 
     // 4. Other initialization
-    log.i('Word Ninja Desktop bootstrapped');
+    log.i('WordFlow Desktop bootstrapped');
   }
 }

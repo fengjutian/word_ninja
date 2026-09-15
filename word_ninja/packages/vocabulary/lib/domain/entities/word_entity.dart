@@ -9,6 +9,7 @@ class WordEntity {
   final int mastery;
   final String source;
   final List<String> tags;
+
   /// AI 标记的重点分数（0-100），用于强化学习优先调度
   final int focusScore;
 

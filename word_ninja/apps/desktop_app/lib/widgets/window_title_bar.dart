@@ -20,8 +20,7 @@ class WindowTitleBar extends StatefulWidget {
   State<WindowTitleBar> createState() => _WindowTitleBarState();
 }
 
-class _WindowTitleBarState extends State<WindowTitleBar>
-    with WindowListener {
+class _WindowTitleBarState extends State<WindowTitleBar> with WindowListener {
   bool _isMaximized = false;
 
   @override
@@ -84,13 +83,13 @@ class _WindowTitleBarState extends State<WindowTitleBar>
                 child: Row(
                   children: [
                     Icon(
-                      PhosphorIconsBold.sword,
+                      PhosphorIconsBold.bookOpen,
                       size: 18,
                       color: fg.withOpacity(0.7),
                     ),
                     const SizedBox(width: 10),
                     Text(
-                      'Word Ninja',
+                      'WordFlow',
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,

@@ -76,5 +76,6 @@ abstract class ChatRepository {
   Future<void> upsertWordStats({required String word, required int timestamp});
   Future<List<WordFrequency>> topWords({int limit = 20});
   Future<List<WordFrequency>> wordsSince(int timestampMs);
-  Future<List<WordFrequency>> userWordFrequency({int days = 30, int limit = 50});
+  Future<List<WordFrequency>> userWordFrequency(
+      {int days = 30, int limit = 50});
 }

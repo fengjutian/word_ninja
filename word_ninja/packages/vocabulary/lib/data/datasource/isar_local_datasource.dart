@@ -93,10 +93,8 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
   Future<void> saveWord(Word word) async {
     final schema = _wordToSchema(word);
     // 查找现有记录（按 wordId 匹配以支持 upsert）
-    final existing = await _isar.wordSchemas
-        .where()
-        .wordIdEqualTo(word.id)
-        .findFirst();
+    final existing =
+        await _isar.wordSchemas.where().wordIdEqualTo(word.id).findFirst();
     if (existing != null) {
       schema.id = existing.id; // 复用 Isar ID 实现 update
       await _isar.writeTxn(() => _isar.wordSchemas.put(schema));
@@ -113,10 +111,8 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
 
   @override
   Future<void> deleteWord(String id) async {
-    final existing = await _isar.wordSchemas
-        .where()
-        .wordIdEqualTo(id)
-        .findFirst();
+    final existing =
+        await _isar.wordSchemas.where().wordIdEqualTo(id).findFirst();
     if (existing != null) {
       await _isar.writeTxn(() => _isar.wordSchemas.delete(existing.id));
     }
@@ -146,7 +142,9 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
         masteryMap: mastMap,
       );
     } catch (e) {
-      log.w('Failed to load word importance scores, falling back to mastery sort', e);
+      log.w(
+          'Failed to load word importance scores, falling back to mastery sort',
+          e);
     }
 
     // 多维度排序：focusScore ↓ → 重要性 ↓ → mastery ↑
@@ -215,17 +213,16 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
   }
 
   static int _nextEbbinghausLevel(int currentLevel, int score) {
-    if (score >= 5) return (currentLevel + 1).clamp(0, _ebbinghausIntervals.length - 1);
+    if (score >= 5)
+      return (currentLevel + 1).clamp(0, _ebbinghausIntervals.length - 1);
     if (score >= 3) return currentLevel;
     return 0;
   }
 
   @override
   Future<List<Review>> getReviewsForWord(String wordId) async {
-    final schemas = await _isar.reviewSchemas
-        .filter()
-        .wordIdEqualTo(wordId)
-        .findAll();
+    final schemas =
+        await _isar.reviewSchemas.filter().wordIdEqualTo(wordId).findAll();
     return schemas
         .map((s) => Review(
               id: s.reviewId,

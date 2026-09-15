@@ -6,7 +6,7 @@
 - **状态管理**: Riverpod 2.x
 - **路由**: GoRouter
 - **本地数据库**: Isar 3.x
-- **UI**: Ninja Theme（忍者主题）
+- **UI**: App Theme（学习者主题）
 
 ## 架构模式
 

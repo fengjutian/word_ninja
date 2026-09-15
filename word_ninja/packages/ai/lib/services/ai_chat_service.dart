@@ -37,7 +37,8 @@ class AiChatService {
       final content = res.data['choices'][0]['message']['content'] as String;
       return (true, content);
     } on DioException catch (e) {
-      log.e('Connection test failed: status=${e.response?.statusCode}, message=${e.message}');
+      log.e(
+          'Connection test failed: status=${e.response?.statusCode}, message=${e.message}');
       return (false, _dioErrorToUserMessage(e));
     }
   }
@@ -49,7 +50,8 @@ class AiChatService {
     List<Map<String, String>>? history,
   }) async {
     final messages = <Map<String, dynamic>>[];
-    if (systemPrompt != null) messages.add({'role': 'system', 'content': systemPrompt});
+    if (systemPrompt != null)
+      messages.add({'role': 'system', 'content': systemPrompt});
     if (history != null) messages.addAll(history);
     messages.add({'role': 'user', 'content': message});
     try {
@@ -61,7 +63,8 @@ class AiChatService {
       });
       return res.data['choices'][0]['message']['content'] as String;
     } on DioException catch (e) {
-      log.e('AI chat error: status=${e.response?.statusCode}, message=${e.message}');
+      log.e(
+          'AI chat error: status=${e.response?.statusCode}, message=${e.message}');
       log.e('  Request URL: ${_dio.options.baseUrl}/chat/completions');
       log.e('  Model: $_modelName, Key length: ${_apiKey.length}');
       return _dioErrorToUserMessage(e);
@@ -75,7 +78,8 @@ class AiChatService {
     List<Map<String, String>>? history,
   }) async* {
     final messages = <Map<String, dynamic>>[];
-    if (systemPrompt != null) messages.add({'role': 'system', 'content': systemPrompt});
+    if (systemPrompt != null)
+      messages.add({'role': 'system', 'content': systemPrompt});
     if (history != null) messages.addAll(history);
     messages.add({'role': 'user', 'content': message});
     try {
@@ -105,12 +109,15 @@ class AiChatService {
               final json = jsonDecode(data) as Map<String, dynamic>;
               final delta = json['choices']?[0]?['delta']?['content'];
               if (delta is String && delta.isNotEmpty) yield delta;
-            } catch (e) { log.w('SSE chunk parse failed', e); }
+            } catch (e) {
+              log.w('SSE chunk parse failed', e);
+            }
           }
         }
       }
     } on DioException catch (e) {
-      log.e('AI stream error: status=${e.response?.statusCode}, message=${e.message}');
+      log.e(
+          'AI stream error: status=${e.response?.statusCode}, message=${e.message}');
       log.e('  Request URL: ${_dio.options.baseUrl}/chat/completions');
       log.e('  Model: $_modelName, Key length: ${_apiKey.length}');
       // 流式中断：已经 yield 了部分内容，现在抛出异常让调用方处理
@@ -168,7 +175,8 @@ class AiChatService {
   // ─── JSON 解析工具 ───
 
   /// 从 AI 返回文本中提取 JSON Map
-  static Map<String, dynamic> parseJsonMap(String text, Map<String, dynamic> fallback) {
+  static Map<String, dynamic> parseJsonMap(
+      String text, Map<String, dynamic> fallback) {
     try {
       final jsonStr = _extractJson(text);
       final decoded = jsonDecode(jsonStr);

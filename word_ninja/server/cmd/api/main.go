@@ -10,15 +10,15 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
-	"github.com/word-ninja/server/configs"
-	"github.com/word-ninja/server/internal/ai"
-	"github.com/word-ninja/server/internal/auth"
-	"github.com/word-ninja/server/internal/sync"
-	"github.com/word-ninja/server/internal/vocabulary"
-	"github.com/word-ninja/server/pkg/database"
-	"github.com/word-ninja/server/pkg/logger"
-	"github.com/word-ninja/server/pkg/middleware"
-	"github.com/word-ninja/server/pkg/redis"
+	"github.com/word-flow/server/configs"
+	"github.com/word-flow/server/internal/ai"
+	"github.com/word-flow/server/internal/auth"
+	"github.com/word-flow/server/internal/sync"
+	"github.com/word-flow/server/internal/vocabulary"
+	"github.com/word-flow/server/pkg/database"
+	"github.com/word-flow/server/pkg/logger"
+	"github.com/word-flow/server/pkg/middleware"
+	"github.com/word-flow/server/pkg/redis"
 )
 
 func main() {
@@ -114,7 +114,7 @@ func main() {
 
 	// 健康检查
 	r.GET("/health", func(c *gin.Context) {
-		c.JSON(200, gin.H{"status": "ok", "service": "word-ninja"})
+		c.JSON(200, gin.H{"status": "ok", "service": "word-flow"})
 	})
 
 	// ─── 启动服务器 ───
@@ -124,7 +124,7 @@ func main() {
 	}
 
 	go func() {
-		slog.Info("Word Ninja API starting", "port", cfg.Port)
+		slog.Info("WordFlow API starting", "port", cfg.Port)
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
 			slog.Error("server failed", "error", err)
 			os.Exit(1)

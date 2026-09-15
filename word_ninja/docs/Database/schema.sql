@@ -1,4 +1,4 @@
--- Word Ninja 数据库 Schema
+-- WordFlow 数据库 Schema
 -- PostgreSQL 13+
 
 -- 用户表

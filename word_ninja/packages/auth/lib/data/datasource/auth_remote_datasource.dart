@@ -13,6 +13,5 @@ class AuthRemoteDataSource {
           String email, String password, String nickname) =>
       _api.register(email, password, nickname);
 
-  Future<void> forgotPassword(String email) =>
-      _api.forgotPassword(email);
+  Future<void> forgotPassword(String email) => _api.forgotPassword(email);
 }

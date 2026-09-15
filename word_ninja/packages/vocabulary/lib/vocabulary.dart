@@ -1,4 +1,4 @@
-/// Vocabulary 单词修炼模块
+/// Vocabulary 词汇学习模块
 library vocabulary;
 
 export 'data/data.dart';

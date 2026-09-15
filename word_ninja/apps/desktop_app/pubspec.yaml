@@ -1,5 +1,5 @@
 name: desktop_app
-description: Word Ninja Desktop App (Windows/macOS/Linux)
+description: WordFlow Desktop App (Windows/macOS/Linux)
 publish_to: none
 version: 1.0.0+1
 
@@ -57,10 +57,10 @@ flutter:
   uses-material-design: true
 
 msix_config:
-  display_name: Word Ninja
-  publisher_display_name: Word Ninja
-  identity_name: com.wordninja.desktop
+  display_name: WordFlow
+  publisher_display_name: WordFlow
+  identity_name: com.wordflow.desktop
   msix_version: 1.0.0.0
   logo_path: windows\runner\resources\app_icon.ico
   capabilities: internetClient
-  protocol_activation: wordninja
+  protocol_activation: wordflow

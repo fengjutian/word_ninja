@@ -2,7 +2,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:core/network/api_client.dart' show ApiClient;
 
-/// Word Ninja 管理后台
+/// WordFlow 管理后台
 void main() {
   runApp(const AdminApp());
 }
@@ -13,7 +13,7 @@ class AdminApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Word Ninja Admin',
+      title: 'WordFlow Admin',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         primarySwatch: Colors.indigo,
@@ -68,7 +68,7 @@ class _AdminDashboardState extends State<AdminDashboard> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Word Ninja 管理后台'),
+        title: const Text('WordFlow 管理后台'),
         actions: [
           if (_isRefreshing)
             const Padding(

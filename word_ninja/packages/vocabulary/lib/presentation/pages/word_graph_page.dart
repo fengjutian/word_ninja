@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'dart:math' as math;
@@ -9,8 +9,7 @@ import 'dart:math' as math;
 class WordGraphPage extends ConsumerStatefulWidget {
   final List<Word> words;
   final int initialIndex;
-  const WordGraphPage(
-      {super.key, required this.words, this.initialIndex = 0});
+  const WordGraphPage({super.key, required this.words, this.initialIndex = 0});
 
   @override
   ConsumerState<WordGraphPage> createState() => _WordGraphPageState();
@@ -84,9 +83,7 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
 
     // If not enough, add random words
     if (related.length < 4) {
-      final remaining = all
-          .where((w) => !seen.contains(w.word))
-          .toList()
+      final remaining = all.where((w) => !seen.contains(w.word)).toList()
         ..shuffle();
       for (final w in remaining.take(6 - related.length)) {
         if (seen.add(w.word)) {
@@ -104,8 +101,8 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
 
   void _selectNode(int index) {
     setState(() {
-      _centerIndex = widget.words
-          .indexWhere((w) => w.word == _nodes[index].word);
+      _centerIndex =
+          widget.words.indexWhere((w) => w.word == _nodes[index].word);
       if (_centerIndex < 0) _centerIndex = 0;
       _buildGraph();
     });
@@ -145,7 +142,9 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
           ? const Center(child: Text('请先添加单词'))
           : Column(
               children: [
-                Expanded(child: _GraphCanvas(nodes: _nodes, edges: _edges, onNodeTap: _selectNode)),
+                Expanded(
+                    child: _GraphCanvas(
+                        nodes: _nodes, edges: _edges, onNodeTap: _selectNode)),
                 _NodeLegend(),
               ],
             ),
@@ -171,12 +170,12 @@ class _GraphNode {
   });
 
   Color get color {
-    if (isCenter) return NinjaColors.primary;
+    if (isCenter) return AppColors.primary;
     return switch (source) {
-      'reading' => NinjaColors.success,
-      'ai' => NinjaColors.accentPurple,
-      'manual' => NinjaColors.secondary,
-      _ => NinjaColors.info,
+      'reading' => AppColors.success,
+      'ai' => AppColors.accentPurple,
+      'manual' => AppColors.secondary,
+      _ => AppColors.info,
     };
   }
 
@@ -296,7 +295,7 @@ class _GraphPainter extends CustomPainter {
       final from = nodes[e.from].pos;
       final to = nodes[e.to].pos;
       final linePaint = Paint()
-        ..color = NinjaColors.divider.withValues(alpha: 0.5)
+        ..color = AppColors.divider.withValues(alpha: 0.5)
         ..strokeWidth = 1.5 + e.strength * 2;
       canvas.drawLine(from, to, linePaint);
 
@@ -305,8 +304,7 @@ class _GraphPainter extends CustomPainter {
       final tp = TextPainter(
           text: TextSpan(
               text: e.label,
-              style: TextStyle(
-                  fontSize: 10, color: NinjaColors.textSecondary)),
+              style: TextStyle(fontSize: 10, color: AppColors.textSecondary)),
           textDirection: TextDirection.ltr)
         ..layout();
       tp.paint(canvas, mid - Offset(tp.width / 2, tp.height / 2));
@@ -325,7 +323,7 @@ class _GraphPainter extends CustomPainter {
 
     // Shadow
     canvas.drawCircle(
-        pos, r + 2, Paint()..color = NinjaColors.primary.withValues(alpha: 0.15));
+        pos, r + 2, Paint()..color = AppColors.primary.withValues(alpha: 0.15));
 
     // Background circle
     canvas.drawCircle(pos, r, Paint()..color = n.color.withValues(alpha: 0.15));
@@ -349,13 +347,13 @@ class _GraphPainter extends CustomPainter {
                   fontSize: n.isCenter ? (li == 0 ? 14 : 10) : 11,
                   fontWeight:
                       n.isCenter && li == 0 ? FontWeight.w700 : FontWeight.w500,
-                  color: isDark
-                      ? NinjaColors.textOnDark
-                      : NinjaColors.textPrimary)),
+                  color:
+                      isDark ? AppColors.textOnDark : AppColors.textPrimary)),
           textDirection: TextDirection.ltr)
         ..layout();
       final yOffset = (li - (lines.length - 1) * 0.5) * (tp.height + 2);
-      tp.paint(canvas, pos - Offset(tp.width / 2, tp.height / 2) + Offset(0, yOffset));
+      tp.paint(canvas,
+          pos - Offset(tp.width / 2, tp.height / 2) + Offset(0, yOffset));
     }
   }
 
@@ -373,11 +371,11 @@ class _NodeLegend extends StatelessWidget {
         spacing: 16,
         runSpacing: 8,
         children: const [
-          _LegendDot(NinjaColors.primary, '中心词'),
-          _LegendDot(NinjaColors.secondary, '手动添加'),
-          _LegendDot(NinjaColors.success, '阅读收集'),
-          _LegendDot(NinjaColors.accentPurple, 'AI 生成'),
-          _LegendDot(NinjaColors.info, '其他'),
+          _LegendDot(AppColors.primary, '中心词'),
+          _LegendDot(AppColors.secondary, '手动添加'),
+          _LegendDot(AppColors.success, '阅读收集'),
+          _LegendDot(AppColors.accentPurple, 'AI 生成'),
+          _LegendDot(AppColors.info, '其他'),
         ],
       ),
     );
@@ -393,10 +391,12 @@ class _LegendDot extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       Container(
-          width: 10, height: 10,
+          width: 10,
+          height: 10,
           decoration: BoxDecoration(shape: BoxShape.circle, color: color)),
       const SizedBox(width: 4),
-      Text(label, style: const TextStyle(fontSize: 11, color: NinjaColors.textSecondary)),
+      Text(label,
+          style: const TextStyle(fontSize: 11, color: AppColors.textSecondary)),
     ]);
   }
 }

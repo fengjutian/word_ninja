@@ -21,7 +21,7 @@ void main() async {
   runApp(
     ProviderScope(
       overrides: diOverrides,
-      child: WordNinjaApp(router: router),
+      child: WordFlowApp(router: router),
     ),
   );
 }

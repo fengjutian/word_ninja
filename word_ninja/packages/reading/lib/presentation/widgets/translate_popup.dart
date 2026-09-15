@@ -2,13 +2,14 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai/providers/ai_providers.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 
 /// 划词翻译弹窗
 /// 显示翻译结果并提供加入单词本和AI解析操作
 class TranslatePopup extends ConsumerStatefulWidget {
   final String word;
-  final void Function(String meaning, String example, String phonetic)? onAddToVocabulary;
+  final void Function(String meaning, String example, String phonetic)?
+      onAddToVocabulary;
   final VoidCallback? onAiAnalysis;
 
   const TranslatePopup({
@@ -41,7 +42,8 @@ class _TranslatePopupState extends ConsumerState<TranslatePopup> {
   }
 
   void _fetchTranslation() {
-    _translationFuture = ref.read(aiChatServiceProvider).explainWord(widget.word);
+    _translationFuture =
+        ref.read(aiChatServiceProvider).explainWord(widget.word);
     _translationFuture?.then((data) {
       if (mounted) setState(() => _translationData = data);
     });
@@ -55,7 +57,7 @@ class _TranslatePopupState extends ConsumerState<TranslatePopup> {
       child: Builder(
         builder: (context) => Container(
           constraints: const BoxConstraints(maxWidth: 280),
-          padding: const EdgeInsets.all(NinjaSpacing.md),
+          padding: const EdgeInsets.all(AppSpacing.md),
           decoration: BoxDecoration(
             color: Theme.of(context).cardColor,
             borderRadius: BorderRadius.circular(12),
@@ -64,10 +66,10 @@ class _TranslatePopupState extends ConsumerState<TranslatePopup> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(widget.word, style: NinjaTextStyles.heading3),
+              Text(widget.word, style: AppTextStyles.heading3),
               const SizedBox(height: 4),
               _TranslationResult(future: _translationFuture),
-              const Divider(height: NinjaSpacing.lg),
+              const Divider(height: AppSpacing.lg),
               Row(
                 children: [
                   TextButton.icon(
@@ -87,16 +89,19 @@ class _TranslatePopupState extends ConsumerState<TranslatePopup> {
                         );
                       }
                     },
-                    icon: const Icon(PhosphorIconsRegular.bookmarkSimple, size: 16),
+                    icon: const Icon(PhosphorIconsRegular.bookmarkSimple,
+                        size: 16),
                     label: const Text('加入单词本'),
                   ),
                   const Spacer(),
                   TextButton.icon(
-                    onPressed: widget.onAiAnalysis ?? () {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('正在AI解析「${widget.word}」...')),
-                      );
-                    },
+                    onPressed: widget.onAiAnalysis ??
+                        () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text('正在AI解析「${widget.word}」...')),
+                          );
+                        },
                     icon: const Icon(PhosphorIconsRegular.sparkle, size: 16),
                     label: const Text('AI解析'),
                   ),
@@ -119,7 +124,9 @@ class _TranslationResult extends StatelessWidget {
   Widget build(BuildContext context) {
     final f = future;
     if (f == null) {
-      return const SizedBox(height: 20, child: Center(child: CircularProgressIndicator(strokeWidth: 2)));
+      return const SizedBox(
+          height: 20,
+          child: Center(child: CircularProgressIndicator(strokeWidth: 2)));
     }
     return FutureBuilder<Map<String, dynamic>>(
       future: f,
@@ -127,7 +134,8 @@ class _TranslationResult extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const SizedBox(
             height: 20,
-            child: Center(child: SizedBox.square(
+            child: Center(
+                child: SizedBox.square(
               dimension: 14,
               child: CircularProgressIndicator(strokeWidth: 2),
             )),
@@ -138,13 +146,15 @@ class _TranslationResult extends StatelessWidget {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(data['meaning'] ?? '暂无翻译', style: NinjaTextStyles.bodyMedium),
+              Text(data['meaning'] ?? '暂无翻译', style: AppTextStyles.bodyMedium),
               if (data['phonetic']?.isNotEmpty == true)
-                Text(data['phonetic']!, style: NinjaTextStyles.caption),
+                Text(data['phonetic']!, style: AppTextStyles.caption),
             ],
           );
         }
-        return Text('翻译失败', style: NinjaTextStyles.bodySmall.copyWith(color: NinjaColors.textSecondary));
+        return Text('翻译失败',
+            style: AppTextStyles.bodySmall
+                .copyWith(color: AppColors.textSecondary));
       },
     );
   }

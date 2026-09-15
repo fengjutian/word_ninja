@@ -30,7 +30,8 @@ class Preferences {
       _prefs.setString(key, value);
 
   // ─── String list ───
-  static List<String> getStringList(String key, {List<String> defaultValue = const []}) =>
+  static List<String> getStringList(String key,
+          {List<String> defaultValue = const []}) =>
       _prefs.getStringList(key) ?? defaultValue;
 
   static Future<bool> setStringList(String key, List<String> value) =>

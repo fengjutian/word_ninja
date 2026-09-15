@@ -2,7 +2,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai/providers/ai_providers.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 
 /// 写作训练页
 class WritingPage extends ConsumerStatefulWidget {
@@ -33,7 +33,10 @@ class _WritingPageState extends ConsumerState<WritingPage> {
   Future<void> _generateComposition() async {
     final topic = _topicCtrl.text.trim();
     if (topic.isEmpty) return;
-    setState(() { _isGenerating = true; _error = null; });
+    setState(() {
+      _isGenerating = true;
+      _error = null;
+    });
     try {
       final service = ref.read(aiWritingServiceProvider);
       final result = await service.generateComposition(topic);
@@ -48,7 +51,10 @@ class _WritingPageState extends ConsumerState<WritingPage> {
   Future<void> _correctEssay() async {
     final text = _essayCtrl.text.trim();
     if (text.isEmpty) return;
-    setState(() { _isCorrecting = true; _error = null; });
+    setState(() {
+      _isCorrecting = true;
+      _error = null;
+    });
     try {
       final service = ref.read(aiWritingServiceProvider);
       final result = await service.correct(text);
@@ -66,7 +72,10 @@ class _WritingPageState extends ConsumerState<WritingPage> {
   Future<void> _ieltsScore() async {
     final text = _essayCtrl.text.trim();
     if (text.isEmpty) return;
-    setState(() { _isScoring = true; _error = null; });
+    setState(() {
+      _isScoring = true;
+      _error = null;
+    });
     try {
       final service = ref.read(aiWritingServiceProvider);
       final result = await service.ieltsScore(text);
@@ -90,26 +99,28 @@ class _WritingPageState extends ConsumerState<WritingPage> {
         expand: false,
         builder: (ctx, scrollCtrl) => ListView(
           controller: scrollCtrl,
-          padding: const EdgeInsets.all(NinjaSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
-            Text('批改结果', style: NinjaTextStyles.heading2),
-            const SizedBox(height: NinjaSpacing.md),
+            Text('批改结果', style: AppTextStyles.heading2),
+            const SizedBox(height: AppSpacing.md),
             Text('评分：${result['score'] ?? '?'} 分',
-                style: NinjaTextStyles.heading3.copyWith(color: NinjaColors.accentGold)),
-            const SizedBox(height: NinjaSpacing.md),
+                style: AppTextStyles.heading3
+                    .copyWith(color: AppColors.accentGold)),
+            const SizedBox(height: AppSpacing.md),
             if (errors.isNotEmpty) ...[
-              Text('语法错误 (${errors.length})', style: NinjaTextStyles.titleSmall),
+              Text('语法错误 (${errors.length})', style: AppTextStyles.titleSmall),
               ...errors.map((e) => Card(
-                    margin: const EdgeInsets.only(bottom: NinjaSpacing.sm),
+                    margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                     child: ListTile(
                       title: Text('❌ ${e['error'] ?? ''}',
-                          style: const TextStyle(color: NinjaColors.error)),
-                      subtitle: Text('✅ ${e['correction'] ?? ''}\n${e['explanation'] ?? ''}'),
+                          style: const TextStyle(color: AppColors.error)),
+                      subtitle: Text(
+                          '✅ ${e['correction'] ?? ''}\n${e['explanation'] ?? ''}'),
                     ),
                   )),
             ],
             Text('总评：${result['overall_comment'] ?? ''}',
-                style: NinjaTextStyles.bodyLarge),
+                style: AppTextStyles.bodyLarge),
           ],
         ),
       ),
@@ -121,23 +132,24 @@ class _WritingPageState extends ConsumerState<WritingPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('写作训练')),
       body: ListView(
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           if (_error != null)
             Container(
-              padding: const EdgeInsets.all(NinjaSpacing.md),
-              margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              margin: const EdgeInsets.only(bottom: AppSpacing.md),
               decoration: BoxDecoration(
-                color: NinjaColors.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                color: AppColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               ),
-              child: Text(_error!, style: const TextStyle(color: NinjaColors.error)),
+              child:
+                  Text(_error!, style: const TextStyle(color: AppColors.error)),
             ),
-          Text('AI作文生成', style: NinjaTextStyles.heading2),
-          const SizedBox(height: NinjaSpacing.md),
+          Text('AI作文生成', style: AppTextStyles.heading2),
+          const SizedBox(height: AppSpacing.md),
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(NinjaSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 children: [
                   TextField(
@@ -148,39 +160,43 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                     ),
                     maxLines: 2,
                   ),
-                  const SizedBox(height: NinjaSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
                       onPressed: _isGenerating ? null : _generateComposition,
                       icon: _isGenerating
                           ? const SizedBox.square(
-                              dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              dimension: 18,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
                           : const Icon(PhosphorIconsRegular.sparkle),
                       label: Text(_isGenerating ? '生成中...' : '生成范文'),
                     ),
                   ),
                   if (_generatedComposition != null) ...[
-                    const SizedBox(height: NinjaSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     Container(
-                      padding: const EdgeInsets.all(NinjaSpacing.md),
+                      padding: const EdgeInsets.all(AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: NinjaColors.background,
-                        borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                        color: AppColors.background,
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.buttonRadius),
                       ),
-                      child: Text(_generatedComposition!, style: NinjaTextStyles.bodyMedium),
+                      child: Text(_generatedComposition!,
+                          style: AppTextStyles.bodyMedium),
                     ),
                   ],
                 ],
               ),
             ),
           ),
-          const SizedBox(height: NinjaSpacing.xl),
-          Text('AI批改', style: NinjaTextStyles.heading2),
-          const SizedBox(height: NinjaSpacing.md),
+          const SizedBox(height: AppSpacing.xl),
+          Text('AI批改', style: AppTextStyles.heading2),
+          const SizedBox(height: AppSpacing.md),
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(NinjaSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 children: [
                   TextField(
@@ -191,7 +207,7 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                     ),
                     maxLines: 5,
                   ),
-                  const SizedBox(height: NinjaSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
                       Expanded(
@@ -199,21 +215,26 @@ class _WritingPageState extends ConsumerState<WritingPage> {
                           onPressed: _isCorrecting ? null : _correctEssay,
                           icon: _isCorrecting
                               ? const SizedBox.square(
-                                  dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                  dimension: 18,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white))
                               : const Icon(PhosphorIconsRegular.chatCircleText),
                           label: Text(_isCorrecting ? '批改中...' : 'AI批改'),
                         ),
                       ),
-                      const SizedBox(width: NinjaSpacing.md),
+                      const SizedBox(width: AppSpacing.md),
                       Expanded(
                         child: ElevatedButton.icon(
                           onPressed: _isScoring ? null : _ieltsScore,
                           icon: _isScoring
                               ? const SizedBox.square(
-                                  dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                                  dimension: 18,
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2, color: Colors.white))
                               : const Icon(PhosphorIconsRegular.graduationCap),
                           label: Text(_isScoring ? '评分中...' : 'IELTS评分'),
-                          style: ElevatedButton.styleFrom(backgroundColor: NinjaColors.accentGold),
+                          style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.accentGold),
                         ),
                       ),
                     ],
@@ -223,24 +244,28 @@ class _WritingPageState extends ConsumerState<WritingPage> {
             ),
           ),
           if (_ieltsResult != null) ...[
-            const SizedBox(height: NinjaSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(NinjaSpacing.lg),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
                   children: [
-                    Text('IELTS 评分结果', style: NinjaTextStyles.heading2),
-                    const SizedBox(height: NinjaSpacing.md),
-                    Text('Overall: ${((_ieltsResult!['overall_band'] as num?)?.toStringAsFixed(1) ?? '0.0')}',
-                        style: NinjaTextStyles.displayMedium.copyWith(color: NinjaColors.accentGold)),
-                    const SizedBox(height: NinjaSpacing.md),
+                    Text('IELTS 评分结果', style: AppTextStyles.heading2),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                        'Overall: ${((_ieltsResult!['overall_band'] as num?)?.toStringAsFixed(1) ?? '0.0')}',
+                        style: AppTextStyles.displayMedium
+                            .copyWith(color: AppColors.accentGold)),
+                    const SizedBox(height: AppSpacing.md),
                     _IeltsBar('任务完成度', _ieltsResult!['task_achievement']),
                     _IeltsBar('连贯与衔接', _ieltsResult!['coherence']),
                     _IeltsBar('词汇资源', _ieltsResult!['lexical_resource']),
                     _IeltsBar('语法准确性', _ieltsResult!['grammatical_range']),
-                    if (_ieltsResult!['comment']?.toString().isNotEmpty == true) ...[
-                      const SizedBox(height: NinjaSpacing.md),
-                      Text('评语：${_ieltsResult!['comment']}', style: NinjaTextStyles.bodyMedium),
+                    if (_ieltsResult!['comment']?.toString().isNotEmpty ==
+                        true) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      Text('评语：${_ieltsResult!['comment']}',
+                          style: AppTextStyles.bodyMedium),
                     ],
                   ],
                 ),
@@ -262,10 +287,11 @@ class _IeltsBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final v = (value is num) ? value.toDouble() : 0.0;
     return Padding(
-      padding: const EdgeInsets.only(bottom: NinjaSpacing.sm),
+      padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Row(
         children: [
-          SizedBox(width: 80, child: Text(label, style: NinjaTextStyles.bodySmall)),
+          SizedBox(
+              width: 80, child: Text(label, style: AppTextStyles.bodySmall)),
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(4),
@@ -273,13 +299,19 @@ class _IeltsBar extends StatelessWidget {
                 value: (v / 9).clamp(0.0, 1.0),
                 minHeight: 6,
                 valueColor: AlwaysStoppedAnimation<Color>(
-                  v >= 7 ? NinjaColors.success : v >= 5 ? NinjaColors.warning : NinjaColors.error,
+                  v >= 7
+                      ? AppColors.success
+                      : v >= 5
+                          ? AppColors.warning
+                          : AppColors.error,
                 ),
               ),
             ),
           ),
-          const SizedBox(width: NinjaSpacing.sm),
-          SizedBox(width: 30, child: Text(v.toStringAsFixed(1), style: NinjaTextStyles.caption)),
+          const SizedBox(width: AppSpacing.sm),
+          SizedBox(
+              width: 30,
+              child: Text(v.toStringAsFixed(1), style: AppTextStyles.caption)),
         ],
       ),
     );

@@ -34,7 +34,8 @@ class AuthState {
 /// Auth Riverpod Provider
 /// 需要外部注入 AuthRepository，参见 mobile_app/lib/app/di.dart
 final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  throw UnimplementedError('authRepositoryProvider must be overridden in app DI');
+  throw UnimplementedError(
+      'authRepositoryProvider must be overridden in app DI');
 });
 
 final authProvider = StateNotifierProvider<AuthNotifier, AuthState>((ref) {
@@ -47,8 +48,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   late final LoginUseCase _login;
   late final RegisterUseCase _register;
 
-  AuthNotifier(this._repo)
-      : super(const AuthState()) {
+  AuthNotifier(this._repo) : super(const AuthState()) {
     _login = LoginUseCase(_repo);
     _register = RegisterUseCase(_repo);
     _checkAuth();
@@ -76,8 +76,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
   }
 
-  Future<void> register(
-      String email, String password, String nickname) async {
+  Future<void> register(String email, String password, String nickname) async {
     state = state.copyWith(status: AuthStatus.loading, error: null);
     try {
       final user = await _register(email, password, nickname);

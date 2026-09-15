@@ -14,7 +14,7 @@ class PlanSchema {
   late int dayCount;
   late int currentDay;
   late bool isActive;
-  List<String> tasks = [];  // JSON 序列化的任务数组
+  List<String> tasks = []; // JSON 序列化的任务数组
   DateTime? createdAt;
   DateTime? updatedAt;
 }

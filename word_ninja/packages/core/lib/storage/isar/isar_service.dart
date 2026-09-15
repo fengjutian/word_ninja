@@ -23,7 +23,7 @@ class IsarService {
         PlanSchemaSchema,
       ],
       directory: directory,
-      name: 'word_ninja',
+      name: 'word_flow',
     );
     return _isar!;
   }

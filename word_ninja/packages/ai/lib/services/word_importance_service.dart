@@ -47,8 +47,7 @@ class WordImportanceService {
       freqMap[f.word.toLowerCase()] = f.count;
     }
 
-    final maxFreq =
-        freqMap.values.fold<int>(1, (a, b) => a > b ? a : b);
+    final maxFreq = freqMap.values.fold<int>(1, (a, b) => a > b ? a : b);
 
     final scores = <String, int>{};
     for (final w in words) {

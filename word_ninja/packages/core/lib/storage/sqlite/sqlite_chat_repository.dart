@@ -71,10 +71,9 @@ class SqliteChatRepository implements ChatRepository {
       sessionId: message.sessionId,
       role: message.role,
       content: message.content,
-      wordsJson:
-          message.words != null && message.words!.isNotEmpty
-              ? jsonEncode(message.words)
-              : null,
+      wordsJson: message.words != null && message.words!.isNotEmpty
+          ? jsonEncode(message.words)
+          : null,
       createdAt: message.createdAt,
     );
   }
@@ -82,8 +81,8 @@ class SqliteChatRepository implements ChatRepository {
   @override
   Future<List<MessageData>> getMessages(String sessionId,
       {int limit = 50, int offset = 0}) async {
-    final rows = await ChatDatabase.getMessages(sessionId,
-        limit: limit, offset: offset);
+    final rows =
+        await ChatDatabase.getMessages(sessionId, limit: limit, offset: offset);
     return rows.map(_rowToMessage).toList();
   }
 
@@ -104,8 +103,8 @@ class SqliteChatRepository implements ChatRepository {
   Future<List<WordFrequency>> topWords({int limit = 20}) async {
     final rows = await ChatDatabase.topWords(limit: limit);
     return rows
-        .map((r) =>
-            WordFrequency(word: r['word'] as String, count: r['ask_count'] as int))
+        .map((r) => WordFrequency(
+            word: r['word'] as String, count: r['ask_count'] as int))
         .toList();
   }
 
@@ -113,16 +112,15 @@ class SqliteChatRepository implements ChatRepository {
   Future<List<WordFrequency>> wordsSince(int timestampMs) async {
     final rows = await ChatDatabase.wordsSince(timestampMs);
     return rows
-        .map((r) =>
-            WordFrequency(word: r['word'] as String, count: r['ask_count'] as int))
+        .map((r) => WordFrequency(
+            word: r['word'] as String, count: r['ask_count'] as int))
         .toList();
   }
 
   @override
   Future<List<WordFrequency>> userWordFrequency(
       {int days = 30, int limit = 50}) async {
-    final rows =
-        await ChatDatabase.userWordFrequency(days: days, limit: limit);
+    final rows = await ChatDatabase.userWordFrequency(days: days, limit: limit);
     return rows
         .map((r) =>
             WordFrequency(word: r['word'] as String, count: r['cnt'] as int))

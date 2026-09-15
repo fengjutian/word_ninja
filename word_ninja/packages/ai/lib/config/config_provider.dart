@@ -27,9 +27,11 @@ class ModelConfigNotifier extends StateNotifier<ModelConfig> {
         // 迁移旧模型名到新版本 — 保留用户已保存的 API Key
         if (oldModel == 'deepseek-chat') {
           final oldApiKey = json['apiKey'] as String? ?? '';
-          final migrated = ModelConfig.deepSeekV4Pro.copyWith(apiKey: oldApiKey);
+          final migrated =
+              ModelConfig.deepSeekV4Pro.copyWith(apiKey: oldApiKey);
           state = migrated;
-          await prefs.setString(_kModelConfigKey, jsonEncode(migrated.toJson()));
+          await prefs.setString(
+              _kModelConfigKey, jsonEncode(migrated.toJson()));
           return;
         }
         state = ModelConfig.fromJson(json);

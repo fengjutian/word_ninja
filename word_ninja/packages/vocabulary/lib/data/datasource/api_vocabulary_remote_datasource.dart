@@ -11,7 +11,9 @@ class ApiVocabularyRemoteDataSource implements VocabularyRemoteDataSource {
   @override
   Future<List<Word>> fetchWords({int page = 1, int size = 20}) async {
     final list = await _api.getWords(page: page, size: size);
-    return list.map((json) => Word.fromJson(Map<String, dynamic>.from(json as Map))).toList();
+    return list
+        .map((json) => Word.fromJson(Map<String, dynamic>.from(json as Map)))
+        .toList();
   }
 
   @override

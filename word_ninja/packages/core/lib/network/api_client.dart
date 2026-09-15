@@ -33,8 +33,8 @@ class ApiClient {
 
   // ─── Words ───
   Future<List<dynamic>> getWords({int page = 1, int size = 20}) async {
-    final res = await _client.get('/api/v1/words',
-        queryParameters: {'page': page, 'size': size});
+    final res = await _client
+        .get('/api/v1/words', queryParameters: {'page': page, 'size': size});
     return res.data['data'] as List<dynamic>;
   }
 
@@ -56,5 +56,4 @@ class ApiClient {
     final res = await _client.post('/api/v1/sync', data: payload);
     return res.data as Map<String, dynamic>;
   }
-
 }

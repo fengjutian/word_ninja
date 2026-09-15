@@ -1,7 +1,7 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import '../../data/model/word.dart';
 import '../providers/word_provider.dart';
 
@@ -34,10 +34,7 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
     if (words.length < 2) return [];
     return words.map((word) {
       final options = <String>{word.meaning};
-      final others = words
-          .where((w) => w.id != word.id)
-          .toList()
-        ..shuffle();
+      final others = words.where((w) => w.id != word.id).toList()..shuffle();
       for (var i = 0; i < 3 && i < others.length; i++) {
         options.add(others[i].meaning);
       }
@@ -92,7 +89,9 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
       final stats = await ref.read(vocabularyRepositoryProvider).getStats();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('已同步 · 总词汇 ${stats.totalWords} · 掌握 ${stats.masteredWords}')),
+          SnackBar(
+              content: Text(
+                  '已同步 · 总词汇 ${stats.totalWords} · 掌握 ${stats.masteredWords}')),
         );
       }
     } catch (_) {
@@ -114,16 +113,16 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
           children: [
             Text(
               '$_correctCount / $_totalAnswered',
-              style: NinjaTextStyles.displayLarge.copyWith(
+              style: AppTextStyles.displayLarge.copyWith(
                 color: _correctCount >= _totalAnswered * 0.8
-                    ? NinjaColors.success
-                    : NinjaColors.warning,
+                    ? AppColors.success
+                    : AppColors.warning,
               ),
             ),
             const SizedBox(height: 8),
             Text(
               _correctCount >= _totalAnswered * 0.8 ? '太棒了！继续加油！' : '再接再厉！',
-              style: NinjaTextStyles.bodyLarge,
+              style: AppTextStyles.bodyLarge,
             ),
           ],
         ),
@@ -149,9 +148,10 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(PhosphorIconsRegular.brain, size: 64, color: NinjaColors.textSecondary),
+              Icon(PhosphorIconsRegular.brain,
+                  size: 64, color: AppColors.textSecondary),
               SizedBox(height: 16),
-              Text('需要至少 2 个单词才能开始测试', style: NinjaTextStyles.bodyLarge),
+              Text('需要至少 2 个单词才能开始测试', style: AppTextStyles.bodyLarge),
             ],
           ),
         ),
@@ -168,7 +168,11 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
           if (_isSaving)
             const Padding(
               padding: EdgeInsets.only(right: 12),
-              child: SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)),
+              child: SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white)),
             ),
         ],
       ),
@@ -176,66 +180,76 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
         children: [
           LinearProgressIndicator(
             value: progress,
-            backgroundColor: NinjaColors.divider.withValues(alpha: 0.2),
-            valueColor: const AlwaysStoppedAnimation<Color>(NinjaColors.primary),
+            backgroundColor: AppColors.divider.withValues(alpha: 0.2),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
           ),
-          const SizedBox(height: NinjaSpacing.xl),
+          const SizedBox(height: AppSpacing.xl),
 
           // 题目
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: NinjaSpacing.xl),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
             child: Text(
               '请选择 "${question.word}" 的中文释义：',
-              style: NinjaTextStyles.heading2,
+              style: AppTextStyles.heading2,
               textAlign: TextAlign.center,
             ),
           ),
 
-          const SizedBox(height: NinjaSpacing.xxl),
+          const SizedBox(height: AppSpacing.xxl),
 
           // 选项
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: NinjaSpacing.xl),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
               children: question.options.map((option) {
                 final isCorrect = option == question.correctAnswer;
                 final isSelected = option == _selectedAnswer;
                 Color? bgColor;
                 if (_showResult) {
-                  if (isCorrect) bgColor = NinjaColors.success.withValues(alpha: 0.15);
-                  else if (isSelected) bgColor = NinjaColors.error.withValues(alpha: 0.15);
+                  if (isCorrect)
+                    bgColor = AppColors.success.withValues(alpha: 0.15);
+                  else if (isSelected)
+                    bgColor = AppColors.error.withValues(alpha: 0.15);
                 }
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: NinjaSpacing.md),
+                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
                   child: Material(
                     color: bgColor,
-                    borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                    borderRadius:
+                        BorderRadius.circular(AppSpacing.buttonRadius),
                     child: InkWell(
                       onTap: () => _selectAnswer(option),
-                      borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.buttonRadius),
                       child: Container(
                         width: double.infinity,
-                        padding: const EdgeInsets.all(NinjaSpacing.lg),
+                        padding: const EdgeInsets.all(AppSpacing.lg),
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                          borderRadius:
+                              BorderRadius.circular(AppSpacing.buttonRadius),
                           border: Border.all(
                             color: _showResult && isCorrect
-                                ? NinjaColors.success
+                                ? AppColors.success
                                 : isSelected
-                                    ? NinjaColors.error
-                                    : NinjaColors.divider,
-                            width: _showResult && (isCorrect || isSelected) ? 2 : 1,
+                                    ? AppColors.error
+                                    : AppColors.divider,
+                            width: _showResult && (isCorrect || isSelected)
+                                ? 2
+                                : 1,
                           ),
                         ),
                         child: Row(
                           children: [
                             Expanded(
-                              child: Text(option, style: NinjaTextStyles.bodyLarge),
+                              child:
+                                  Text(option, style: AppTextStyles.bodyLarge),
                             ),
                             if (_showResult && isCorrect)
-                              const Icon(PhosphorIconsRegular.checkCircle, color: NinjaColors.success),
+                              const Icon(PhosphorIconsRegular.checkCircle,
+                                  color: AppColors.success),
                             if (_showResult && isSelected && !isCorrect)
-                              const Icon(PhosphorIconsRegular.xCircle, color: NinjaColors.error),
+                              const Icon(PhosphorIconsRegular.xCircle,
+                                  color: AppColors.error),
                           ],
                         ),
                       ),
@@ -249,7 +263,7 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
           // 下一题按钮
           if (_showResult)
             Padding(
-              padding: const EdgeInsets.all(NinjaSpacing.xl),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: ElevatedButton(
                 onPressed: _nextQuestion,
                 child: Text(

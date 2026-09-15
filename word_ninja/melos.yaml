@@ -1,4 +1,4 @@
-name: word_ninja
+name: word_flow
 
 packages:
   - apps/*

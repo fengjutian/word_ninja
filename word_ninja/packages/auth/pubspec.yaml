@@ -1,5 +1,5 @@
 name: auth
-description: Word Ninja authentication module
+description: WordFlow authentication module
 version: 1.0.0
 publish_to: none
 

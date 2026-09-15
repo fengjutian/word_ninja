@@ -4,14 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/cards/word_card.dart';
-import 'package:ui_kit/loading/ninja_loading.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
-import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
+import 'package:ui_kit/loading/app_loading.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
+import 'package:ui_kit/ui_kit.dart' show AppIcon;
 import '../providers/word_provider.dart';
 import '../../data/model/word.dart';
 import 'add_word_page.dart';
 
-/// 单词本主页面 — 单词修炼
+/// 单词本主页面 — 词汇学习
 class VocabularyPage extends ConsumerStatefulWidget {
   const VocabularyPage({super.key});
 
@@ -28,8 +28,8 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
   @override
   void initState() {
     super.initState();
-    Future.microtask(() =>
-        ref.read(wordListProvider.notifier).loadWords(refresh: true));
+    Future.microtask(
+        () => ref.read(wordListProvider.notifier).loadWords(refresh: true));
     _scrollCtrl.addListener(_onScroll);
   }
 
@@ -42,7 +42,8 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
   }
 
   void _onScroll() {
-    if (_scrollCtrl.position.pixels >= _scrollCtrl.position.maxScrollExtent - 100) {
+    if (_scrollCtrl.position.pixels >=
+        _scrollCtrl.position.maxScrollExtent - 100) {
       ref.read(wordListProvider.notifier).loadWords();
     }
   }
@@ -98,7 +99,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
                 style: const TextStyle(color: Colors.white),
                 onChanged: _onSearchChanged,
               )
-            : const Text('单词修炼'),
+            : const Text('词汇学习'),
         actions: [
           if (state.words.isNotEmpty)
             IconButton(
@@ -110,7 +111,9 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
               ),
             ),
           IconButton(
-            icon: Icon(_isSearching ? PhosphorIconsRegular.x : PhosphorIconsRegular.magnifyingGlass),
+            icon: Icon(_isSearching
+                ? PhosphorIconsRegular.x
+                : PhosphorIconsRegular.magnifyingGlass),
             onPressed: () => setState(() {
               _isSearching = !_isSearching;
               if (!_isSearching) {
@@ -125,7 +128,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
       body: _buildBody(state),
       floatingActionButton: FloatingActionButton(
         onPressed: () => AddWordPage.showAsBottomSheet(context),
-        backgroundColor: NinjaColors.primary,
+        backgroundColor: AppColors.primary,
         child: const Icon(PhosphorIconsRegular.plus, color: Colors.white),
       ),
     );
@@ -133,7 +136,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
 
   Widget _buildBody(WordListState state) {
     if (state.isLoading && state.words.isEmpty) {
-      return const NinjaLoading(message: '加载单词中...');
+      return const AppLoading(message: '加载单词中...');
     }
 
     if (state.error != null && state.words.isEmpty) {
@@ -141,10 +144,11 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(PhosphorIconsRegular.warningCircle, size: 48, color: NinjaColors.error),
-            const SizedBox(height: NinjaSpacing.md),
-            Text(state.error!, style: NinjaTextStyles.bodyMedium),
-            const SizedBox(height: NinjaSpacing.lg),
+            const Icon(PhosphorIconsRegular.warningCircle,
+                size: 48, color: AppColors.error),
+            const SizedBox(height: AppSpacing.md),
+            Text(state.error!, style: AppTextStyles.bodyMedium),
+            const SizedBox(height: AppSpacing.lg),
             ElevatedButton(
               onPressed: () =>
                   ref.read(wordListProvider.notifier).loadWords(refresh: true),
@@ -160,12 +164,12 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(PhosphorIconsRegular.bookOpen, size: 64, color: NinjaColors.textSecondary),
-            const SizedBox(height: NinjaSpacing.md),
-            Text('还没有单词', style: NinjaTextStyles.heading3),
-            const SizedBox(height: NinjaSpacing.sm),
-            Text('点击 + 添加第一个单词',
-                style: NinjaTextStyles.bodyMedium),
+            const Icon(PhosphorIconsRegular.bookOpen,
+                size: 64, color: AppColors.textSecondary),
+            const SizedBox(height: AppSpacing.md),
+            Text('还没有单词', style: AppTextStyles.heading3),
+            const SizedBox(height: AppSpacing.sm),
+            Text('点击 + 添加第一个单词', style: AppTextStyles.bodyMedium),
           ],
         ),
       );
@@ -176,9 +180,9 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
           ref.read(wordListProvider.notifier).loadWords(refresh: true),
       child: ListView(
         controller: _scrollCtrl,
-        padding: const EdgeInsets.only(top: NinjaSpacing.sm, bottom: 80),
+        padding: const EdgeInsets.only(top: AppSpacing.sm, bottom: 80),
         children: [
-          // ─── 修炼模式入口 ───
+          // ─── 学习模式入口 ───
           _buildPracticeSection(state.words.length),
           // ─── 单词列表 ───
           ..._buildWordList(state),
@@ -190,22 +194,22 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
   Widget _buildPracticeSection(int totalWords) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(
-        NinjaSpacing.lg,
-        NinjaSpacing.md,
-        NinjaSpacing.lg,
-        NinjaSpacing.sm,
+        AppSpacing.lg,
+        AppSpacing.md,
+        AppSpacing.lg,
+        AppSpacing.sm,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              NinjaIcon.sword(size: 20, color: NinjaColors.primary),
-              const SizedBox(width: NinjaSpacing.sm),
-              Text('修炼模式', style: NinjaTextStyles.heading3),
+              AppIcon.practice(size: 20, color: AppColors.primary),
+              const SizedBox(width: AppSpacing.sm),
+              Text('学习模式', style: AppTextStyles.heading3),
             ],
           ),
-          const SizedBox(height: NinjaSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
           Row(
             children: [
               Expanded(
@@ -213,25 +217,25 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
                   icon: PhosphorIconsRegular.chalkboardTeacher,
                   label: '单词测验',
                   subtitle: '选择题模式 · 巩固记忆',
-                  color: NinjaColors.info,
+                  color: AppColors.info,
                   onTap: totalWords >= 2 ? _startQuiz : null,
                   disabled: totalWords < 2,
                 ),
               ),
-              const SizedBox(width: NinjaSpacing.sm),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: _PracticeCard(
                   icon: PhosphorIconsRegular.cardholder,
                   label: '艾宾浩斯复习',
                   subtitle: '翻转卡片 · 科学记忆',
-                  color: NinjaColors.success,
+                  color: AppColors.success,
                   onTap: totalWords >= 1 ? _startReview : null,
                   disabled: totalWords < 1,
                 ),
               ),
             ],
           ),
-          const SizedBox(height: NinjaSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
         ],
       ),
     );
@@ -243,13 +247,13 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
     items.add(
       Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: NinjaSpacing.lg,
-          vertical: NinjaSpacing.xs,
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.xs,
         ),
         child: Text(
           '我的词库（${state.words.length}）',
-          style: NinjaTextStyles.caption.copyWith(
-            color: NinjaColors.textSecondary,
+          style: AppTextStyles.caption.copyWith(
+            color: AppColors.textSecondary,
           ),
         ),
       ),
@@ -277,7 +281,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
   }
 }
 
-/// 修炼模式卡片
+/// 学习模式卡片
 class _PracticeCard extends StatelessWidget {
   final IconData icon;
   final String label;
@@ -301,14 +305,14 @@ class _PracticeCard extends StatelessWidget {
       opacity: disabled ? 0.4 : 1.0,
       child: Material(
         color: color.withValues(alpha: 0.08),
-        borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         child: InkWell(
           onTap: disabled ? null : onTap,
-          borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
+          borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
           child: Container(
-            padding: const EdgeInsets.all(NinjaSpacing.lg),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
+              borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
               border: Border.all(
                 color: color.withValues(alpha: 0.2),
               ),
@@ -321,16 +325,17 @@ class _PracticeCard extends StatelessWidget {
                   height: 40,
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(NinjaSpacing.sm),
+                    borderRadius: BorderRadius.circular(AppSpacing.sm),
                   ),
                   child: Icon(icon, color: color, size: 22),
                 ),
-                const SizedBox(height: NinjaSpacing.sm),
-                Text(label, style: NinjaTextStyles.titleMedium),
-                const SizedBox(height: NinjaSpacing.xxs),
-                Text(subtitle,
-                  style: NinjaTextStyles.caption.copyWith(
-                    color: NinjaColors.textSecondary,
+                const SizedBox(height: AppSpacing.sm),
+                Text(label, style: AppTextStyles.titleMedium),
+                const SizedBox(height: AppSpacing.xxs),
+                Text(
+                  subtitle,
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textSecondary,
                   ),
                 ),
               ],
@@ -356,34 +361,38 @@ class _WordDetailSheet extends ConsumerWidget {
       expand: false,
       builder: (ctx, scrollCtrl) => SingleChildScrollView(
         controller: scrollCtrl,
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
               child: Container(
-                width: 40, height: 4,
+                width: 40,
+                height: 4,
                 decoration: BoxDecoration(
-                  color: NinjaColors.divider,
+                  color: AppColors.divider,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
             ),
-            const SizedBox(height: NinjaSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(NinjaSpacing.xl),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Column(
                   children: [
-                    Text(word.word as String, style: NinjaTextStyles.displayMedium),
+                    Text(word.word as String,
+                        style: AppTextStyles.displayMedium),
                     if ((word.phonetic as String).isNotEmpty) ...[
-                      const SizedBox(height: NinjaSpacing.sm),
-                      Text('/${word.phonetic}/', style: NinjaTextStyles.bodyLarge),
+                      const SizedBox(height: AppSpacing.sm),
+                      Text('/${word.phonetic}/',
+                          style: AppTextStyles.bodyLarge),
                     ],
-                    const SizedBox(height: NinjaSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     Text(word.meaning as String,
-                        style: NinjaTextStyles.heading3.copyWith(color: NinjaColors.primary)),
-                    const SizedBox(height: NinjaSpacing.lg),
+                        style: AppTextStyles.heading3
+                            .copyWith(color: AppColors.primary)),
+                    const SizedBox(height: AppSpacing.lg),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [_buildMasteryBadge(word.mastery as int)],
@@ -392,25 +401,29 @@ class _WordDetailSheet extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: NinjaSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
             if ((word.example as String).isNotEmpty) ...[
-              const Text('例句', style: NinjaTextStyles.heading3),
-              const SizedBox(height: NinjaSpacing.sm),
+              const Text('例句', style: AppTextStyles.heading3),
+              const SizedBox(height: AppSpacing.sm),
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(NinjaSpacing.lg),
-                  child: Text(word.example as String, style: NinjaTextStyles.bodyLarge),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Text(word.example as String,
+                      style: AppTextStyles.bodyLarge),
                 ),
               ),
-              const SizedBox(height: NinjaSpacing.lg),
+              const SizedBox(height: AppSpacing.lg),
             ],
             if ((word.tags as List).isNotEmpty) ...[
-              const Text('标签', style: NinjaTextStyles.heading3),
-              const SizedBox(height: NinjaSpacing.sm),
+              const Text('标签', style: AppTextStyles.heading3),
+              const SizedBox(height: AppSpacing.sm),
               Wrap(
-                spacing: NinjaSpacing.sm,
+                spacing: AppSpacing.sm,
                 children: (word.tags as List)
-                    .map((tag) => Chip(label: Text(tag.toString()), backgroundColor: NinjaColors.primary.withValues(alpha: 0.1)))
+                    .map((tag) => Chip(
+                        label: Text(tag.toString()),
+                        backgroundColor:
+                            AppColors.primary.withValues(alpha: 0.1)))
                     .toList(),
               ),
             ],
@@ -435,9 +448,9 @@ class _WordDetailSheet extends ConsumerWidget {
   }
 
   (Color, String) _masteryInfo(int mastery) {
-    if (mastery >= 85) return (NinjaColors.success, '已掌握');
-    if (mastery >= 60) return (NinjaColors.info, '熟悉');
-    if (mastery >= 30) return (NinjaColors.warning, '学习中');
-    return (NinjaColors.error, '陌生');
+    if (mastery >= 85) return (AppColors.success, '已掌握');
+    if (mastery >= 60) return (AppColors.info, '熟悉');
+    if (mastery >= 30) return (AppColors.warning, '学习中');
+    return (AppColors.error, '陌生');
   }
 }

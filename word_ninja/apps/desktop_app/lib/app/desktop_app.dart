@@ -3,9 +3,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart' as mt;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
-import 'package:ui_kit/ninja_theme/theme_data.dart';
-import 'package:ui_kit/ui_kit.dart' show NinjaIcon;
+import 'package:ui_kit/app_theme/app_theme.dart';
+import 'package:ui_kit/app_theme/theme_data.dart';
+import 'package:ui_kit/ui_kit.dart' show AppIcon;
 import 'package:vocabulary/presentation/pages/word_graph_page.dart';
 import 'package:vocabulary/presentation/pages/vocabulary_page.dart';
 import 'package:vocabulary/presentation/pages/word_detail_page.dart';
@@ -30,26 +30,27 @@ import 'package:window_manager/window_manager.dart';
 import 'package:core/storage/preferences.dart';
 
 /// Desktop app root widget — uses fluent_ui for native Windows look & feel
-class WordNinjaDesktopApp extends StatelessWidget {
+class WordFlowDesktopApp extends StatelessWidget {
   final GoRouter router;
-  const WordNinjaDesktopApp({super.key, required this.router});
+  const WordFlowDesktopApp({super.key, required this.router});
 
   @override
   Widget build(BuildContext context) {
     return FluentApp.router(
-      title: 'Word Ninja',
+      title: 'WordFlow',
       debugShowCheckedModeBanner: false,
-      theme: _ninjaFluentTheme(Brightness.light),
-      darkTheme: _ninjaFluentTheme(Brightness.dark),
-      themeMode:
-          Preferences.getBool('dark_mode') ? ThemeMode.dark : ThemeMode.light,
+      theme: _appFluentTheme(Brightness.light),
+      darkTheme: _appFluentTheme(Brightness.dark),
+      themeMode: Preferences.getBool('dark_mode')
+          ? ThemeMode.dark
+          : ThemeMode.light,
       routerConfig: router,
       builder: kDebugMode ? _debugBuilder : null,
     );
   }
 
-  /// Build a FluentThemeData from NinjaColors
-  static FluentThemeData _ninjaFluentTheme(Brightness brightness) {
+  /// Build a FluentThemeData from AppColors
+  static FluentThemeData _appFluentTheme(Brightness brightness) {
     final isDark = brightness == Brightness.dark;
     return FluentThemeData(
       brightness: brightness,
@@ -57,54 +58,56 @@ class WordNinjaDesktopApp extends StatelessWidget {
         'darkest': Color(0xFFAB000D),
         'darker': Color(0xFFC62828),
         'dark': Color(0xFFD32F2F),
-        'normal': NinjaColors.primary,
-        'light': NinjaColors.primaryLight,
+        'normal': AppColors.primary,
+        'light': AppColors.primaryLight,
         'lighter': Color(0xFFFF8A80),
         'lightest': Color(0xFFFFCDD2),
       }),
-      scaffoldBackgroundColor:
-          isDark ? NinjaColors.surfaceDark : NinjaColors.background,
+      scaffoldBackgroundColor: isDark
+          ? AppColors.surfaceDark
+          : AppColors.background,
       navigationPaneTheme: NavigationPaneThemeData(
-        backgroundColor:
-            isDark ? NinjaColors.surfaceDark : NinjaColors.surface,
-        highlightColor: NinjaColors.primary.withValues(alpha: 0.08),
+        backgroundColor: isDark ? AppColors.surfaceDark : AppColors.surface,
+        highlightColor: AppColors.primary.withValues(alpha: 0.08),
       ),
     );
   }
 
   static Widget _debugBuilder(BuildContext context, Widget? child) {
     final bool isActive = DebugOverlay.isActive;
-    return Stack(children: [
-      if (child != null) child,
-      Positioned(
-        right: 16,
-        bottom: 40,
-        child: Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: isActive ? mt.Colors.lightGreen : mt.Colors.grey.shade400,
-            boxShadow: [
-              BoxShadow(
-                color: mt.Colors.black.withValues(alpha: 0.2),
-                blurRadius: 4,
-              ),
-            ],
-          ),
-          child: GestureDetector(
-            onTap: DebugOverlay.toggleAll,
-            child: Center(
-              child: Icon(
-                isActive ? FluentIcons.view : FluentIcons.view,
-                size: 18,
-                color: mt.Colors.white,
+    return Stack(
+      children: [
+        if (child != null) child,
+        Positioned(
+          right: 16,
+          bottom: 40,
+          child: Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: isActive ? mt.Colors.lightGreen : mt.Colors.grey.shade400,
+              boxShadow: [
+                BoxShadow(
+                  color: mt.Colors.black.withValues(alpha: 0.2),
+                  blurRadius: 4,
+                ),
+              ],
+            ),
+            child: GestureDetector(
+              onTap: DebugOverlay.toggleAll,
+              child: Center(
+                child: Icon(
+                  isActive ? FluentIcons.view : FluentIcons.view,
+                  size: 18,
+                  color: mt.Colors.white,
+                ),
               ),
             ),
           ),
         ),
-      ),
-    ]);
+      ],
+    );
   }
 }
 
@@ -137,41 +140,53 @@ GoRouter createDesktopRouter() {
         builder: (ctx, state, child) => DesktopShell(child: child),
         routes: [
           GoRoute(
-              path: DesktopRoutes.home,
-              builder: (ctx, state) => const _DesktopHome()),
+            path: DesktopRoutes.home,
+            builder: (ctx, state) => const _DesktopHome(),
+          ),
           GoRoute(
-              path: DesktopRoutes.vocabulary,
-              builder: (ctx, state) => const VocabularyPage()),
+            path: DesktopRoutes.vocabulary,
+            builder: (ctx, state) => const VocabularyPage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.reading,
-              builder: (ctx, state) => const ReaderPage()),
+            path: DesktopRoutes.reading,
+            builder: (ctx, state) => const ReaderPage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.aiTutor,
-              builder: (ctx, state) => const TutorChatPage()),
+            path: DesktopRoutes.aiTutor,
+            builder: (ctx, state) => const TutorChatPage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.aiAnalysis,
-              builder: (ctx, state) => const AnalysisPage()),
+            path: DesktopRoutes.aiAnalysis,
+            builder: (ctx, state) => const AnalysisPage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.modelConfig,
-              builder: (ctx, state) => const ModelConfigPage()),
+            path: DesktopRoutes.modelConfig,
+            builder: (ctx, state) => const ModelConfigPage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.writing,
-              builder: (ctx, state) => const WritingPage()),
+            path: DesktopRoutes.writing,
+            builder: (ctx, state) => const WritingPage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.studyPlan,
-              builder: (ctx, state) => const StudyPlanPage()),
+            path: DesktopRoutes.studyPlan,
+            builder: (ctx, state) => const StudyPlanPage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.profile,
-              builder: (ctx, state) => const ProfilePage()),
+            path: DesktopRoutes.profile,
+            builder: (ctx, state) => const ProfilePage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.settings,
-              builder: (ctx, state) => const SettingsPage()),
+            path: DesktopRoutes.settings,
+            builder: (ctx, state) => const SettingsPage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.listening,
-              builder: (ctx, state) => const ListeningPage()),
+            path: DesktopRoutes.listening,
+            builder: (ctx, state) => const ListeningPage(),
+          ),
           GoRoute(
-              path: DesktopRoutes.speaking,
-              builder: (ctx, state) => const SpeakingPage()),
+            path: DesktopRoutes.speaking,
+            builder: (ctx, state) => const SpeakingPage(),
+          ),
         ],
       ),
       // ─── 全屏子页面 ───
@@ -182,16 +197,15 @@ GoRouter createDesktopRouter() {
           return mt.MaterialPage(
             key: state.pageKey,
             child: WordDetailPage(
-                word: Word(id: id, userId: '', word: '', meaning: '')),
+              word: Word(id: id, userId: '', word: '', meaning: ''),
+            ),
           );
         },
       ),
       GoRoute(
         path: DesktopRoutes.addWord,
-        pageBuilder: (ctx, state) => mt.MaterialPage(
-          key: state.pageKey,
-          child: const AddWordPage(),
-        ),
+        pageBuilder: (ctx, state) =>
+            mt.MaterialPage(key: state.pageKey, child: const AddWordPage()),
       ),
       GoRoute(
         path: DesktopRoutes.review,
@@ -257,13 +271,10 @@ class DesktopShell extends StatelessWidget {
       titleBar: _buildTitleBar(context, isDark),
       paneBodyBuilder: (item, body) {
         return mt.Theme(
-          data: isDark ? NinjaTheme.dark : NinjaTheme.light,
+          data: isDark ? AppTheme.dark : AppTheme.light,
           child: Builder(
-            builder: (ctx) => mt.Material(
-              child: mt.ScaffoldMessenger(
-                child: child,
-              ),
-            ),
+            builder: (ctx) =>
+                mt.Material(child: mt.ScaffoldMessenger(child: child)),
           ),
         );
       },
@@ -273,12 +284,13 @@ class DesktopShell extends StatelessWidget {
         displayMode: PaneDisplayMode.compact,
         header: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-          child: Text('🥷',
-              style: TextStyle(
-                  fontSize: 28,
-                  color: isDark
-                      ? NinjaColors.textOnDark
-                      : NinjaColors.textPrimary)),
+          child: Text(
+            'W',
+            style: TextStyle(
+              fontSize: 28,
+              color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+            ),
+          ),
         ),
         items: [
           PaneItem(
@@ -342,80 +354,99 @@ class DesktopShell extends StatelessWidget {
   Widget _buildTitleBar(BuildContext context, bool isDark) {
     return GestureDetector(
       onDoubleTap: () => windowManager.isMaximized().then(
-            (m) => m ? windowManager.unmaximize() : windowManager.maximize(),
-          ),
+        (m) => m ? windowManager.unmaximize() : windowManager.maximize(),
+      ),
       onPanStart: (_) => windowManager.startDragging(),
       child: Container(
         height: 36,
-        color: isDark ? NinjaColors.surfaceDark : NinjaColors.surface,
-        child: Row(children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8),
-            child: Row(children: [
-              const PaneToggleButton(),
-              const SizedBox(width: 4),
-              Text('\u{1F977}',
-                  style: TextStyle(
+        color: isDark ? AppColors.surfaceDark : AppColors.surface,
+        child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Row(
+                children: [
+                  const PaneToggleButton(),
+                  const SizedBox(width: 4),
+                  Text(
+                    '\u{1F977}',
+                    style: TextStyle(
                       fontSize: 18,
                       color: isDark
-                          ? NinjaColors.textOnDark
-                          : NinjaColors.textPrimary)),
-              const SizedBox(width: 8),
-              Text('Word Ninja',
-                  style: TextStyle(
+                          ? AppColors.textOnDark
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    'WordFlow',
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: isDark
-                          ? NinjaColors.textOnDark
-                          : NinjaColors.textPrimary)),
-            ]),
-          ),
-          const Spacer(),
-          _WindowBtn(
-              label: '\u{2014}', tooltip: 'Minimize',
+                          ? AppColors.textOnDark
+                          : AppColors.textPrimary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const Spacer(),
+            _WindowBtn(
+              label: '\u{2014}',
+              tooltip: 'Minimize',
               isDark: isDark,
-              onTap: () => windowManager.minimize()),
-          _WindowBtn(
-              label: '\u{25A1}', tooltip: 'Maximize',
+              onTap: () => windowManager.minimize(),
+            ),
+            _WindowBtn(
+              label: '\u{25A1}',
+              tooltip: 'Maximize',
               isDark: isDark,
-              onTap: () => windowManager
-                  .isMaximized()
-                  .then((m) => m
-                      ? windowManager.unmaximize()
-                      : windowManager.maximize())),
-          _WindowBtn(
-              label: '\u{2715}', tooltip: 'Close',
-              isDark: isDark, isClose: true,
-              onTap: () => windowManager.close()),
-        ]),
+              onTap: () => windowManager.isMaximized().then(
+                (m) =>
+                    m ? windowManager.unmaximize() : windowManager.maximize(),
+              ),
+            ),
+            _WindowBtn(
+              label: '\u{2715}',
+              tooltip: 'Close',
+              isDark: isDark,
+              isClose: true,
+              onTap: () => windowManager.close(),
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _WindowBtn(
-      {required String label,
-      required String tooltip,
-      required VoidCallback onTap,
-      required bool isDark,
-      bool isClose = false}) {
+  Widget _WindowBtn({
+    required String label,
+    required String tooltip,
+    required VoidCallback onTap,
+    required bool isDark,
+    bool isClose = false,
+  }) {
     return Tooltip(
       message: tooltip,
       child: mt.Material(
         color: mt.Colors.transparent,
         child: mt.InkWell(
           onTap: onTap,
-          hoverColor:
-              isClose ? NinjaColors.primary : NinjaColors.divider.withValues(alpha: 0.3),
+          hoverColor: isClose
+              ? AppColors.primary
+              : AppColors.divider.withValues(alpha: 0.3),
           child: Container(
             width: 46,
             height: 36,
             alignment: Alignment.center,
-            child: Text(label,
-                style: TextStyle(
-                    fontSize: 14,
-                    color: isDark
-                        ? NinjaColors.textOnDark
-                        : NinjaColors.textPrimary)),
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 14,
+                color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+              ),
+            ),
           ),
         ),
       ),
@@ -433,22 +464,33 @@ class DesktopShell extends StatelessWidget {
     if (uri.startsWith(DesktopRoutes.studyPlan)) return 7;
     if (uri.startsWith(DesktopRoutes.modelConfig)) return 8;
     if (uri.startsWith(DesktopRoutes.profile) ||
-        uri.startsWith(DesktopRoutes.settings)) return 9;
+        uri.startsWith(DesktopRoutes.settings))
+      return 9;
     return 0;
   }
 
   void _navigate(BuildContext context, int index) {
     switch (index) {
-      case 0: context.go(DesktopRoutes.home);
-      case 1: context.go(DesktopRoutes.vocabulary);
-      case 2: context.go(DesktopRoutes.reading);
-      case 3: context.go(DesktopRoutes.listening);
-      case 4: context.go(DesktopRoutes.speaking);
-      case 5: context.go(DesktopRoutes.aiTutor);
-      case 6: context.go(DesktopRoutes.writing);
-      case 7: context.go(DesktopRoutes.studyPlan);
-      case 8: context.go(DesktopRoutes.modelConfig);
-      case 9: context.go(DesktopRoutes.profile);
+      case 0:
+        context.go(DesktopRoutes.home);
+      case 1:
+        context.go(DesktopRoutes.vocabulary);
+      case 2:
+        context.go(DesktopRoutes.reading);
+      case 3:
+        context.go(DesktopRoutes.listening);
+      case 4:
+        context.go(DesktopRoutes.speaking);
+      case 5:
+        context.go(DesktopRoutes.aiTutor);
+      case 6:
+        context.go(DesktopRoutes.writing);
+      case 7:
+        context.go(DesktopRoutes.studyPlan);
+      case 8:
+        context.go(DesktopRoutes.modelConfig);
+      case 9:
+        context.go(DesktopRoutes.profile);
     }
   }
 }
@@ -459,11 +501,10 @@ class _DesktopHome extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final isDark = FluentTheme.of(context).brightness == Brightness.dark;
-    final textColor =
-        isDark ? NinjaColors.textOnDark : NinjaColors.textPrimary;
+    final textColor = isDark ? AppColors.textOnDark : AppColors.textPrimary;
     final subColor = isDark
-        ? NinjaColors.textOnDark.withValues(alpha: 0.6)
-        : NinjaColors.textSecondary;
+        ? AppColors.textOnDark.withValues(alpha: 0.6)
+        : AppColors.textSecondary;
 
     // Try to load stats (may fail if vocabulary not yet initialized)
     final statsAsync = ref.watch(vocabularyStatsProvider);
@@ -475,22 +516,29 @@ class _DesktopHome extends ConsumerWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Header
-            Row(children: [
-              NinjaIcon.shuriken(size: 40, color: NinjaColors.primary),
-              const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text('🥷 Word Ninja',
+            Row(
+              children: [
+                AppIcon.learning(size: 40, color: AppColors.primary),
+                const SizedBox(width: 12),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'WordFlow',
                       style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.w800,
-                          color: textColor)),
-                  Text('你的 AI 英语忍者修炼之路',
-                      style: TextStyle(fontSize: 13, color: subColor)),
-                ],
-              ),
-            ]),
+                        fontSize: 24,
+                        fontWeight: FontWeight.w800,
+                        color: textColor,
+                      ),
+                    ),
+                    Text(
+                      '你的 AI 英语学习者学习之路',
+                      style: TextStyle(fontSize: 13, color: subColor),
+                    ),
+                  ],
+                ),
+              ],
+            ),
             const SizedBox(height: 24),
 
             // Stats cards
@@ -503,46 +551,55 @@ class _DesktopHome extends ConsumerWidget {
             const SizedBox(height: 20),
 
             // Quick actions
-            Text('快捷入口',
-                style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: textColor)),
+            Text(
+              '快捷入口',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: textColor,
+              ),
+            ),
             const SizedBox(height: 12),
             Wrap(
               spacing: 12,
               runSpacing: 12,
               children: [
                 _QuickCard(
-                    icon: FluentIcons.bookmarks,
-                    label: '单词本',
-                    color: NinjaColors.secondary,
-                    onTap: () => context.go(DesktopRoutes.vocabulary)),
+                  icon: FluentIcons.bookmarks,
+                  label: '单词本',
+                  color: AppColors.secondary,
+                  onTap: () => context.go(DesktopRoutes.vocabulary),
+                ),
                 _QuickCard(
-                    icon: FluentIcons.reading_mode,
-                    label: '阅读',
-                    color: NinjaColors.success,
-                    onTap: () => context.go(DesktopRoutes.reading)),
+                  icon: FluentIcons.reading_mode,
+                  label: '阅读',
+                  color: AppColors.success,
+                  onTap: () => context.go(DesktopRoutes.reading),
+                ),
                 _QuickCard(
-                    icon: FluentIcons.chat,
-                    label: 'AI Tutor',
-                    color: NinjaColors.accentPurple,
-                    onTap: () => context.go(DesktopRoutes.aiTutor)),
+                  icon: FluentIcons.chat,
+                  label: 'AI Tutor',
+                  color: AppColors.accentPurple,
+                  onTap: () => context.go(DesktopRoutes.aiTutor),
+                ),
                 _QuickCard(
-                    icon: FluentIcons.design,
-                    label: '写作',
-                    color: NinjaColors.info,
-                    onTap: () => context.go(DesktopRoutes.writing)),
+                  icon: FluentIcons.design,
+                  label: '写作',
+                  color: AppColors.info,
+                  onTap: () => context.go(DesktopRoutes.writing),
+                ),
                 _QuickCard(
-                    icon: FluentIcons.task_list,
-                    label: '学习计划',
-                    color: NinjaColors.accentGold,
-                    onTap: () => context.go(DesktopRoutes.studyPlan)),
+                  icon: FluentIcons.task_list,
+                  label: '学习计划',
+                  color: AppColors.accentGold,
+                  onTap: () => context.go(DesktopRoutes.studyPlan),
+                ),
                 _QuickCard(
-                    icon: FluentIcons.headset,
-                    label: '听力',
-                    color: NinjaColors.levelAdvanced,
-                    onTap: () => context.go(DesktopRoutes.listening)),
+                  icon: FluentIcons.headset,
+                  label: '听力',
+                  color: AppColors.levelAdvanced,
+                  onTap: () => context.go(DesktopRoutes.listening),
+                ),
               ],
             ),
             const SizedBox(height: 20),
@@ -552,16 +609,18 @@ class _DesktopHome extends ConsumerWidget {
     );
   }
 
-  Widget _buildStatsRow(VocabularyStats stats, Color textColor, Color subColor) {
+  Widget _buildStatsRow(
+    VocabularyStats stats,
+    Color textColor,
+    Color subColor,
+  ) {
     final items = [
-      _StatItem(stats.totalWords.toString(), '总词汇', NinjaColors.primary),
-      _StatItem(stats.masteredWords.toString(), '已掌握', NinjaColors.success),
-      _StatItem(stats.todayReview.toString(), '今日复习', NinjaColors.accentGold),
-      _StatItem(stats.learningWords.toString(), '待复习', NinjaColors.warning),
+      _StatItem(stats.totalWords.toString(), '总词汇', AppColors.primary),
+      _StatItem(stats.masteredWords.toString(), '已掌握', AppColors.success),
+      _StatItem(stats.todayReview.toString(), '今日复习', AppColors.accentGold),
+      _StatItem(stats.learningWords.toString(), '待复习', AppColors.warning),
     ];
-    return Row(
-      children: items.map((s) => Expanded(child: s)).toList(),
-    );
+    return Row(children: items.map((s) => Expanded(child: s)).toList());
   }
 }
 
@@ -576,17 +635,23 @@ class _StatItem extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 4),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
-        child: Column(children: [
-          Text(value,
+        child: Column(
+          children: [
+            Text(
+              value,
               style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w700,
-                  color: color)),
-          const SizedBox(height: 4),
-          Text(label,
-              style: TextStyle(
-                  fontSize: 12, color: NinjaColors.textSecondary)),
-        ]),
+                fontSize: 24,
+                fontWeight: FontWeight.w700,
+                color: color,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -598,11 +663,12 @@ class _QuickCard extends StatelessWidget {
   final Color color;
   final VoidCallback onTap;
 
-  const _QuickCard(
-      {required this.icon,
-      required this.label,
-      required this.color,
-      required this.onTap});
+  const _QuickCard({
+    required this.icon,
+    required this.label,
+    required this.color,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -612,13 +678,17 @@ class _QuickCard extends StatelessWidget {
         onPressed: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
-          child: Column(children: [
-            Icon(icon, size: 28, color: color),
-            const SizedBox(height: 8),
-            Text(label,
+          child: Column(
+            children: [
+              Icon(icon, size: 28, color: color),
+              const SizedBox(height: 8),
+              Text(
+                label,
                 style: TextStyle(fontSize: 13, color: color),
-                textAlign: TextAlign.center),
-          ]),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
         ),
       ),
     );

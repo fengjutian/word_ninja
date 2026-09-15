@@ -3,9 +3,9 @@ class AppConstants {
   AppConstants._();
 
   /// App 名称
-  static const String appName = 'Word Ninja';
+  static const String appName = 'WordFlow';
 
-  /// 忍者等级上限
+  /// 学习者等级上限
   static const int maxLevel = 100;
 
   /// 每级所需基础经验
@@ -27,5 +27,5 @@ class AppConstants {
   static const int reviewIntervalHours = 24;
 
   /// 数据库
-  static const String isarDbName = 'word_ninja';
+  static const String isarDbName = 'word_flow';
 }

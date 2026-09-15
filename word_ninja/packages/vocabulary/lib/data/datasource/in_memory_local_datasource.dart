@@ -15,7 +15,9 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
 
   @override
   Future<List<Word>> getWords({int page = 1, int size = 20}) async {
-    final sorted = List<Word>.from(_words)..sort((a, b) => (b.updatedAt ?? DateTime(0)).compareTo(a.updatedAt ?? DateTime(0)));
+    final sorted = List<Word>.from(_words)
+      ..sort((a, b) =>
+          (b.updatedAt ?? DateTime(0)).compareTo(a.updatedAt ?? DateTime(0)));
     final start = (page - 1) * size;
     if (start >= sorted.length) return [];
     return sorted.skip(start).take(size).toList();
@@ -34,7 +36,9 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
   Future<List<Word>> searchWords(String query) async {
     final q = query.toLowerCase();
     return _words
-        .where((w) => w.word.toLowerCase().contains(q) || w.meaning.toLowerCase().contains(q))
+        .where((w) =>
+            w.word.toLowerCase().contains(q) ||
+            w.meaning.toLowerCase().contains(q))
         .toList();
   }
 
@@ -66,7 +70,10 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
   Future<List<Word>> getDueReviews() async {
     final now = DateTime.now();
     final due = _words
-        .where((w) => w.nextReviewDate == null || w.nextReviewDate!.isBefore(now) || w.nextReviewDate!.isAtSameMomentAs(now))
+        .where((w) =>
+            w.nextReviewDate == null ||
+            w.nextReviewDate!.isBefore(now) ||
+            w.nextReviewDate!.isAtSameMomentAs(now))
         .toList();
 
     // 尝试加载词频数据用于重要性排序
@@ -82,7 +89,9 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
         masteryMap: mastMap,
       );
     } catch (e) {
-      log.w('Failed to load word importance scores, falling back to mastery sort', e);
+      log.w(
+          'Failed to load word importance scores, falling back to mastery sort',
+          e);
     }
 
     // 多维度排序：focusScore ↓ → 重要性 ↓ → mastery ↑
@@ -122,7 +131,8 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
     final newMastery = (word.mastery + gain).clamp(0, 100);
 
     // 艾宾浩斯间隔计算
-    final currentLevel = word.reviewCount.clamp(0, _ebbinghausIntervals.length - 1);
+    final currentLevel =
+        word.reviewCount.clamp(0, _ebbinghausIntervals.length - 1);
     final nextLevel = _nextEbbinghausLevel(currentLevel, review.score);
     var intervalDays = _ebbinghausIntervals[nextLevel];
     // reviewCount 追踪间隔等级：score>=5 递增，score>=3 保持，score<3 重置为1
@@ -151,7 +161,8 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
   /// score >= 3: 保持当前等级
   /// score < 3:  重置到第一级
   static int _nextEbbinghausLevel(int currentLevel, int score) {
-    if (score >= 5) return (currentLevel + 1).clamp(0, _ebbinghausIntervals.length - 1);
+    if (score >= 5)
+      return (currentLevel + 1).clamp(0, _ebbinghausIntervals.length - 1);
     if (score >= 3) return currentLevel;
     return 0;
   }
@@ -166,12 +177,15 @@ class InMemoryVocabularyLocalDataSource implements VocabularyLocalDataSource {
   Future<VocabularyStats> getStats() async {
     final today = DateTime.now();
     final todayStart = DateTime(today.year, today.month, today.day);
-    final todayReviews = _reviews.where((r) => r.reviewTime.isAfter(todayStart)).length;
+    final todayReviews =
+        _reviews.where((r) => r.reviewTime.isAfter(todayStart)).length;
     final now = DateTime.now();
-    final dueCount = _words.where((w) =>
-        w.nextReviewDate == null ||
-        w.nextReviewDate!.isBefore(now) ||
-        w.nextReviewDate!.isAtSameMomentAs(now)).length;
+    final dueCount = _words
+        .where((w) =>
+            w.nextReviewDate == null ||
+            w.nextReviewDate!.isBefore(now) ||
+            w.nextReviewDate!.isAtSameMomentAs(now))
+        .length;
     return VocabularyStats(
       totalWords: _words.length,
       masteredWords: _words.where((w) => w.mastery >= 80).length,

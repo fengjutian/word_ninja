@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import '../ninja_theme/ninja_theme.dart';
+import '../app_theme/app_theme.dart';
 
-/// 忍者等级徽章组件
-class NinjaLevelBadge extends StatelessWidget {
+/// 学习者等级徽章组件
+class LevelBadge extends StatelessWidget {
   final int level;
   final double size;
 
-  const NinjaLevelBadge({
+  const LevelBadge({
     super.key,
     required this.level,
     this.size = 48,
@@ -24,11 +24,11 @@ class NinjaLevelBadge extends StatelessWidget {
   }
 
   Color get _color {
-    if (level >= 100) return NinjaColors.levelLegend;
-    if (level >= 80) return NinjaColors.levelMaster;
-    if (level >= 40) return NinjaColors.levelAdvanced;
-    if (level >= 20) return NinjaColors.levelIntermediate;
-    return NinjaColors.levelBeginner;
+    if (level >= 100) return AppColors.levelLegend;
+    if (level >= 80) return AppColors.levelMaster;
+    if (level >= 40) return AppColors.levelAdvanced;
+    if (level >= 20) return AppColors.levelIntermediate;
+    return AppColors.levelBeginner;
   }
 
   @override

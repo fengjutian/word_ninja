@@ -3,21 +3,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
-/// 忍者应用自定义 SVG 图标系统
+/// 学习者应用自定义 SVG 图标系统
 ///
 /// SVG 资产由消费方应用提供（打包在应用 assets/icons/ 目录下）。
 /// 使用方法：
 /// ```dart
-/// NinjaIcon.shuriken(size: 24, color: NinjaColors.primary)
-/// NinjaIcon.scroll(size: 20)
+/// AppIcon.learning(size: 24, color: AppColors.primary)
+/// AppIcon.scroll(size: 20)
 /// ```
-class NinjaIcon extends StatelessWidget {
+class AppIcon extends StatelessWidget {
   final String _assetName;
   final double size;
   final Color? color;
   final BoxFit fit;
 
-  const NinjaIcon._(
+  const AppIcon._(
     this._assetName, {
     super.key,
     this.size = 24,
@@ -27,58 +27,58 @@ class NinjaIcon extends StatelessWidget {
 
   // ─── 图标目录 ───
 
-  /// 手里剑 — 核心品牌图标
-  static const shuriken = _NinjaIconRef('shuriken');
+  /// 学习 — 核心品牌图标
+  static const learning = _AppIconRef('learning');
 
   /// 卷轴 — 单词/阅读
-  static const scroll = _NinjaIconRef('scroll');
+  static const scroll = _AppIconRef('scroll');
 
-  /// 忍者头像 — 个人中心
-  static const ninjaHead = _NinjaIconRef('ninja_head');
+  /// 学习者头像 — 个人中心
+  static const profile = _AppIconRef('profile');
 
   /// 对话气泡 — AI 导师
-  static const chatBubble = _NinjaIconRef('chat_bubble');
+  static const chatBubble = _AppIconRef('chat_bubble');
 
   /// 奖杯 — 成就
-  static const trophy = _NinjaIconRef('trophy');
+  static const trophy = _AppIconRef('trophy');
 
   /// 金币 — 商店
-  static const coin = _NinjaIconRef('coin');
+  static const coin = _AppIconRef('coin');
 
   /// 耳机 — 听力
-  static const headphone = _NinjaIconRef('headphone');
+  static const headphone = _AppIconRef('headphone');
 
   /// 麦克风 — 口语
-  static const mic = _NinjaIconRef('mic');
+  static const mic = _AppIconRef('mic');
 
   /// 山峰 — 等级/进度
-  static const mountain = _NinjaIconRef('mountain');
+  static const mountain = _AppIconRef('mountain');
 
-  /// 剑 — 修炼/训练
-  static const sword = _NinjaIconRef('sword');
+  /// 剑 — 学习/训练
+  static const practice = _AppIconRef('practice');
 
   /// 钢笔 — 写作
-  static const pen = _NinjaIconRef('pen');
+  static const pen = _AppIconRef('pen');
 
   /// 日历 — 计划
-  static const calendar = _NinjaIconRef('calendar');
+  static const calendar = _AppIconRef('calendar');
 
-  /// 每个忍者图标的 Material 回退图标（SVG 加载失败时使用）
+  /// 每个学习者图标的 Material 回退图标（SVG 加载失败时使用）
   static IconData? _fallbackIcon(String name) {
     return switch (name) {
-      'shuriken'    => PhosphorIconsRegular.star,
-      'scroll'      => PhosphorIconsRegular.bookOpen,
-      'ninja_head'  => PhosphorIconsRegular.user,
+      'learning' => PhosphorIconsRegular.star,
+      'scroll' => PhosphorIconsRegular.bookOpen,
+      'profile' => PhosphorIconsRegular.user,
       'chat_bubble' => PhosphorIconsRegular.chats,
-      'trophy'      => PhosphorIconsRegular.trophy,
-      'coin'        => PhosphorIconsRegular.coin,
-      'headphone'   => PhosphorIconsRegular.headphones,
-      'mic'         => PhosphorIconsRegular.microphone,
-      'mountain'    => PhosphorIconsRegular.mountains,
-      'sword'       => PhosphorIconsRegular.barbell,
-      'pen'         => PhosphorIconsRegular.pencilSimple,
-      'calendar'    => PhosphorIconsRegular.calendar,
-      _             => null,
+      'trophy' => PhosphorIconsRegular.trophy,
+      'coin' => PhosphorIconsRegular.coin,
+      'headphone' => PhosphorIconsRegular.headphones,
+      'mic' => PhosphorIconsRegular.microphone,
+      'mountain' => PhosphorIconsRegular.mountains,
+      'practice' => PhosphorIconsRegular.bookOpen,
+      'pen' => PhosphorIconsRegular.pencilSimple,
+      'calendar' => PhosphorIconsRegular.calendar,
+      _ => null,
     };
   }
 
@@ -145,18 +145,18 @@ class NinjaIcon extends StatelessWidget {
   }
 }
 
-/// 图标引用 — 用于声明式调用，如 `NinjaIcon.shuriken`
-class _NinjaIconRef {
+/// 图标引用 — 用于声明式调用，如 `AppIcon.learning`
+class _AppIconRef {
   final String _name;
-  const _NinjaIconRef(this._name);
+  const _AppIconRef(this._name);
 
   /// 创建带参数的图标实例
-  NinjaIcon call({
+  AppIcon call({
     double size = 24,
     Color? color,
     BoxFit fit = BoxFit.contain,
   }) {
-    return NinjaIcon._(
+    return AppIcon._(
       _name,
       size: size,
       color: color,

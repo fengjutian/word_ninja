@@ -1,7 +1,7 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
 /// 注册页面
@@ -21,7 +21,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   bool _obscurePassword = true;
   bool _agreeToS = false;
 
-  static final _emailRegExp = RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
+  static final _emailRegExp =
+      RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
 
   @override
   void dispose() {
@@ -52,38 +53,37 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     final state = ref.watch(authProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('忍者注册')),
+      appBar: AppBar(title: const Text('学习者注册')),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(NinjaSpacing.xl),
+            padding: const EdgeInsets.all(AppSpacing.xl),
             child: Form(
               key: _formKey,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text('成为英语忍者学徒',
-                      style: NinjaTextStyles.heading2),
-                  const SizedBox(height: NinjaSpacing.xxl),
+                  const Text('成为英语学习者', style: AppTextStyles.heading2),
+                  const SizedBox(height: AppSpacing.xxl),
 
                   if (state.error != null)
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(NinjaSpacing.md),
-                      margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: NinjaColors.error.withValues(alpha: 0.1),
+                        color: AppColors.error.withValues(alpha: 0.1),
                         borderRadius:
-                            BorderRadius.circular(NinjaSpacing.buttonRadius),
+                            BorderRadius.circular(AppSpacing.buttonRadius),
                       ),
                       child: Text(state.error!,
-                          style: const TextStyle(color: NinjaColors.error)),
+                          style: const TextStyle(color: AppColors.error)),
                     ),
 
                   TextFormField(
                     controller: _nicknameCtrl,
                     decoration: const InputDecoration(
-                      labelText: '忍者名号',
+                      labelText: '学习者名号',
                       prefixIcon: Icon(PhosphorIconsRegular.user),
                     ),
                     validator: (v) {
@@ -92,7 +92,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: NinjaSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
 
                   TextFormField(
                     controller: _emailCtrl,
@@ -107,7 +107,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: NinjaSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
 
                   TextFormField(
                     controller: _passwordCtrl,
@@ -119,8 +119,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                         icon: Icon(_obscurePassword
                             ? PhosphorIconsRegular.eyeSlash
                             : PhosphorIconsRegular.eye),
-                        onPressed: () =>
-                            setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                       ),
                     ),
                     validator: (v) {
@@ -129,7 +129,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: NinjaSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
 
                   TextFormField(
                     controller: _confirmCtrl,
@@ -143,15 +143,16 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: NinjaSpacing.lg),
+                  const SizedBox(height: AppSpacing.lg),
 
                   // 同意协议
                   Row(
                     children: [
                       Checkbox(
                         value: _agreeToS,
-                        onChanged: (v) => setState(() => _agreeToS = v ?? false),
-                        activeColor: NinjaColors.primary,
+                        onChanged: (v) =>
+                            setState(() => _agreeToS = v ?? false),
+                        activeColor: AppColors.primary,
                       ),
                       const Expanded(
                         child: Text('我已阅读并同意《用户协议》和《隐私政策》',
@@ -159,12 +160,13 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: NinjaSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
 
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: state.status == AuthStatus.loading ? null : _submit,
+                      onPressed:
+                          state.status == AuthStatus.loading ? null : _submit,
                       child: state.status == AuthStatus.loading
                           ? const SizedBox(
                               width: 20,

@@ -76,19 +76,108 @@ class ChatSessionsState {
 
 /// 英语单词提取 — 过滤常见停用词
 const _stopWords = {
-  'the', 'and', 'for', 'are', 'but', 'not', 'you', 'all', 'can',
-  'her', 'was', 'one', 'our', 'out', 'has', 'have', 'been', 'some',
-  'how', 'who', 'what', 'when', 'where', 'which', 'why', 'will',
-  'with', 'from', 'this', 'that', 'than', 'then', 'them', 'they',
-  'into', 'just', 'like', 'make', 'more', 'much', 'over', 'such',
-  'take', 'very', 'your', 'also', 'does', 'said', 'know', 'think',
-  'mean', 'means', 'about', 'after', 'before', 'could', 'other',
-  'these', 'those', 'would', 'their', 'there', 'being', 'doing',
-  'hello', 'thanks', 'please', 'really', 'right', 'still', 'thing',
-  'word', 'words', 'english', 'language', 'using', 'people', 'many',
-  'each', 'every', 'well', 'way', 'even', 'too', 'its', 'get', 'got',
-  'had', 'did', 'say', 'use', 'used', 'good', 'need', 'help', 'any',
-  'yes', 'ask', 'see', 'let', 'hi', 'hey',
+  'the',
+  'and',
+  'for',
+  'are',
+  'but',
+  'not',
+  'you',
+  'all',
+  'can',
+  'her',
+  'was',
+  'one',
+  'our',
+  'out',
+  'has',
+  'have',
+  'been',
+  'some',
+  'how',
+  'who',
+  'what',
+  'when',
+  'where',
+  'which',
+  'why',
+  'will',
+  'with',
+  'from',
+  'this',
+  'that',
+  'than',
+  'then',
+  'them',
+  'they',
+  'into',
+  'just',
+  'like',
+  'make',
+  'more',
+  'much',
+  'over',
+  'such',
+  'take',
+  'very',
+  'your',
+  'also',
+  'does',
+  'said',
+  'know',
+  'think',
+  'mean',
+  'means',
+  'about',
+  'after',
+  'before',
+  'could',
+  'other',
+  'these',
+  'those',
+  'would',
+  'their',
+  'there',
+  'being',
+  'doing',
+  'hello',
+  'thanks',
+  'please',
+  'really',
+  'right',
+  'still',
+  'thing',
+  'word',
+  'words',
+  'english',
+  'language',
+  'using',
+  'people',
+  'many',
+  'each',
+  'every',
+  'well',
+  'way',
+  'even',
+  'too',
+  'its',
+  'get',
+  'got',
+  'had',
+  'did',
+  'say',
+  'use',
+  'used',
+  'good',
+  'need',
+  'help',
+  'any',
+  'yes',
+  'ask',
+  'see',
+  'let',
+  'hi',
+  'hey',
 };
 
 List<String> _extractWords(String text) {
@@ -121,7 +210,7 @@ class ChatHistoryNotifier extends StateNotifier<ChatSessionsState> {
       title: title,
       messages: const [
         ChatMessage(
-          '你好！我是 Sensei Shell，你的英语忍者导师。\n有什么问题尽管问我！',
+          '你好！我是 AI Tutor，你的英语学习导师。\n有什么问题尽管问我！',
           isUser: false,
         ),
       ],
@@ -188,12 +277,10 @@ class ChatHistoryNotifier extends StateNotifier<ChatSessionsState> {
       final jsonStr = prefs.getString('ai_tutor_sessions');
       if (jsonStr != null && jsonStr.isNotEmpty) {
         final data = jsonDecode(jsonStr) as Map<String, dynamic>;
-        final sessionsJson =
-            data['sessions'] as List<dynamic>;
+        final sessionsJson = data['sessions'] as List<dynamic>;
         if (sessionsJson.isNotEmpty) {
           for (final sj in sessionsJson) {
-            final s =
-                ChatSession.fromJson(sj as Map<String, dynamic>);
+            final s = ChatSession.fromJson(sj as Map<String, dynamic>);
             await _saveSessionToDb(s);
           }
           state = _buildStateFromJson(data);
@@ -333,9 +420,8 @@ class ChatHistoryNotifier extends StateNotifier<ChatSessionsState> {
     final newMsgs = [...cur.messages, msg];
     var title = cur.title;
     if (title == '新会话' && msg.isUser) {
-      title = msg.text.length > 30
-          ? '${msg.text.substring(0, 30)}...'
-          : msg.text;
+      title =
+          msg.text.length > 30 ? '${msg.text.substring(0, 30)}...' : msg.text;
     }
     sessions[state.currentIndex] = ChatSession(
       id: cur.id,
@@ -371,8 +457,8 @@ class ChatHistoryNotifier extends StateNotifier<ChatSessionsState> {
     if (cur.messages.isEmpty) return;
     final allMsgs = [...cur.messages];
     final last = allMsgs.removeLast();
-    final updated = ChatMessage(
-        last.text + chunk, isUser: last.isUser, isError: last.isError);
+    final updated = ChatMessage(last.text + chunk,
+        isUser: last.isUser, isError: last.isError);
     sessions[state.currentIndex] = ChatSession(
       id: cur.id,
       title: cur.title,

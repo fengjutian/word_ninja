@@ -2,7 +2,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import '../../data/model/word.dart';
 import '../providers/word_provider.dart';
 
@@ -31,28 +31,28 @@ class WordDetailPage extends ConsumerWidget {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // 单词主信息
             Card(
               child: Padding(
-                padding: const EdgeInsets.all(NinjaSpacing.xl),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Column(
                   children: [
-                    Text(word.word, style: NinjaTextStyles.displayMedium),
+                    Text(word.word, style: AppTextStyles.displayMedium),
                     if (word.phonetic.isNotEmpty) ...[
-                      const SizedBox(height: NinjaSpacing.sm),
+                      const SizedBox(height: AppSpacing.sm),
                       Text('/${word.phonetic}/',
-                          style: NinjaTextStyles.bodyLarge),
+                          style: AppTextStyles.bodyLarge),
                     ],
-                    const SizedBox(height: NinjaSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     Text(word.meaning,
-                        style: NinjaTextStyles.heading3.copyWith(
-                          color: NinjaColors.primary,
+                        style: AppTextStyles.heading3.copyWith(
+                          color: AppColors.primary,
                         )),
-                    const SizedBox(height: NinjaSpacing.lg),
+                    const SizedBox(height: AppSpacing.lg),
                     // 掌握度
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -64,33 +64,32 @@ class WordDetailPage extends ConsumerWidget {
                 ),
               ),
             ),
-            const SizedBox(height: NinjaSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
 
             // 例句
             if (word.example.isNotEmpty) ...[
-              const Text('例句', style: NinjaTextStyles.heading3),
-              const SizedBox(height: NinjaSpacing.sm),
+              const Text('例句', style: AppTextStyles.heading3),
+              const SizedBox(height: AppSpacing.sm),
               Card(
                 child: Padding(
-                  padding: const EdgeInsets.all(NinjaSpacing.lg),
-                  child: Text(word.example,
-                      style: NinjaTextStyles.bodyLarge),
+                  padding: const EdgeInsets.all(AppSpacing.lg),
+                  child: Text(word.example, style: AppTextStyles.bodyLarge),
                 ),
               ),
-              const SizedBox(height: NinjaSpacing.lg),
+              const SizedBox(height: AppSpacing.lg),
             ],
 
             // 标签
             if (word.tags.isNotEmpty) ...[
-              const Text('标签', style: NinjaTextStyles.heading3),
-              const SizedBox(height: NinjaSpacing.sm),
+              const Text('标签', style: AppTextStyles.heading3),
+              const SizedBox(height: AppSpacing.sm),
               Wrap(
-                spacing: NinjaSpacing.sm,
+                spacing: AppSpacing.sm,
                 children: word.tags
                     .map((tag) => Chip(
                           label: Text(tag),
-                          backgroundColor: NinjaColors.primary
-                              .withValues(alpha: 0.1),
+                          backgroundColor:
+                              AppColors.primary.withValues(alpha: 0.1),
                         ))
                     .toList(),
               ),
@@ -131,7 +130,7 @@ class WordDetailPage extends ConsumerWidget {
                 }
               }
             },
-            style: TextButton.styleFrom(foregroundColor: NinjaColors.error),
+            style: TextButton.styleFrom(foregroundColor: AppColors.error),
             child: const Text('删除'),
           ),
         ],
@@ -154,9 +153,9 @@ class WordDetailPage extends ConsumerWidget {
   }
 
   (Color, String) _masteryInfo(int mastery) {
-    if (mastery >= 85) return (NinjaColors.success, '已掌握');
-    if (mastery >= 60) return (NinjaColors.info, '熟悉');
-    if (mastery >= 30) return (NinjaColors.warning, '学习中');
-    return (NinjaColors.error, '陌生');
+    if (mastery >= 85) return (AppColors.success, '已掌握');
+    if (mastery >= 60) return (AppColors.info, '熟悉');
+    if (mastery >= 30) return (AppColors.warning, '学习中');
+    return (AppColors.error, '陌生');
   }
 }

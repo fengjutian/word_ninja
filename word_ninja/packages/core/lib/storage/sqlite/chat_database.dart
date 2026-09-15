@@ -1,4 +1,3 @@
-
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
 import 'package:sqflite/sqflite.dart';
@@ -14,7 +13,7 @@ class ChatDatabase {
 
   static Future<void> open() async {
     final dir = await getApplicationDocumentsDirectory();
-    final path = p.join(dir.path, 'word_ninja_chat.sqlite');
+    final path = p.join(dir.path, 'word_flow_chat.sqlite');
     _db = await openDatabase(
       path,
       version: 1,
@@ -91,8 +90,7 @@ class ChatDatabase {
       String id, int messageCount, int timestamp) async {
     await db.update('chat_sessions',
         {'message_count': messageCount, 'updated_at': timestamp},
-        where: 'id = ?',
-        whereArgs: [id]);
+        where: 'id = ?', whereArgs: [id]);
   }
 
   static Future<void> updateSessionTitle(String id, String title) async {
@@ -189,12 +187,10 @@ class ChatDatabase {
   }
 
   static Future<List<Map<String, dynamic>>> topWords({int limit = 20}) async {
-    return db.query('word_stats',
-        orderBy: 'ask_count DESC', limit: limit);
+    return db.query('word_stats', orderBy: 'ask_count DESC', limit: limit);
   }
 
-  static Future<List<Map<String, dynamic>>> wordsSince(
-      int timestampMs) async {
+  static Future<List<Map<String, dynamic>>> wordsSince(int timestampMs) async {
     return db.query('word_stats',
         where: 'last_ask >= ?',
         whereArgs: [timestampMs],
@@ -208,9 +204,8 @@ class ChatDatabase {
     int days = 30,
     int limit = 50,
   }) async {
-    final since = DateTime.now()
-        .subtract(Duration(days: days))
-        .millisecondsSinceEpoch;
+    final since =
+        DateTime.now().subtract(Duration(days: days)).millisecondsSinceEpoch;
     return db.rawQuery(
       'SELECT value AS word, COUNT(*) AS cnt '
       'FROM chat_messages, json_each(chat_messages.words_json) '

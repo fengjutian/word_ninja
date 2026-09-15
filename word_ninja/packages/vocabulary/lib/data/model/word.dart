@@ -18,10 +18,13 @@ class Word with _$Word {
     @Default([]) List<String> tags,
     DateTime? createdAt,
     DateTime? updatedAt,
+
     /// 下次复习日期（null = 立即待复习 / 从未复习）
     DateTime? nextReviewDate,
+
     /// 已复习次数（用于艾宾浩斯间隔计算）
     @Default(0) int reviewCount,
+
     /// AI 标记的重点分数（0-100），用于强化学习优先调度
     @Default(0) int focusScore,
   }) = _Word;

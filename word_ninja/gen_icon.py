@@ -1,4 +1,4 @@
-"""Generate ninja app icon from emoji"""
+"""Generate the WordFlow app icon."""
 from PIL import Image, ImageDraw, ImageFont
 import os
 
@@ -12,7 +12,7 @@ try:
 except Exception:
     font = ImageFont.load_default()
 
-draw.text((size // 2, size // 2), "🥷", fill="white", font=font, anchor="mm")
+draw.text((size // 2, size // 2), "W", fill="white", font=font, anchor="mm")
 
 # Save as multi-size .ico
 out = os.path.join(os.path.dirname(__file__), "app_icon.ico")

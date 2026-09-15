@@ -71,7 +71,8 @@ class SyncService {
     Future<void> Function()? syncRecords,
     Future<void> Function()? syncPlans,
   }) async {
-    return sync(syncWords: syncWords, syncRecords: syncRecords, syncPlans: syncPlans);
+    return sync(
+        syncWords: syncWords, syncRecords: syncRecords, syncPlans: syncPlans);
   }
 }
 

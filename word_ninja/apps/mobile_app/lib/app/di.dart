@@ -18,7 +18,7 @@ import 'package:sync/sync_service.dart';
 import 'package:ai/services/ai_chat_service.dart';
 
 /// ═══════════════════════════════════════
-///  Word Ninja 依赖注入（DI）模块
+///  WordFlow 依赖注入（DI）模块
 ///  所有 Provider 在此统一绑定并作为 overrides 导出
 /// ═══════════════════════════════════════
 

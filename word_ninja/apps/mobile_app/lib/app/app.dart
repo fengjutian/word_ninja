@@ -3,24 +3,25 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ninja_theme/theme_data.dart';
+import 'package:ui_kit/app_theme/theme_data.dart';
 import 'package:core/storage/preferences.dart';
 import '../debug_overlay.dart';
 
 /// App 根组件
-class WordNinjaApp extends ConsumerWidget {
+class WordFlowApp extends ConsumerWidget {
   final GoRouter router;
 
-  const WordNinjaApp({super.key, required this.router});
+  const WordFlowApp({super.key, required this.router});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
-      title: 'Word Ninja',
+      title: 'WordFlow',
       debugShowCheckedModeBanner: false,
-      theme: NinjaTheme.light,
-      darkTheme: NinjaTheme.dark,
-      themeMode: Preferences.getBool('dark_mode') ? ThemeMode.dark : ThemeMode.light,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
+      themeMode:
+          Preferences.getBool('dark_mode') ? ThemeMode.dark : ThemeMode.light,
       routerConfig: router,
       builder: kDebugMode ? _debugBuilder : null,
     );
@@ -41,7 +42,9 @@ class WordNinjaApp extends ConsumerWidget {
                 : Colors.grey.shade400,
             onPressed: DebugOverlay.toggleAll,
             child: Icon(
-              DebugOverlay.isActive ? PhosphorIconsRegular.eye : PhosphorIconsRegular.eyeSlash,
+              DebugOverlay.isActive
+                  ? PhosphorIconsRegular.eye
+                  : PhosphorIconsRegular.eyeSlash,
               size: 20,
             ),
           ),

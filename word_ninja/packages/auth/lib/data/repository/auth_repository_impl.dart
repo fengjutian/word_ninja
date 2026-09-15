@@ -33,8 +33,7 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<User> register(
-      String email, String password, String nickname) async {
+  Future<User> register(String email, String password, String nickname) async {
     final data = await _remote.register(email, password, nickname);
     _currentUser = User(
       id: data['user']['id'],

@@ -128,7 +128,7 @@ func (h *Handler) Chat(c *gin.Context) {
 	}
 
 	messages := []openaiMessage{
-		{Role: "system", Content: "你是 Word Ninja 的 AI 导师 Sensei Shell，帮助用户学习英语。用中文回复。"},
+		{Role: "system", Content: "你是 WordFlow 的 AI 导师 AI Tutor，帮助用户学习英语。用中文回复。"},
 	}
 	for _, m := range req.History {
 		role := m["role"]
@@ -222,7 +222,7 @@ func (h *Handler) Explain(c *gin.Context) {
 		return
 	}
 	result, err := h.callOpenAI(c,
-		"你是 Word Ninja 的 AI 导师。请用中文详细解释以下英语单词，包括：词性、中文释义、词根词缀分析、常见搭配、例句。",
+		"你是 WordFlow 的 AI 导师。请用中文详细解释以下英语单词，包括：词性、中文释义、词根词缀分析、常见搭配、例句。",
 		fmt.Sprintf("请解释单词: %s", req.Word),
 	)
 	if err != nil {
@@ -246,7 +246,7 @@ func (h *Handler) Plan(c *gin.Context) {
 	prompt := fmt.Sprintf("用户的学习目标是: %s。用户当前等级: %d。请生成一个 %d 天的英语学习计划，每天列出具体的学习任务。",
 		req.Goal, req.Level, req.DayCount)
 	result, err := h.callOpenAI(c,
-		"你是 Word Ninja 的 AI 导师。请根据用户的学习目标和等级，生成一份结构化的英语学习计划。用中文回复。",
+		"你是 WordFlow 的 AI 导师。请根据用户的学习目标和等级，生成一份结构化的英语学习计划。用中文回复。",
 		prompt,
 	)
 	if err != nil {
@@ -265,7 +265,7 @@ func (h *Handler) Correct(c *gin.Context) {
 		return
 	}
 	result, err := h.callOpenAI(c,
-		"你是 Word Ninja 的 AI 写作导师。请批改以下英文文本，指出语法错误、用词不当、并提供改进建议。用中文回复。",
+		"你是 WordFlow 的 AI 写作导师。请批改以下英文文本，指出语法错误、用词不当、并提供改进建议。用中文回复。",
 		fmt.Sprintf("请批改以下文本，指出错误并给出修改建议:\n\n%s", req.Text),
 	)
 	if err != nil {

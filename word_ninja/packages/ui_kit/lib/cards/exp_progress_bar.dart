@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../ninja_theme/ninja_theme.dart';
+import '../app_theme/app_theme.dart';
 
 /// 经验条组件
 class ExpProgressBar extends StatelessWidget {
@@ -20,17 +20,17 @@ class ExpProgressBar extends StatelessWidget {
       children: [
         Text(
           '${currentExp} / $maxExp EXP',
-          style: NinjaTextStyles.caption,
+          style: AppTextStyles.caption,
         ),
-        const SizedBox(height: NinjaSpacing.xs),
+        const SizedBox(height: AppSpacing.xs),
         ClipRRect(
           borderRadius: BorderRadius.circular(6),
           child: LinearProgressIndicator(
             value: progress,
             minHeight: 10,
-            backgroundColor: NinjaColors.divider.withValues(alpha: 0.3),
+            backgroundColor: AppColors.divider.withValues(alpha: 0.3),
             valueColor: const AlwaysStoppedAnimation<Color>(
-              NinjaColors.accentGold,
+              AppColors.accentGold,
             ),
           ),
         ),

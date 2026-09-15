@@ -2,7 +2,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import '../providers/auth_provider.dart';
 
 /// 登录页面
@@ -19,7 +19,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   final _passwordCtrl = TextEditingController();
   bool _obscurePassword = true;
 
-  static final _emailRegExp = RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
+  static final _emailRegExp =
+      RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
 
   @override
   void dispose() {
@@ -44,7 +45,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(NinjaSpacing.xl),
+            padding: const EdgeInsets.all(AppSpacing.xl),
             child: Form(
               key: _formKey,
               child: Column(
@@ -56,36 +57,36 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     height: 80,
                     decoration: const BoxDecoration(
                       shape: BoxShape.circle,
-                      color: NinjaColors.primary,
+                      color: AppColors.primary,
                     ),
                     child: const Center(
-                      child: Text('忍', style: TextStyle(
-                        fontSize: 36,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                      )),
+                      child: Text('W',
+                          style: TextStyle(
+                            fontSize: 36,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w900,
+                          )),
                     ),
                   ),
-                  const SizedBox(height: NinjaSpacing.lg),
-                  Text('Word Ninja', style: NinjaTextStyles.displayMedium),
-                  const SizedBox(height: NinjaSpacing.xs),
-                  Text('登录继续你的忍者修炼',
-                      style: NinjaTextStyles.bodyMedium),
-                  const SizedBox(height: NinjaSpacing.xxl),
+                  const SizedBox(height: AppSpacing.lg),
+                  Text('WordFlow', style: AppTextStyles.displayMedium),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text('登录继续你的学习成长', style: AppTextStyles.bodyMedium),
+                  const SizedBox(height: AppSpacing.xxl),
 
                   // 错误提示
                   if (state.error != null)
                     Container(
                       width: double.infinity,
-                      padding: const EdgeInsets.all(NinjaSpacing.md),
-                      margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: NinjaColors.error.withValues(alpha: 0.1),
+                        color: AppColors.error.withValues(alpha: 0.1),
                         borderRadius:
-                            BorderRadius.circular(NinjaSpacing.buttonRadius),
+                            BorderRadius.circular(AppSpacing.buttonRadius),
                       ),
                       child: Text(state.error!,
-                          style: const TextStyle(color: NinjaColors.error)),
+                          style: const TextStyle(color: AppColors.error)),
                     ),
 
                   // 邮箱
@@ -102,7 +103,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: NinjaSpacing.lg),
+                  const SizedBox(height: AppSpacing.lg),
 
                   // 密码
                   TextFormField(
@@ -115,8 +116,8 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                         icon: Icon(_obscurePassword
                             ? PhosphorIconsRegular.eyeSlash
                             : PhosphorIconsRegular.eye),
-                        onPressed: () =>
-                            setState(() => _obscurePassword = !_obscurePassword),
+                        onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword),
                       ),
                     ),
                     validator: (v) {
@@ -125,13 +126,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                       return null;
                     },
                   ),
-                  const SizedBox(height: NinjaSpacing.xl),
+                  const SizedBox(height: AppSpacing.xl),
 
                   // 登录按钮
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: state.status == AuthStatus.loading ? null : _submit,
+                      onPressed:
+                          state.status == AuthStatus.loading ? null : _submit,
                       child: state.status == AuthStatus.loading
                           ? const SizedBox(
                               width: 20,
@@ -144,7 +146,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                           : const Text('登 录'),
                     ),
                   ),
-                  const SizedBox(height: NinjaSpacing.lg),
+                  const SizedBox(height: AppSpacing.lg),
 
                   // 辅助链接
                   Row(

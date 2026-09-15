@@ -33,7 +33,8 @@ class WordListState {
 
 /// 单词仓库 Provider（需在 app DI 中 override）
 final vocabularyRepositoryProvider = Provider<VocabularyRepository>((ref) {
-  throw UnimplementedError('vocabularyRepositoryProvider must be overridden in app DI');
+  throw UnimplementedError(
+      'vocabularyRepositoryProvider must be overridden in app DI');
 });
 
 /// 单词 Provider

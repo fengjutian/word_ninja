@@ -1,4 +1,4 @@
-module github.com/word-ninja/server
+module github.com/word-flow/server
 
 go 1.25.3
 

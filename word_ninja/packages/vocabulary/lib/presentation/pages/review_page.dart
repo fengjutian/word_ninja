@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import '../../data/model/word.dart';
 import '../providers/word_provider.dart';
 
@@ -116,9 +116,10 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(PhosphorIconsRegular.checkCircle, size: 64, color: NinjaColors.success),
+              Icon(PhosphorIconsRegular.checkCircle,
+                  size: 64, color: AppColors.success),
               SizedBox(height: 16),
-              Text('暂无待复习单词', style: NinjaTextStyles.heading3),
+              Text('暂无待复习单词', style: AppTextStyles.heading3),
             ],
           ),
         ),
@@ -144,8 +145,8 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
           // 进度条
           LinearProgressIndicator(
             value: (_currentIndex + 1) / _words.length,
-            backgroundColor: NinjaColors.divider.withValues(alpha: 0.2),
-            valueColor: const AlwaysStoppedAnimation<Color>(NinjaColors.primary),
+            backgroundColor: AppColors.divider.withValues(alpha: 0.2),
+            valueColor: const AlwaysStoppedAnimation<Color>(AppColors.primary),
           ),
 
           Expanded(
@@ -178,7 +179,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
           // 评分按钮
           if (_showMeaning)
             Padding(
-              padding: const EdgeInsets.all(NinjaSpacing.xl),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: _isSubmitting
                   ? const Padding(
                       padding: EdgeInsets.all(16),
@@ -188,11 +189,11 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         _scoreBtn(PhosphorIconsRegular.smileySad, '不认识',
-                            NinjaColors.error, () => _rateWord(1)),
+                            AppColors.error, () => _rateWord(1)),
                         _scoreBtn(PhosphorIconsRegular.smileyMeh, '模糊',
-                            NinjaColors.warning, () => _rateWord(3)),
+                            AppColors.warning, () => _rateWord(3)),
                         _scoreBtn(PhosphorIconsRegular.smiley, '认识',
-                            NinjaColors.success, () => _rateWord(5)),
+                            AppColors.success, () => _rateWord(5)),
                       ],
                     ),
             ),
@@ -203,39 +204,37 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
 
   Widget _buildWordFront(Word word) {
     return Card(
-      margin: const EdgeInsets.all(NinjaSpacing.xl),
+      margin: const EdgeInsets.all(AppSpacing.xl),
       child: Container(
         width: double.infinity,
         height: 280,
         alignment: Alignment.center,
-        child: Text(word.word, style: NinjaTextStyles.displayLarge),
+        child: Text(word.word, style: AppTextStyles.displayLarge),
       ),
     );
   }
 
   Widget _buildWordBack(Word word) {
     return Card(
-      margin: const EdgeInsets.all(NinjaSpacing.xl),
-      color: NinjaColors.primaryLight.withValues(alpha: 0.05),
+      margin: const EdgeInsets.all(AppSpacing.xl),
+      color: AppColors.primaryLight.withValues(alpha: 0.05),
       child: Container(
         width: double.infinity,
         height: 280,
-        padding: const EdgeInsets.all(NinjaSpacing.xl),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         alignment: Alignment.center,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(word.meaning, style: NinjaTextStyles.heading1),
+            Text(word.meaning, style: AppTextStyles.heading1),
             if (word.phonetic.isNotEmpty) ...[
-              const SizedBox(height: NinjaSpacing.sm),
-              Text('/${word.phonetic}/',
-                  style: NinjaTextStyles.bodyLarge),
+              const SizedBox(height: AppSpacing.sm),
+              Text('/${word.phonetic}/', style: AppTextStyles.bodyLarge),
             ],
             if (word.example.isNotEmpty) ...[
-              const SizedBox(height: NinjaSpacing.md),
+              const SizedBox(height: AppSpacing.md),
               Text(word.example,
-                  style: NinjaTextStyles.bodyMedium,
-                  textAlign: TextAlign.center),
+                  style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
             ],
           ],
         ),
@@ -243,7 +242,8 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
     );
   }
 
-  Widget _scoreBtn(IconData icon, String label, Color color, VoidCallback onTap) {
+  Widget _scoreBtn(
+      IconData icon, String label, Color color, VoidCallback onTap) {
     return GestureDetector(
       onTap: onTap,
       child: Column(
@@ -258,7 +258,7 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
             ),
             child: Icon(icon, color: color, size: 28),
           ),
-          const SizedBox(height: NinjaSpacing.xs),
+          const SizedBox(height: AppSpacing.xs),
           Text(label, style: TextStyle(color: color, fontSize: 12)),
         ],
       ),

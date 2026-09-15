@@ -30,6 +30,6 @@ class AppBootstrap {
     }
 
     // 4. 其他初始化
-    log.i('Word Ninja bootstrapped');
+    log.i('WordFlow bootstrapped');
   }
 }

@@ -1,4 +1,4 @@
-# Register wordninja:// custom URL protocol
+# Register wordflow:// custom URL protocol
 # Run as Administrator with: Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 $exe = (Get-Process -Id $pid).MainModule.FileName
@@ -11,11 +11,11 @@ if (-not (Test-Path $exePath)) {
 
 Write-Host "Registering protocol for: $exePath"
 
-New-Item -Path "HKCU:\Software\Classes\wordninja" -Force | Out-Null
-Set-ItemProperty -Path "HKCU:\Software\Classes\wordninja" -Name "(Default)" -Value "URL:Word Ninja Protocol"
-Set-ItemProperty -Path "HKCU:\Software\Classes\wordninja" -Name "URL Protocol" -Value ""
+New-Item -Path "HKCU:\Software\Classes\wordflow" -Force | Out-Null
+Set-ItemProperty -Path "HKCU:\Software\Classes\wordflow" -Name "(Default)" -Value "URL:WordFlow Protocol"
+Set-ItemProperty -Path "HKCU:\Software\Classes\wordflow" -Name "URL Protocol" -Value ""
 
-New-Item -Path "HKCU:\Software\Classes\wordninja\shell\open\command" -Force | Out-Null
-Set-ItemProperty -Path "HKCU:\Software\Classes\wordninja\shell\open\command" -Name "(Default)" -Value "`"$exePath`" `"%1`""
+New-Item -Path "HKCU:\Software\Classes\wordflow\shell\open\command" -Force | Out-Null
+Set-ItemProperty -Path "HKCU:\Software\Classes\wordflow\shell\open\command" -Name "(Default)" -Value "`"$exePath`" `"%1`""
 
-Write-Host "Done! Test: start wordninja://vocabulary/add?word=hello" -ForegroundColor Green
+Write-Host "Done! Test: start wordflow://vocabulary/add?word=hello" -ForegroundColor Green

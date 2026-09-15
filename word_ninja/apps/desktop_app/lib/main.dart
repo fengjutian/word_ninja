@@ -23,7 +23,7 @@ void main() async {
   await windowManager.ensureInitialized();
 
   const windowOptions = WindowOptions(
-    title: 'Word Ninja',
+    title: 'WordFlow',
     size: Size(1280, 800),
     minimumSize: Size(960, 640),
     center: true,
@@ -43,34 +43,31 @@ void main() async {
   // );
 
   await AppBootstrap.init();
-  log.i('Word Ninja Desktop started');
+  log.i('WordFlow Desktop started');
 
   final router = createDesktopRouter();
   final container = ProviderContainer(overrides: desktopOverrides);
 
-  // Deep link handling (wordninja://)
+  // Deep link handling (wordflow://)
   final appLinks = AppLinks();
   appLinks.uriLinkStream.listen((uri) {
     log.i('Deep link received: $uri');
-    // wordninja://vocabulary/add?word=hello -> /vocabulary/add?word=hello
-    final path = uri.toString().replaceFirst('wordninja://', '/');
+    // wordflow://vocabulary/add?word=hello -> /vocabulary/add?word=hello
+    final path = uri.toString().replaceFirst('wordflow://', '/');
     router.go(path);
   });
   // Handle cold-start deep link
   final initialUri = await appLinks.getInitialLink();
   if (initialUri != null) {
     log.i('Cold-start deep link: $initialUri');
-    final path = initialUri.toString().replaceFirst('wordninja://', '/');
+    final path = initialUri.toString().replaceFirst('wordflow://', '/');
     router.go(path);
   }
 
   runApp(
     UncontrolledProviderScope(
       container: container,
-      child: _AppShell(
-        router: router,
-        container: container,
-      ),
+      child: _AppShell(router: router, container: container),
     ),
   );
 }
@@ -103,10 +100,7 @@ class _AppShell extends ConsumerStatefulWidget {
   final GoRouter router;
   final ProviderContainer container;
 
-  const _AppShell({
-    required this.router,
-    required this.container,
-  });
+  const _AppShell({required this.router, required this.container});
 
   @override
   ConsumerState<_AppShell> createState() => _AppShellState();
@@ -157,7 +151,7 @@ class _AppShellState extends ConsumerState<_AppShell> with WindowListener {
       );
     }
 
-    return WordNinjaDesktopApp(router: widget.router);
+    return WordFlowDesktopApp(router: widget.router);
   }
 
   @override

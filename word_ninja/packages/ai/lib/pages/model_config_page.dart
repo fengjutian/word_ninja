@@ -1,7 +1,7 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import '../config/model_config.dart';
 import '../config/config_provider.dart';
 import '../services/ai_chat_service.dart';
@@ -20,11 +20,11 @@ class ModelConfigPage extends ConsumerWidget {
         title: const Text('大模型配置'),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           // ─── 提供商选择 ───
-          Text('模型提供商', style: NinjaTextStyles.titleMedium),
-          const SizedBox(height: NinjaSpacing.sm),
+          Text('模型提供商', style: AppTextStyles.titleMedium),
+          const SizedBox(height: AppSpacing.sm),
           _ProviderCard(
             icon: PhosphorIconsRegular.lightning,
             title: 'DeepSeek V4 Pro',
@@ -33,7 +33,7 @@ class ModelConfigPage extends ConsumerWidget {
                 config.maxTokens >= 1000,
             onTap: () => notifier.selectProvider(ModelProvider.deepSeek),
           ),
-          const SizedBox(height: NinjaSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
           _ProviderCard(
             icon: PhosphorIconsRegular.rocket,
             title: 'DeepSeek V4 Flash',
@@ -42,7 +42,7 @@ class ModelConfigPage extends ConsumerWidget {
                 config.maxTokens < 1000,
             onTap: () => notifier.selectDeepSeekFlash(),
           ),
-          const SizedBox(height: NinjaSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
           _ProviderCard(
             icon: PhosphorIconsRegular.openAiLogo,
             title: 'OpenAI',
@@ -50,7 +50,7 @@ class ModelConfigPage extends ConsumerWidget {
             selected: config.provider == ModelProvider.openAI,
             onTap: () => notifier.selectProvider(ModelProvider.openAI),
           ),
-          const SizedBox(height: NinjaSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
           _ProviderCard(
             icon: PhosphorIconsRegular.wrench,
             title: '自定义',
@@ -59,61 +59,61 @@ class ModelConfigPage extends ConsumerWidget {
             onTap: () => notifier.selectProvider(ModelProvider.custom),
           ),
 
-          const SizedBox(height: NinjaSpacing.xl),
+          const SizedBox(height: AppSpacing.xl),
           const Divider(),
-          const SizedBox(height: NinjaSpacing.md),
+          const SizedBox(height: AppSpacing.md),
 
           // ─── API Key ───
-          Text('API 密钥', style: NinjaTextStyles.titleMedium),
-          const SizedBox(height: NinjaSpacing.sm),
+          Text('API 密钥', style: AppTextStyles.titleMedium),
+          const SizedBox(height: AppSpacing.sm),
           _ApiKeyField(
             initialValue: config.apiKey,
             onSaved: (key) => notifier.updateApiKey(key),
           ),
           if (config.apiKey.isNotEmpty)
             Padding(
-              padding: const EdgeInsets.only(top: NinjaSpacing.sm),
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
               child: Row(
                 children: [
                   const Icon(PhosphorIconsRegular.checkCircle,
-                      color: NinjaColors.success, size: 16),
+                      color: AppColors.success, size: 16),
                   const SizedBox(width: 4),
                   Text('密钥已保存 (${config.apiKey.length} 位)',
-                      style: NinjaTextStyles.caption.copyWith(
-                          color: NinjaColors.success)),
+                      style: AppTextStyles.caption
+                          .copyWith(color: AppColors.success)),
                 ],
               ),
             ),
 
-          const SizedBox(height: NinjaSpacing.md),
+          const SizedBox(height: AppSpacing.md),
           // ─── 测试连接 ───
           _TestButton(apiKey: config.apiKey, config: config),
 
-          const SizedBox(height: NinjaSpacing.xl),
+          const SizedBox(height: AppSpacing.xl),
 
           // ─── 高级设置 ───
-          Text('高级设置', style: NinjaTextStyles.titleMedium),
-          const SizedBox(height: NinjaSpacing.sm),
+          Text('高级设置', style: AppTextStyles.titleMedium),
+          const SizedBox(height: AppSpacing.sm),
           _InfoRow(label: '模型', value: config.modelName),
           _InfoRow(label: 'Base URL', value: config.baseUrl),
           _InfoRow(label: 'Temperature', value: config.temperature.toString()),
           _InfoRow(label: 'Max Tokens', value: config.maxTokens.toString()),
 
-          const SizedBox(height: NinjaSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
           // ─── 当前状态 ───
           Card(
-            color: NinjaColors.success.withValues(alpha: 0.08),
+            color: AppColors.success.withValues(alpha: 0.08),
             child: Padding(
-              padding: const EdgeInsets.all(NinjaSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Row(
                 children: [
                   const Icon(PhosphorIconsRegular.checkCircle,
-                      color: NinjaColors.success),
-                  const SizedBox(width: NinjaSpacing.sm),
+                      color: AppColors.success),
+                  const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(
                       '已选择 ${config.provider.label} 模型',
-                      style: NinjaTextStyles.bodyMedium,
+                      style: AppTextStyles.bodyMedium,
                     ),
                   ),
                 ],
@@ -144,47 +144,47 @@ class _ProviderCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? NinjaColors.primary : NinjaColors.textSecondary;
+    final color = selected ? AppColors.primary : AppColors.textSecondary;
     return Material(
       color: selected
-          ? NinjaColors.primary.withValues(alpha: 0.08)
-          : NinjaColors.surface,
-      borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
+          ? AppColors.primary.withValues(alpha: 0.08)
+          : AppColors.surface,
+      borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
+            borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
             border: Border.all(
               color: selected
-                  ? NinjaColors.primary.withValues(alpha: 0.4)
-                  : NinjaColors.divider.withValues(alpha: 0.3),
+                  ? AppColors.primary.withValues(alpha: 0.4)
+                  : AppColors.divider.withValues(alpha: 0.3),
             ),
           ),
-          padding: const EdgeInsets.all(NinjaSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(
             children: [
               Icon(icon, color: color, size: 24),
-              const SizedBox(width: NinjaSpacing.md),
+              const SizedBox(width: AppSpacing.md),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(title,
-                        style: NinjaTextStyles.titleMedium.copyWith(
+                        style: AppTextStyles.titleMedium.copyWith(
                           color: selected
-                              ? NinjaColors.primary
-                              : NinjaColors.textPrimary,
+                              ? AppColors.primary
+                              : AppColors.textPrimary,
                         )),
-                    const SizedBox(height: NinjaSpacing.xxs),
-                    Text(subtitle, style: NinjaTextStyles.caption),
+                    const SizedBox(height: AppSpacing.xxs),
+                    Text(subtitle, style: AppTextStyles.caption),
                   ],
                 ),
               ),
               if (selected)
                 const Icon(PhosphorIconsRegular.checkCircle,
-                    color: NinjaColors.primary, size: 20),
+                    color: AppColors.primary, size: 20),
             ],
           ),
         ),
@@ -257,18 +257,20 @@ class _ApiKeyFieldState extends State<_ApiKeyField> {
             onFieldSubmitted: (_) => _save(),
           ),
         ),
-        const SizedBox(width: NinjaSpacing.sm),
+        const SizedBox(width: AppSpacing.sm),
         SizedBox(
           height: 40,
           child: FilledButton.icon(
             onPressed: _save,
             icon: Icon(
-              _saved ? PhosphorIconsRegular.checkCircle : PhosphorIconsRegular.floppyDisk,
+              _saved
+                  ? PhosphorIconsRegular.checkCircle
+                  : PhosphorIconsRegular.floppyDisk,
               size: 18,
             ),
             label: Text(_saved ? '已保存' : '保存'),
             style: FilledButton.styleFrom(
-              backgroundColor: _saved ? NinjaColors.success : NinjaColors.primary,
+              backgroundColor: _saved ? AppColors.success : AppColors.primary,
             ),
           ),
         ),
@@ -287,14 +289,14 @@ class _InfoRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: NinjaSpacing.xs),
+      padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: NinjaTextStyles.bodyMedium),
+          Text(label, style: AppTextStyles.bodyMedium),
           Text(value,
-              style: NinjaTextStyles.caption.copyWith(
-                color: NinjaColors.textSecondary,
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.textSecondary,
               )),
         ],
       ),
@@ -360,14 +362,12 @@ class _TestButtonState extends State<_TestButton> {
         ),
         if (hasResult)
           Padding(
-            padding: const EdgeInsets.only(top: NinjaSpacing.sm),
+            padding: const EdgeInsets.only(top: AppSpacing.sm),
             child: Card(
-              color: (_success == true
-                      ? NinjaColors.success
-                      : NinjaColors.error)
+              color: (_success == true ? AppColors.success : AppColors.error)
                   .withValues(alpha: 0.08),
               child: Padding(
-                padding: const EdgeInsets.all(NinjaSpacing.md),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 child: Row(
                   children: [
                     Icon(
@@ -375,18 +375,18 @@ class _TestButtonState extends State<_TestButton> {
                           ? PhosphorIconsRegular.checkCircle
                           : PhosphorIconsRegular.warningCircle,
                       color: _success == true
-                          ? NinjaColors.success
-                          : NinjaColors.error,
+                          ? AppColors.success
+                          : AppColors.error,
                       size: 18,
                     ),
-                    const SizedBox(width: NinjaSpacing.sm),
+                    const SizedBox(width: AppSpacing.sm),
                     Expanded(
                       child: Text(
                         _result!,
-                        style: NinjaTextStyles.caption.copyWith(
+                        style: AppTextStyles.caption.copyWith(
                           color: _success == true
-                              ? NinjaColors.success
-                              : NinjaColors.error,
+                              ? AppColors.success
+                              : AppColors.error,
                         ),
                       ),
                     ),

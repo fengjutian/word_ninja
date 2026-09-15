@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai/providers/ai_providers.dart';
 import 'package:auth/presentation/providers/auth_provider.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 
 /// 学习计划页
 class StudyPlanPage extends ConsumerStatefulWidget {
@@ -32,7 +32,10 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
   Future<void> _generatePlan() async {
     final goal = _goalCtrl.text.trim();
     if (goal.isEmpty) return;
-    setState(() { _isGenerating = true; _error = null; });
+    setState(() {
+      _isGenerating = true;
+      _error = null;
+    });
     try {
       final service = ref.read(aiPlanServiceProvider);
       final plan = await service.generatePlan(
@@ -66,20 +69,22 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('学习计划')),
       body: ListView(
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(NinjaSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Row(children: [
-                    const Text('设定目标', style: NinjaTextStyles.heading2),
+                    const Text('设定目标', style: AppTextStyles.heading2),
                     const Spacer(),
-                    Text('Lv.$_currentLevel', style: NinjaTextStyles.caption.copyWith(color: NinjaColors.primary)),
+                    Text('Lv.$_currentLevel',
+                        style: AppTextStyles.caption
+                            .copyWith(color: AppColors.primary)),
                   ]),
-                  const SizedBox(height: NinjaSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
                   TextField(
                     controller: _goalCtrl,
                     decoration: const InputDecoration(
@@ -87,9 +92,9 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
                       border: OutlineInputBorder(),
                     ),
                   ),
-                  const SizedBox(height: NinjaSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
                   Text('每日学习时长：${_dailyMinutes}分钟',
-                      style: NinjaTextStyles.bodyMedium),
+                      style: AppTextStyles.bodyMedium),
                   Slider(
                     value: _dailyMinutes.toDouble(),
                     min: 10,
@@ -98,16 +103,18 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
                     label: '$_dailyMinutes 分钟',
                     onChanged: (v) => setState(() => _dailyMinutes = v.round()),
                   ),
-                  const SizedBox(height: NinjaSpacing.md),
+                  const SizedBox(height: AppSpacing.md),
                   if (_error != null)
                     Container(
-                      padding: const EdgeInsets.all(NinjaSpacing.md),
-                      margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      margin: const EdgeInsets.only(bottom: AppSpacing.md),
                       decoration: BoxDecoration(
-                        color: NinjaColors.error.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                        color: AppColors.error.withValues(alpha: 0.1),
+                        borderRadius:
+                            BorderRadius.circular(AppSpacing.buttonRadius),
                       ),
-                      child: Text(_error!, style: const TextStyle(color: NinjaColors.error)),
+                      child: Text(_error!,
+                          style: const TextStyle(color: AppColors.error)),
                     ),
                   SizedBox(
                     width: double.infinity,
@@ -115,7 +122,9 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
                       onPressed: _isGenerating ? null : _generatePlan,
                       icon: _isGenerating
                           ? const SizedBox.square(
-                              dimension: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                              dimension: 18,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white))
                           : const Icon(PhosphorIconsRegular.sparkle),
                       label: Text(_isGenerating ? 'AI 生成中...' : 'AI生成计划'),
                     ),
@@ -125,16 +134,17 @@ class _StudyPlanPageState extends ConsumerState<StudyPlanPage> {
             ),
           ),
           if (_plan.isNotEmpty) ...[
-            const SizedBox(height: NinjaSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
             ..._plan.map((day) => _DayCard(
                   day: day,
                   taskCompletion: _taskCompletion,
-                  onToggle: (key) => setState(() => _taskCompletion[key] = !(_taskCompletion[key] ?? false)),
+                  onToggle: (key) => setState(() =>
+                      _taskCompletion[key] = !(_taskCompletion[key] ?? false)),
                 )),
           ] else ...[
-            const SizedBox(height: NinjaSpacing.lg),
-            const Text('今日推荐任务', style: NinjaTextStyles.heading2),
-            const SizedBox(height: NinjaSpacing.md),
+            const SizedBox(height: AppSpacing.lg),
+            const Text('今日推荐任务', style: AppTextStyles.heading2),
+            const SizedBox(height: AppSpacing.md),
             _TaskTile('📖 学习 20 个新单词', 'vocabulary', true, (_) {}),
             _TaskTile('📄 阅读 1 篇文章', 'reading', false, (_) {}),
             _TaskTile('💬 AI 对话 10 分钟', 'ai_tutor', false, (_) {}),
@@ -151,7 +161,10 @@ class _DayCard extends StatelessWidget {
   final Map<String, bool> taskCompletion;
   final void Function(String key) onToggle;
 
-  const _DayCard({required this.day, required this.taskCompletion, required this.onToggle});
+  const _DayCard(
+      {required this.day,
+      required this.taskCompletion,
+      required this.onToggle});
 
   @override
   Widget build(BuildContext context) {
@@ -162,22 +175,26 @@ class _DayCard extends StatelessWidget {
     }).length;
 
     return Card(
-      margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
             width: double.infinity,
-            padding: const EdgeInsets.symmetric(horizontal: NinjaSpacing.lg, vertical: NinjaSpacing.md),
+            padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg, vertical: AppSpacing.md),
             decoration: BoxDecoration(
-              color: NinjaColors.primary.withValues(alpha: 0.08),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(NinjaSpacing.cardRadius)),
+              color: AppColors.primary.withValues(alpha: 0.08),
+              borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(AppSpacing.cardRadius)),
             ),
             child: Row(
               children: [
-                Text('Day ${day['day']}', style: NinjaTextStyles.heading3.copyWith(color: NinjaColors.primary)),
+                Text('Day ${day['day']}',
+                    style: AppTextStyles.heading3
+                        .copyWith(color: AppColors.primary)),
                 const Spacer(),
-                Text('$completed/$tasks.length', style: NinjaTextStyles.caption),
+                Text('$completed/$tasks.length', style: AppTextStyles.caption),
               ],
             ),
           ),
@@ -187,13 +204,14 @@ class _DayCard extends StatelessWidget {
             final key = '${day['day']}_$desc';
             final isChecked = taskCompletion[key] ?? false;
             return CheckboxListTile(
-              title: Text('$desc（${mins}分钟）', style: NinjaTextStyles.bodyMedium.copyWith(
-                decoration: isChecked ? TextDecoration.lineThrough : null,
-                color: isChecked ? NinjaColors.textSecondary : null,
-              )),
+              title: Text('$desc（${mins}分钟）',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    decoration: isChecked ? TextDecoration.lineThrough : null,
+                    color: isChecked ? AppColors.textSecondary : null,
+                  )),
               value: isChecked,
               onChanged: (_) => onToggle(key),
-              activeColor: NinjaColors.success,
+              activeColor: AppColors.success,
             );
           }),
         ],
@@ -213,16 +231,16 @@ class _TaskTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: NinjaSpacing.sm),
+      margin: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: CheckboxListTile(
         title: Text(title,
             style: TextStyle(
               decoration: isCompleted ? TextDecoration.lineThrough : null,
-              color: isCompleted ? NinjaColors.textSecondary : null,
+              color: isCompleted ? AppColors.textSecondary : null,
             )),
         value: isCompleted,
         onChanged: onChanged,
-        activeColor: NinjaColors.success,
+        activeColor: AppColors.success,
       ),
     );
   }

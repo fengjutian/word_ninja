@@ -41,15 +41,15 @@ class User {
     return (current / needed).clamp(0.0, 1.0);
   }
 
-  /// 忍阶名称
+  /// 学习等级名称
   String get rank {
     if (level >= 100) return '英语传奇';
-    if (level >= 80) return '影级大师';
-    if (level >= 50) return '忍者大师';
-    if (level >= 40) return '精英忍者';
-    if (level >= 30) return '上忍';
-    if (level >= 20) return '中忍';
-    if (level >= 10) return '下忍';
+    if (level >= 80) return '专家';
+    if (level >= 50) return '语言大师';
+    if (level >= 40) return '进阶学者';
+    if (level >= 30) return '熟练';
+    if (level >= 20) return '进阶';
+    if (level >= 10) return '入门';
     return '学徒龟';
   }
 

@@ -39,7 +39,9 @@ class AiReadingService {
     });
     return {
       'translation': parsed['translation'] ?? '',
-      'grammar_points': (parsed['grammar_points'] as List<dynamic>?)?.cast<String>() ?? <String>[],
+      'grammar_points':
+          (parsed['grammar_points'] as List<dynamic>?)?.cast<String>() ??
+              <String>[],
       'key_vocabulary': (parsed['key_vocabulary'] as List<dynamic>?)
               ?.map((e) => Map<String, String>.from(e as Map))
               .toList() ??

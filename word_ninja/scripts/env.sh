@@ -1,5 +1,5 @@
 #!/bin/bash
-# Word Ninja 环境配置脚本
+# WordFlow 环境配置脚本
 # 使用国内镜像加速 Flutter/Dart 包下载
 #
 # 用法: source scripts/env.sh

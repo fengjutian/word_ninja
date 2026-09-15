@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:core/logger/logger.dart';
 import 'package:core/storage/secure_storage.dart';
 
-/// Word Ninja 网络层核心 Dio 客户端
+/// WordFlow 网络层核心 Dio 客户端
 class DioClient {
   late final Dio _dio;
 
@@ -113,14 +113,16 @@ class _LogInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    log.e('[HTTP ✗] ${err.response?.statusCode} ${err.requestOptions.uri} — ${err.message}');
+    log.e(
+        '[HTTP ✗] ${err.response?.statusCode} ${err.requestOptions.uri} — ${err.message}');
     handler.next(err);
   }
 }
 
 class _AuthInterceptor extends Interceptor {
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) async {
+  void onRequest(
+      RequestOptions options, RequestInterceptorHandler handler) async {
     final token = await SecureStorage.read(StorageKeys.accessToken);
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
@@ -138,7 +140,9 @@ class _AuthInterceptor extends Interceptor {
           // TODO 调用 refresh token API
           await SecureStorage.delete(StorageKeys.accessToken);
           await SecureStorage.delete(StorageKeys.refreshToken);
-        } catch (e) { log.w('Token refresh failed', e); }
+        } catch (e) {
+          log.w('Token refresh failed', e);
+        }
       }
     }
     handler.next(err);
@@ -150,7 +154,8 @@ class _RetryInterceptor extends Interceptor {
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
-    if (_shouldRetry(err) && (err.requestOptions.extra['_retry'] ?? 0) < _maxRetries) {
+    if (_shouldRetry(err) &&
+        (err.requestOptions.extra['_retry'] ?? 0) < _maxRetries) {
       final retryCount = (err.requestOptions.extra['_retry'] ?? 0) + 1;
       err.requestOptions.extra['_retry'] = retryCount;
       try {

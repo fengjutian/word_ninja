@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/word-ninja/server/pkg/jwt"
+	"github.com/word-flow/server/pkg/jwt"
 )
 
 // AuthRequired JWT 认证中间件

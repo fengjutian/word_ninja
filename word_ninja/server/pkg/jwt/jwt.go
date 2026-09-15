@@ -21,7 +21,7 @@ func GenerateToken(secret, userID, email string) (string, time.Time, error) {
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
-			Issuer:    "word-ninja",
+			Issuer:    "word-flow",
 		},
 	}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)

@@ -42,10 +42,11 @@ $text
               ?.map((e) => Map<String, String>.from(e as Map))
               .toList() ??
           <Map<String, String>>[],
-      'vocabulary_suggestions': (parsed['vocabulary_suggestions'] as List<dynamic>?)
-              ?.map((e) => Map<String, String>.from(e as Map))
-              .toList() ??
-          <Map<String, String>>[],
+      'vocabulary_suggestions':
+          (parsed['vocabulary_suggestions'] as List<dynamic>?)
+                  ?.map((e) => Map<String, String>.from(e as Map))
+                  .toList() ??
+              <Map<String, String>>[],
       'overall_comment': parsed['overall_comment'] ?? '',
     };
   }
@@ -77,10 +78,13 @@ $text
     });
     return {
       'overall_band': (parsed['overall_band'] as num?)?.toDouble() ?? 0.0,
-      'task_achievement': (parsed['task_achievement'] as num?)?.toDouble() ?? 0.0,
+      'task_achievement':
+          (parsed['task_achievement'] as num?)?.toDouble() ?? 0.0,
       'coherence': (parsed['coherence'] as num?)?.toDouble() ?? 0.0,
-      'lexical_resource': (parsed['lexical_resource'] as num?)?.toDouble() ?? 0.0,
-      'grammatical_range': (parsed['grammatical_range'] as num?)?.toDouble() ?? 0.0,
+      'lexical_resource':
+          (parsed['lexical_resource'] as num?)?.toDouble() ?? 0.0,
+      'grammatical_range':
+          (parsed['grammatical_range'] as num?)?.toDouble() ?? 0.0,
       'comment': parsed['comment'] ?? '',
     };
   }

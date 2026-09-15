@@ -1,7 +1,7 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:listening/providers/tts_provider.dart';
 
 /// 口语训练页 - 场景选择 + 发音练习 + TTS 播放
@@ -40,37 +40,36 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
       builder: (_) => Scaffold(
         appBar: AppBar(title: Text('$scene · AI陪练')),
         body: Padding(
-          padding: const EdgeInsets.all(NinjaSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             children: [
-              const Icon(PhosphorIconsRegular.chatCircle, size: 48,
-                  color: NinjaColors.textSecondary),
-              const SizedBox(height: NinjaSpacing.lg),
-              Text('$scene 场景', style: NinjaTextStyles.heading2),
-              const SizedBox(height: NinjaSpacing.md),
+              const Icon(PhosphorIconsRegular.chatCircle,
+                  size: 48, color: AppColors.textSecondary),
+              const SizedBox(height: AppSpacing.lg),
+              Text('$scene 场景', style: AppTextStyles.heading2),
+              const SizedBox(height: AppSpacing.md),
               Text(_getSceneDesc(scene),
-                  style: NinjaTextStyles.bodyMedium, textAlign: TextAlign.center),
-              const SizedBox(height: NinjaSpacing.xl),
+                  style: AppTextStyles.bodyMedium, textAlign: TextAlign.center),
+              const SizedBox(height: AppSpacing.xl),
               Container(
-                padding: const EdgeInsets.all(NinjaSpacing.lg),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
-                  color: NinjaColors.background,
-                  borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
-                  border: Border.all(color: NinjaColors.divider),
+                  color: AppColors.background,
+                  borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+                  border: Border.all(color: AppColors.divider),
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('示例对话：', style: NinjaTextStyles.label),
-                    const SizedBox(height: NinjaSpacing.sm),
-                    Text(prompt, style: NinjaTextStyles.bodyLarge),
-                    const SizedBox(height: NinjaSpacing.sm),
-                    Text('点击播放收听系统 TTS 朗读',
-                        style: NinjaTextStyles.caption),
+                    Text('示例对话：', style: AppTextStyles.label),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text(prompt, style: AppTextStyles.bodyLarge),
+                    const SizedBox(height: AppSpacing.sm),
+                    Text('点击播放收听系统 TTS 朗读', style: AppTextStyles.caption),
                   ],
                 ),
               ),
-              const SizedBox(height: NinjaSpacing.lg),
+              const SizedBox(height: AppSpacing.lg),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 FilledButton.icon(
                   onPressed: () => tts.speak(prompt, rate: 0.8),
@@ -122,39 +121,48 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('口语训练')),
       body: ListView(
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          Semantics(header: true, child: Text('AI陪练场景', style: NinjaTextStyles.heading2)),
-          const SizedBox(height: NinjaSpacing.md),
-          _SceneCard('旅游', PhosphorIconsRegular.airplane, '机场、酒店、问路', () => _openScene('旅游')),
-          _SceneCard('面试', PhosphorIconsRegular.briefcase, '英文面试对话', () => _openScene('面试')),
-          _SceneCard('商务会议', PhosphorIconsRegular.usersThree, '商务谈判、演讲', () => _openScene('商务会议')),
-          _SceneCard('日常聊天', PhosphorIconsRegular.chats, '朋友间的日常对话', () => _openScene('日常聊天')),
-          const SizedBox(height: NinjaSpacing.xl),
-          Semantics(header: true, child: Text('发音练习', style: NinjaTextStyles.heading2)),
-          const SizedBox(height: NinjaSpacing.md),
+          Semantics(
+              header: true,
+              child: Text('AI陪练场景', style: AppTextStyles.heading2)),
+          const SizedBox(height: AppSpacing.md),
+          _SceneCard('旅游', PhosphorIconsRegular.airplane, '机场、酒店、问路',
+              () => _openScene('旅游')),
+          _SceneCard('面试', PhosphorIconsRegular.briefcase, '英文面试对话',
+              () => _openScene('面试')),
+          _SceneCard('商务会议', PhosphorIconsRegular.usersThree, '商务谈判、演讲',
+              () => _openScene('商务会议')),
+          _SceneCard('日常聊天', PhosphorIconsRegular.chats, '朋友间的日常对话',
+              () => _openScene('日常聊天')),
+          const SizedBox(height: AppSpacing.xl),
+          Semantics(
+              header: true, child: Text('发音练习', style: AppTextStyles.heading2)),
+          const SizedBox(height: AppSpacing.md),
           Card(
             child: Padding(
-              padding: const EdgeInsets.all(NinjaSpacing.lg),
+              padding: const EdgeInsets.all(AppSpacing.lg),
               child: Column(
                 children: [
                   const Text('点击下方按钮收听标准发音，然后跟读练习：',
-                      style: NinjaTextStyles.bodyMedium),
-                  const SizedBox(height: NinjaSpacing.md),
+                      style: AppTextStyles.bodyMedium),
+                  const SizedBox(height: AppSpacing.md),
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(NinjaSpacing.lg),
+                    padding: const EdgeInsets.all(AppSpacing.lg),
                     decoration: BoxDecoration(
-                      color: NinjaColors.background,
-                      borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                      color: AppColors.background,
+                      borderRadius:
+                          BorderRadius.circular(AppSpacing.buttonRadius),
                     ),
                     child: const Text(
                       '"The quick brown fox jumps over the lazy dog."',
-                      style: TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
+                      style:
+                          TextStyle(fontSize: 18, fontStyle: FontStyle.italic),
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: NinjaSpacing.lg),
+                  const SizedBox(height: AppSpacing.lg),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -168,7 +176,7 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
                       label: Text(_isPlaying ? '播放中...' : '播放发音'),
                     ),
                   ),
-                  const SizedBox(height: NinjaSpacing.sm),
+                  const SizedBox(height: AppSpacing.sm),
                   Semantics(
                     label: _isRecording ? '停止录音' : '开始录音',
                     child: SizedBox(
@@ -180,21 +188,23 @@ class _SpeakingPageState extends ConsumerState<SpeakingPage> {
                             : PhosphorIconsRegular.microphone),
                         label: Text(_isRecording ? '正在录音...' : '开始跟读'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: _isRecording ? NinjaColors.error : null,
+                          backgroundColor:
+                              _isRecording ? AppColors.error : null,
                         ),
                       ),
                     ),
                   ),
                   if (_isRecording) ...[
-                    const SizedBox(height: NinjaSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     const Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(PhosphorIconsRegular.info, size: 14, color: NinjaColors.info),
+                        Icon(PhosphorIconsRegular.info,
+                            size: 14, color: AppColors.info),
                         SizedBox(width: 6),
                         Text('Windows STT 语音识别开发中，当前通过 TTS 播放示范',
                             style: TextStyle(
-                                color: NinjaColors.textSecondary, fontSize: 12)),
+                                color: AppColors.textSecondary, fontSize: 12)),
                       ],
                     ),
                   ],
@@ -219,11 +229,11 @@ class _SceneCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       child: ListTile(
-        leading: Icon(icon, color: NinjaColors.primary, size: 28),
-        title: Text(title, style: NinjaTextStyles.heading3),
-        subtitle: Text(desc, style: NinjaTextStyles.bodySmall),
+        leading: Icon(icon, color: AppColors.primary, size: 28),
+        title: Text(title, style: AppTextStyles.heading3),
+        subtitle: Text(desc, style: AppTextStyles.bodySmall),
         trailing: const Icon(PhosphorIconsRegular.caretRight, size: 16),
         onTap: onTap,
       ),

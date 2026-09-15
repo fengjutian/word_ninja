@@ -1,5 +1,5 @@
 #!/bin/bash
-# Word Ninja 开发脚本
+# WordFlow 开发脚本
 # 用法: bash scripts/run.sh [command]
 
 COMMAND=${1:-help}
@@ -50,7 +50,7 @@ case "$COMMAND" in
     melos bootstrap
     ;;
   help|*)
-    echo "Word Ninja 开发工具"
+    echo "WordFlow 开发工具"
     echo ""
     echo "用法: bash scripts/run.sh <command> [options]"
     echo ""

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ai/ai.dart';
 import 'package:ai_tutor/ai_tutor.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
@@ -36,7 +36,7 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
   void _initWebView() {
     _webViewCtrl = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(NinjaColors.background)
+      ..setBackgroundColor(AppColors.background)
       ..setNavigationDelegate(
         NavigationDelegate(
           onPageStarted: (url) {
@@ -90,14 +90,16 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
       final messages = state.current.messages;
       final history = messages
           .where((m) => !m.isLoading)
-          .map((m) => {'role': m.isUser ? 'user' : 'assistant', 'content': m.text})
+          .map((m) =>
+              {'role': m.isUser ? 'user' : 'assistant', 'content': m.text})
           .toList();
       final notifier = ref.read(chatHistoryProvider.notifier);
       notifier.removeLast();
       notifier.addMessage(ChatMessage('', isUser: false));
       final stream = aiService.chatStream(
         message: text,
-        systemPrompt: '你是英语忍者导师 Sensei Shell。你在帮助用户阅读网页内容，用友好有趣的方式解答关于网页文章的英语问题。用中文回复。',
+        systemPrompt:
+            '你是英语学习导师 AI Tutor。你在帮助用户阅读网页内容，用友好有趣的方式解答关于网页文章的英语问题。用中文回复。',
         history: history,
       );
       await for (final chunk in stream) {
@@ -145,7 +147,8 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
     String? word;
     for (int j = index - 1; j >= 0; j--) {
       if (messages[j].isUser) {
-        final match = RegExp(r"[a-zA-Z]{2,}(?:-[a-zA-Z]+)*").firstMatch(messages[j].text);
+        final match =
+            RegExp(r"[a-zA-Z]{2,}(?:-[a-zA-Z]+)*").firstMatch(messages[j].text);
         if (match != null) word = match.group(0);
         break;
       }
@@ -154,46 +157,51 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
 
     final aiAnswer = messages[index].text;
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('正在查询「$word」的释义...'), duration: const Duration(seconds: 1)),
+      SnackBar(
+          content: Text('正在查询「$word」的释义...'),
+          duration: const Duration(seconds: 1)),
     );
 
     final aiService = ref.read(aiChatServiceProvider);
     aiService.explainWord(word).then((data) {
       if (!mounted) return;
-      final meaning = (data['meaning'] as String?) ?? _extractFirstLine(aiAnswer);
+      final meaning =
+          (data['meaning'] as String?) ?? _extractFirstLine(aiAnswer);
       final example = (data['example'] as String?)?.isNotEmpty == true
           ? data['example'] as String
           : aiAnswer;
       ref.read(wordListProvider.notifier).addWord(
-        Word(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          userId: 'local',
-          word: word!,
-          meaning: meaning,
-          phonetic: (data['phonetic'] as String?) ?? '',
-          example: example,
-          source: 'web_reader',
-          createdAt: DateTime.now(),
-        ),
-      );
+            Word(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              userId: 'local',
+              word: word!,
+              meaning: meaning,
+              phonetic: (data['phonetic'] as String?) ?? '',
+              example: example,
+              source: 'web_reader',
+              createdAt: DateTime.now(),
+            ),
+          );
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('已加入单词本'), duration: Duration(seconds: 2)),
       );
     }).catchError((_) {
       if (!mounted) return;
       ref.read(wordListProvider.notifier).addWord(
-        Word(
-          id: DateTime.now().millisecondsSinceEpoch.toString(),
-          userId: 'local',
-          word: word!,
-          meaning: _extractFirstLine(aiAnswer),
-          example: aiAnswer,
-          source: 'web_reader',
-          createdAt: DateTime.now(),
-        ),
-      );
+            Word(
+              id: DateTime.now().millisecondsSinceEpoch.toString(),
+              userId: 'local',
+              word: word!,
+              meaning: _extractFirstLine(aiAnswer),
+              example: aiAnswer,
+              source: 'web_reader',
+              createdAt: DateTime.now(),
+            ),
+          );
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('「$word」已加入单词本'), duration: const Duration(seconds: 1)),
+        SnackBar(
+            content: Text('「$word」已加入单词本'),
+            duration: const Duration(seconds: 1)),
       );
     });
   }
@@ -203,8 +211,12 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
         .replaceAll(RegExp(r'\*{1,3}'), '')
         .replaceAll(RegExp(r'#{1,6}\s*'), '')
         .trim();
-    final firstLine = plain.split('\n').firstWhere((l) => l.trim().isNotEmpty, orElse: () => '待补充');
-    return firstLine.length > 80 ? '${firstLine.substring(0, 80)}...' : firstLine;
+    final firstLine = plain
+        .split('\n')
+        .firstWhere((l) => l.trim().isNotEmpty, orElse: () => '待补充');
+    return firstLine.length > 80
+        ? '${firstLine.substring(0, 80)}...'
+        : firstLine;
   }
 
   @override
@@ -231,9 +243,7 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
           ),
         ],
       ),
-      body: isWide
-          ? _buildWideLayout()
-          : _buildNarrowLayout(),
+      body: isWide ? _buildWideLayout() : _buildNarrowLayout(),
     );
   }
 
@@ -263,8 +273,8 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
       child: Column(
         children: [
           TabBar(
-            labelColor: NinjaColors.primary,
-            unselectedLabelColor: NinjaColors.textSecondary,
+            labelColor: AppColors.primary,
+            unselectedLabelColor: AppColors.textSecondary,
             tabs: const [
               Tab(icon: Icon(PhosphorIconsRegular.browser), text: '网页'),
               Tab(icon: Icon(PhosphorIconsRegular.chatCircle), text: 'AI对话'),
@@ -289,8 +299,8 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
       children: [
         // URL 栏
         Container(
-          padding: const EdgeInsets.all(NinjaSpacing.sm),
-          color: NinjaColors.surface,
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          color: AppColors.surface,
           child: Row(
             children: [
               IconButton(
@@ -304,7 +314,8 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
                 onPressed: () => _webViewCtrl.goForward(),
               ),
               IconButton(
-                icon: const Icon(PhosphorIconsRegular.arrowsClockwise, size: 20),
+                icon:
+                    const Icon(PhosphorIconsRegular.arrowsClockwise, size: 20),
                 tooltip: '刷新',
                 onPressed: () => _webViewCtrl.reload(),
               ),
@@ -314,12 +325,14 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
                   decoration: InputDecoration(
                     hintText: '输入网址...',
                     isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                    contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 12, vertical: 10),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(20),
                     ),
                     suffixIcon: IconButton(
-                      icon: const Icon(PhosphorIconsRegular.arrowRight, size: 18),
+                      icon:
+                          const Icon(PhosphorIconsRegular.arrowRight, size: 18),
                       onPressed: _navigateToUrl,
                     ),
                   ),
@@ -350,7 +363,7 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
         Expanded(
           child: ListView.builder(
             controller: _scrollCtrl,
-            padding: const EdgeInsets.all(NinjaSpacing.sm),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             itemCount: messages.length,
             itemBuilder: (ctx, i) {
               final msg = messages[i];
@@ -366,8 +379,8 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
         const Divider(height: 1),
         // 输入栏
         Container(
-          padding: const EdgeInsets.all(NinjaSpacing.sm),
-          color: NinjaColors.surface,
+          padding: const EdgeInsets.all(AppSpacing.sm),
+          color: AppColors.surface,
           child: SafeArea(
             child: Row(
               children: [
@@ -379,18 +392,22 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
                       ),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 8),
                       isDense: true,
                     ),
                     onSubmitted: (_) => _sendChatMessage(),
                   ),
                 ),
-                const SizedBox(width: NinjaSpacing.xs),
+                const SizedBox(width: AppSpacing.xs),
                 CircleAvatar(
-                  backgroundColor: _isChatLoading ? NinjaColors.textSecondary : NinjaColors.primary,
+                  backgroundColor: _isChatLoading
+                      ? AppColors.textSecondary
+                      : AppColors.primary,
                   radius: 18,
                   child: IconButton(
-                    icon: const Icon(PhosphorIconsRegular.paperPlaneTilt, color: Colors.white, size: 16),
+                    icon: const Icon(PhosphorIconsRegular.paperPlaneTilt,
+                        color: Colors.white, size: 16),
                     padding: EdgeInsets.zero,
                     onPressed: _isChatLoading ? null : _sendChatMessage,
                   ),
@@ -414,39 +431,50 @@ class _ChatBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bgColor = message.isError
-        ? NinjaColors.error.withValues(alpha: 0.1)
+        ? AppColors.error.withValues(alpha: 0.1)
         : message.isUser
-            ? NinjaColors.primary
-            : NinjaColors.background;
+            ? AppColors.primary
+            : AppColors.background;
     final textColor = message.isError
-        ? NinjaColors.error
+        ? AppColors.error
         : message.isUser
             ? Colors.white
-            : NinjaColors.textPrimary;
+            : AppColors.textPrimary;
 
     return Align(
       alignment: message.isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
-        margin: const EdgeInsets.only(bottom: NinjaSpacing.xs),
-        padding: const EdgeInsets.all(NinjaSpacing.sm),
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.7),
+        margin: const EdgeInsets.only(bottom: AppSpacing.xs),
+        padding: const EdgeInsets.all(AppSpacing.sm),
         decoration: BoxDecoration(
           color: bgColor,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(12),
             topRight: const Radius.circular(12),
-            bottomLeft: message.isUser ? const Radius.circular(12) : const Radius.circular(4),
-            bottomRight: message.isUser ? const Radius.circular(4) : const Radius.circular(12),
+            bottomLeft: message.isUser
+                ? const Radius.circular(12)
+                : const Radius.circular(4),
+            bottomRight: message.isUser
+                ? const Radius.circular(4)
+                : const Radius.circular(12),
           ),
         ),
         child: message.isLoading
             ? Row(mainAxisSize: MainAxisSize.min, children: [
-                const SizedBox(width: 14, height: 14, child: CircularProgressIndicator(strokeWidth: 2)),
+                const SizedBox(
+                    width: 14,
+                    height: 14,
+                    child: CircularProgressIndicator(strokeWidth: 2)),
                 const SizedBox(width: 6),
-                Flexible(child: Text(message.text, style: TextStyle(color: textColor, fontSize: 13))),
+                Flexible(
+                    child: Text(message.text,
+                        style: TextStyle(color: textColor, fontSize: 13))),
               ])
             : message.isUser
-                ? Text(message.text, style: TextStyle(color: textColor, fontSize: 14))
+                ? Text(message.text,
+                    style: TextStyle(color: textColor, fontSize: 14))
                 : Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
@@ -455,10 +483,11 @@ class _ChatBubble extends StatelessWidget {
                         data: message.text,
                         selectable: true,
                         styleSheet: MarkdownStyleSheet(
-                          p: TextStyle(color: textColor, fontSize: 14, height: 1.4),
+                          p: TextStyle(
+                              color: textColor, fontSize: 14, height: 1.4),
                           code: TextStyle(
-                            color: NinjaColors.accentPurple,
-                            backgroundColor: NinjaColors.background,
+                            color: AppColors.accentPurple,
+                            backgroundColor: AppColors.background,
                             fontSize: 12,
                           ),
                         ),
@@ -471,9 +500,16 @@ class _ChatBubble extends StatelessWidget {
                             child: Row(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Icon(PhosphorIconsRegular.bookmarkSimple, size: 11, color: NinjaColors.primary.withValues(alpha: 0.7)),
+                                Icon(PhosphorIconsRegular.bookmarkSimple,
+                                    size: 11,
+                                    color: AppColors.primary
+                                        .withValues(alpha: 0.7)),
                                 const SizedBox(width: 2),
-                                Text('加入单词本', style: TextStyle(fontSize: 10, color: NinjaColors.primary.withValues(alpha: 0.7))),
+                                Text('加入单词本',
+                                    style: TextStyle(
+                                        fontSize: 10,
+                                        color: AppColors.primary
+                                            .withValues(alpha: 0.7))),
                               ],
                             ),
                           ),

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:auth/presentation/providers/auth_provider.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 
 /// 忘记密码页面
 class ForgotPasswordPage extends ConsumerStatefulWidget {
@@ -20,7 +20,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
   bool _sent = false;
   String? _error;
 
-  static final _emailRegExp = RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
+  static final _emailRegExp =
+      RegExp(r'^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$');
 
   @override
   void dispose() {
@@ -50,7 +51,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
     return Scaffold(
       appBar: AppBar(title: const Text('找回密码')),
       body: Padding(
-        padding: const EdgeInsets.all(NinjaSpacing.xl),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: _sent ? _buildSuccess() : _buildForm(),
       ),
     );
@@ -63,24 +64,26 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 48),
-          const Icon(PhosphorIconsRegular.lockKey, size: 64, color: NinjaColors.primary),
+          const Icon(PhosphorIconsRegular.lockKey,
+              size: 64, color: AppColors.primary),
           const SizedBox(height: 24),
           const Text(
             '输入注册邮箱，我们将发送重置链接',
-            style: NinjaTextStyles.bodyLarge,
+            style: AppTextStyles.bodyLarge,
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 32),
           if (_error != null)
             Container(
               width: double.infinity,
-              padding: const EdgeInsets.all(NinjaSpacing.md),
-              margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.md),
+              margin: const EdgeInsets.only(bottom: AppSpacing.md),
               decoration: BoxDecoration(
-                color: NinjaColors.error.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(NinjaSpacing.buttonRadius),
+                color: AppColors.error.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
               ),
-              child: Text(_error!, style: const TextStyle(color: NinjaColors.error)),
+              child:
+                  Text(_error!, style: const TextStyle(color: AppColors.error)),
             ),
           TextFormField(
             controller: _emailCtrl,
@@ -102,8 +105,10 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
               onPressed: _isLoading ? null : _submit,
               child: _isLoading
                   ? const SizedBox(
-                      width: 20, height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white))
                   : const Text('发送重置链接'),
             ),
           ),
@@ -117,17 +122,18 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         const SizedBox(height: 48),
-        const Icon(PhosphorIconsRegular.checkCircle, size: 64, color: NinjaColors.success),
+        const Icon(PhosphorIconsRegular.checkCircle,
+            size: 64, color: AppColors.success),
         const SizedBox(height: 24),
         const Text(
           '重置链接已发送',
-          style: NinjaTextStyles.heading2,
+          style: AppTextStyles.heading2,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 12),
         Text(
           '请检查 ${_emailCtrl.text} 的收件箱',
-          style: NinjaTextStyles.bodyMedium,
+          style: AppTextStyles.bodyMedium,
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 32),

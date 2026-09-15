@@ -2,7 +2,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ai/providers/ai_providers.dart';
-import 'package:ui_kit/ninja_theme/ninja_theme.dart';
+import 'package:ui_kit/app_theme/app_theme.dart';
 import '../../data/model/word.dart';
 import '../providers/word_provider.dart';
 
@@ -20,7 +20,8 @@ class AddWordPage extends ConsumerStatefulWidget {
       isScrollControlled: true,
       useSafeArea: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(NinjaSpacing.lg)),
+        borderRadius:
+            BorderRadius.vertical(top: Radius.circular(AppSpacing.lg)),
       ),
       builder: (ctx) => const _AddWordSheet(),
     );
@@ -55,15 +56,18 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
             onPressed: _isSaving ? null : _submit,
             child: _isSaving
                 ? const SizedBox(
-                    width: 20, height: 20,
-                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white))
                 : const Text('保存',
-                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.w600)),
           ),
         ],
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(NinjaSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Form(
           key: _formKey,
           child: Column(
@@ -77,7 +81,7 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
                 validator: (v) =>
                     v == null || v.trim().isEmpty ? '请输入单词' : null,
               ),
-              const SizedBox(height: NinjaSpacing.md),
+              const SizedBox(height: AppSpacing.md),
               TextFormField(
                 controller: _meaningCtrl,
                 decoration: const InputDecoration(
@@ -87,7 +91,7 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
                 validator: (v) =>
                     v == null || v.trim().isEmpty ? '请输入释义' : null,
               ),
-              const SizedBox(height: NinjaSpacing.md),
+              const SizedBox(height: AppSpacing.md),
               TextFormField(
                 controller: _phoneticCtrl,
                 decoration: const InputDecoration(
@@ -95,7 +99,7 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
                   hintText: '如 ˈbjuːtəfəl',
                 ),
               ),
-              const SizedBox(height: NinjaSpacing.md),
+              const SizedBox(height: AppSpacing.md),
               TextFormField(
                 controller: _exampleCtrl,
                 maxLines: 3,
@@ -105,13 +109,14 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
                   alignLabelWithHint: true,
                 ),
               ),
-              const SizedBox(height: NinjaSpacing.xl),
+              const SizedBox(height: AppSpacing.xl),
               // AI 补全按钮
               OutlinedButton.icon(
                 onPressed: _isAiLoading ? null : _aiAutoComplete,
                 icon: _isAiLoading
                     ? const SizedBox(
-                        width: 18, height: 18,
+                        width: 18,
+                        height: 18,
                         child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(PhosphorIconsRegular.sparkle),
                 label: Text(_isAiLoading ? 'AI 补全中...' : 'AI 智能补全'),
@@ -170,19 +175,26 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
         final meaning = result['meaning'] as String?;
         final phonetic = result['phonetic'] as String?;
         final example = result['example'] as String?;
-        if (_meaningCtrl.text.trim().isEmpty && meaning != null && meaning.isNotEmpty) {
+        if (_meaningCtrl.text.trim().isEmpty &&
+            meaning != null &&
+            meaning.isNotEmpty) {
           _meaningCtrl.text = meaning;
         }
-        if (_phoneticCtrl.text.trim().isEmpty && phonetic != null && phonetic.isNotEmpty) {
+        if (_phoneticCtrl.text.trim().isEmpty &&
+            phonetic != null &&
+            phonetic.isNotEmpty) {
           _phoneticCtrl.text = phonetic;
         }
-        if (_exampleCtrl.text.trim().isEmpty && example != null && example.isNotEmpty) {
+        if (_exampleCtrl.text.trim().isEmpty &&
+            example != null &&
+            example.isNotEmpty) {
           _exampleCtrl.text = example;
         }
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('AI 补全完成'), duration: Duration(seconds: 2)),
+          const SnackBar(
+              content: Text('AI 补全完成'), duration: Duration(seconds: 2)),
         );
       }
     } catch (e) {
@@ -227,10 +239,10 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
   Widget build(BuildContext context) {
     return Padding(
       padding: EdgeInsets.only(
-        left: NinjaSpacing.lg,
-        right: NinjaSpacing.lg,
-        top: NinjaSpacing.lg,
-        bottom: MediaQuery.of(context).viewInsets.bottom + NinjaSpacing.lg,
+        left: AppSpacing.lg,
+        right: AppSpacing.lg,
+        top: AppSpacing.lg,
+        bottom: MediaQuery.of(context).viewInsets.bottom + AppSpacing.lg,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -240,9 +252,9 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
             child: Container(
               width: 40,
               height: 4,
-              margin: const EdgeInsets.only(bottom: NinjaSpacing.md),
+              margin: const EdgeInsets.only(bottom: AppSpacing.md),
               decoration: BoxDecoration(
-                color: NinjaColors.textSecondary.withValues(alpha: 0.3),
+                color: AppColors.textSecondary.withValues(alpha: 0.3),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -251,19 +263,22 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('添加单词', style: NinjaTextStyles.heading3),
+              Text('添加单词', style: AppTextStyles.heading3),
               TextButton(
                 onPressed: _isSaving ? null : _submit,
                 child: _isSaving
                     ? const SizedBox(
-                        width: 20, height: 20,
-                        child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white))
                     : const Text('保存',
-                        style: TextStyle(color: Colors.white, fontWeight: FontWeight.w600)),
+                        style: TextStyle(
+                            color: Colors.white, fontWeight: FontWeight.w600)),
               ),
             ],
           ),
-          const SizedBox(height: NinjaSpacing.md),
+          const SizedBox(height: AppSpacing.md),
           // 可滚动的表单区域 — 使用 Expanded 确保有界高度，防止 overflow
           Expanded(
             child: Form(
@@ -280,7 +295,7 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
                       validator: (v) =>
                           v == null || v.trim().isEmpty ? '请输入单词' : null,
                     ),
-                    const SizedBox(height: NinjaSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     TextFormField(
                       controller: _meaningCtrl,
                       decoration: const InputDecoration(
@@ -290,7 +305,7 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
                       validator: (v) =>
                           v == null || v.trim().isEmpty ? '请输入释义' : null,
                     ),
-                    const SizedBox(height: NinjaSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     TextFormField(
                       controller: _phoneticCtrl,
                       decoration: const InputDecoration(
@@ -298,7 +313,7 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
                         hintText: '如 ˈbjuːtəfəl',
                       ),
                     ),
-                    const SizedBox(height: NinjaSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     TextFormField(
                       controller: _exampleCtrl,
                       maxLines: 3,
@@ -308,19 +323,22 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
                         alignLabelWithHint: true,
                       ),
                     ),
-                    const SizedBox(height: NinjaSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     // AI 补全按钮
                     OutlinedButton.icon(
                       onPressed: _isAiLoading ? null : _aiAutoComplete,
                       icon: _isAiLoading
                           ? const SizedBox(
-                              width: 18, height: 18,
+                              width: 18,
+                              height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2))
                           : const Icon(PhosphorIconsRegular.sparkle),
                       label: Text(_isAiLoading ? 'AI 补全中...' : 'AI 智能补全'),
                     ),
                     // 底部留白，确保键盘弹出时最后一项不被遮挡
-                    SizedBox(height: MediaQuery.of(context).padding.bottom + NinjaSpacing.lg),
+                    SizedBox(
+                        height: MediaQuery.of(context).padding.bottom +
+                            AppSpacing.lg),
                   ],
                 ),
               ),
@@ -378,19 +396,26 @@ class _AddWordSheetState extends ConsumerState<_AddWordSheet> {
         final meaning = result['meaning'] as String?;
         final phonetic = result['phonetic'] as String?;
         final example = result['example'] as String?;
-        if (_meaningCtrl.text.trim().isEmpty && meaning != null && meaning.isNotEmpty) {
+        if (_meaningCtrl.text.trim().isEmpty &&
+            meaning != null &&
+            meaning.isNotEmpty) {
           _meaningCtrl.text = meaning;
         }
-        if (_phoneticCtrl.text.trim().isEmpty && phonetic != null && phonetic.isNotEmpty) {
+        if (_phoneticCtrl.text.trim().isEmpty &&
+            phonetic != null &&
+            phonetic.isNotEmpty) {
           _phoneticCtrl.text = phonetic;
         }
-        if (_exampleCtrl.text.trim().isEmpty && example != null && example.isNotEmpty) {
+        if (_exampleCtrl.text.trim().isEmpty &&
+            example != null &&
+            example.isNotEmpty) {
           _exampleCtrl.text = example;
         }
       });
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('AI 补全完成'), duration: Duration(seconds: 2)),
+          const SnackBar(
+              content: Text('AI 补全完成'), duration: Duration(seconds: 2)),
         );
       }
     } catch (e) {

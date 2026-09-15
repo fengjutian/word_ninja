@@ -1,6 +1,6 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
-import '../ninja_theme/ninja_theme.dart';
+import '../app_theme/app_theme.dart';
 
 /// 单词卡片组件
 class WordCard extends StatelessWidget {
@@ -20,24 +20,24 @@ class WordCard extends StatelessWidget {
   });
 
   Color _masteryColor(int value) {
-    if (value < 30) return NinjaColors.error;
-    if (value < 60) return NinjaColors.warning;
-    if (value < 85) return NinjaColors.success;
-    return NinjaColors.info;
+    if (value < 30) return AppColors.error;
+    if (value < 60) return AppColors.warning;
+    if (value < 85) return AppColors.success;
+    return AppColors.info;
   }
 
   @override
   Widget build(BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(
-        horizontal: NinjaSpacing.lg,
-        vertical: NinjaSpacing.sm,
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.sm,
       ),
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(NinjaSpacing.cardRadius),
+        borderRadius: BorderRadius.circular(AppSpacing.cardRadius),
         child: Padding(
-          padding: const EdgeInsets.all(NinjaSpacing.lg),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Row(
             children: [
               // 掌握度圆环
@@ -50,14 +50,14 @@ class WordCard extends StatelessWidget {
                     CircularProgressIndicator(
                       value: mastery / 100,
                       strokeWidth: 3,
-                      backgroundColor: NinjaColors.divider.withValues(alpha: 0.2),
+                      backgroundColor: AppColors.divider.withValues(alpha: 0.2),
                       valueColor: AlwaysStoppedAnimation<Color>(
                         _masteryColor(mastery),
                       ),
                     ),
                     Text(
                       '$mastery%',
-                      style: NinjaTextStyles.caption.copyWith(
+                      style: AppTextStyles.caption.copyWith(
                         fontWeight: FontWeight.w700,
                         color: _masteryColor(mastery),
                       ),
@@ -65,23 +65,23 @@ class WordCard extends StatelessWidget {
                   ],
                 ),
               ),
-              const SizedBox(width: NinjaSpacing.md),
+              const SizedBox(width: AppSpacing.md),
               // 单词信息
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(word, style: NinjaTextStyles.heading3),
+                    Text(word, style: AppTextStyles.heading3),
                     if (phonetic != null)
-                      Text(phonetic!,
-                          style: NinjaTextStyles.bodySmall),
-                    const SizedBox(height: NinjaSpacing.xs),
-                    Text(meaning, style: NinjaTextStyles.bodyMedium),
+                      Text(phonetic!, style: AppTextStyles.bodySmall),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(meaning, style: AppTextStyles.bodyMedium),
                   ],
                 ),
               ),
               // 箭头
-              const Icon(PhosphorIconsRegular.caretRight, color: NinjaColors.textSecondary),
+              const Icon(PhosphorIconsRegular.caretRight,
+                  color: AppColors.textSecondary),
             ],
           ),
         ),

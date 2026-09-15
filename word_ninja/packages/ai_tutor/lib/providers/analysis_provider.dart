@@ -9,12 +9,14 @@ import 'package:vocabulary/data/datasource/isar_local_datasource.dart';
 class AnalysisState {
   final List<WordFrequency> topWords;
   final int sessionCount;
-  final String? report;        // AI 分析报告
-  final String? quickInsight;  // 一句话洞察
+  final String? report; // AI 分析报告
+  final String? quickInsight; // 一句话洞察
   final bool isLoading;
   final String? error;
+
   /// AI 识别的重点强化词
   final List<FocusWord> focusWords;
+
   /// 已执行分析的次数（支持多次分析）
   final int analysisCount;
 

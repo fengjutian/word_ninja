@@ -1,11 +1,11 @@
 {
-    "name": "Word Ninja",
-    "short_name": "Word Ninja",
+    "name": "WordFlow",
+    "short_name": "WordFlow",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#E53935",
     "theme_color": "#E53935",
-    "description": "AI English Learning - Word Ninja",
+    "description": "AI English Learning - WordFlow",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
