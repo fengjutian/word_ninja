@@ -41,21 +41,32 @@ class WordFlowDesktopApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return FluentApp.router(
+    final themeMode = Preferences.getBool('dark_mode')
+        ? mt.ThemeMode.dark
+        : mt.ThemeMode.light;
+    return mt.MaterialApp.router(
       title: 'WordFlow',
       debugShowCheckedModeBanner: false,
-      theme: _appFluentTheme(AppThemeCatalog.indigo, Brightness.light),
-      darkTheme: _appFluentTheme(AppThemeCatalog.indigo, Brightness.dark),
-      themeMode: Preferences.getBool('dark_mode')
-          ? ThemeMode.dark
-          : ThemeMode.light,
+      theme: AppTheme.build(AppThemeCatalog.indigo, Brightness.light),
+      darkTheme: AppTheme.build(AppThemeCatalog.indigo, Brightness.dark),
+      themeMode: themeMode,
       routerConfig: router,
-      builder: kDebugMode ? _debugBuilder : null,
+      builder: (context, child) {
+        final brightness = mt.Theme.of(context).brightness;
+        final content = FluentTheme(
+          data: _appFluentTheme(AppThemeCatalog.indigo, brightness),
+          child: child ?? const SizedBox.shrink(),
+        );
+        return kDebugMode ? _debugBuilder(context, content) : content;
+      },
     );
   }
 
   /// Build a FluentThemeData from AppColors
-  static FluentThemeData _appFluentTheme(AppThemePreset preset, Brightness brightness) {
+  static FluentThemeData _appFluentTheme(
+    AppThemePreset preset,
+    Brightness brightness,
+  ) {
     final isDark = brightness == Brightness.dark;
     final tokens = AppColorTokens.forPreset(preset, brightness);
     final accent = preset.seed;

@@ -61,7 +61,10 @@ GoRouter createDesktopRouter() {
           ),
           GoRoute(
             path: DesktopRoutes.aiTutor,
-            builder: (ctx, state) => const TutorChatPage(),
+            pageBuilder: (ctx, state) => NoTransitionPage<void>(
+              key: state.pageKey,
+              child: const TutorChatPage(),
+            ),
           ),
           GoRoute(
             path: DesktopRoutes.aiAnalysis,
