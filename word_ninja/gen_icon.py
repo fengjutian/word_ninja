@@ -29,7 +29,7 @@ for current_root, _, files in os.walk(os.path.join(root, "apps")):
         lower = filename.lower()
         path = os.path.join(current_root, filename)
         if lower.endswith(".png") and (
-            "icon" in lower or lower == "favicon.png"
+            "icon" in lower or "launcher" in lower or lower == "favicon.png"
         ):
             with Image.open(path) as existing:
                 width, height = existing.size
