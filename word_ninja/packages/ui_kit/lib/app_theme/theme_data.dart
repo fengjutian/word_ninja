@@ -10,11 +10,20 @@ class AppTheme {
   static ThemeData build(AppThemePreset preset, Brightness brightness) {
     final base = brightness == Brightness.dark ? _dark : _light;
     final tokens = AppColorTokens.forPreset(preset, brightness);
-    final scheme = ColorScheme.fromSeed(
+    final generatedScheme = ColorScheme.fromSeed(
       seedColor: preset.seed,
       brightness: brightness,
       surface: base.colorScheme.surface,
       error: base.colorScheme.error,
+    );
+    final scheme = generatedScheme.copyWith(
+      surface: tokens.sidebar,
+      surfaceContainerLowest: tokens.sidebar,
+      surfaceContainerLow: tokens.canvas,
+      surfaceContainer: tokens.subtleSurface,
+      surfaceContainerHigh: tokens.subtleSurface,
+      outline: tokens.border,
+      outlineVariant: tokens.border,
     );
     return base.copyWith(
       colorScheme: scheme,
@@ -35,6 +44,32 @@ class AppTheme {
         backgroundColor: tokens.canvas,
         foregroundColor: scheme.onSurface,
         centerTitle: false,
+      ),
+      dividerTheme: DividerThemeData(color: tokens.border, thickness: 1),
+      filledButtonTheme: FilledButtonThemeData(
+        style: FilledButton.styleFrom(
+          minimumSize: const Size(0, 42),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+          textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
+      ),
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          elevation: 0,
+          minimumSize: const Size(0, 42),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+        ),
+      ),
+      outlinedButtonTheme: OutlinedButtonThemeData(
+        style: OutlinedButton.styleFrom(
+          minimumSize: const Size(0, 42),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          side: BorderSide(color: tokens.border),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(9)),
+          textStyle: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600),
+        ),
       ),
     );
   }

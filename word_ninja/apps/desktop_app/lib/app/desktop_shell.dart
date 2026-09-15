@@ -24,14 +24,17 @@ class DesktopShell extends StatelessWidget {
       pane: NavigationPane(
         selected: _calcIndex(context),
         onChanged: (i) => _navigate(context, i),
-        displayMode: PaneDisplayMode.compact,
+        displayMode: PaneDisplayMode.open,
         header: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          padding: const EdgeInsets.fromLTRB(12, 14, 12, 10),
           child: Text(
-            'W',
+            '学习空间',
             style: TextStyle(
-              fontSize: 28,
-              color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+              color: isDark
+                  ? AppColors.textOnDark.withValues(alpha: 0.65)
+                  : AppColors.textSecondary,
             ),
           ),
         ),
@@ -106,7 +109,7 @@ class DesktopShell extends StatelessWidget {
       ),
       onPanStart: (_) => windowManager.startDragging(),
       child: Container(
-        height: 36,
+        height: 40,
         color: isDark ? AppColors.surfaceDark : AppColors.surface,
         child: Row(
           children: [
@@ -194,7 +197,7 @@ class DesktopShell extends StatelessWidget {
               : AppColors.divider.withValues(alpha: 0.3),
           child: Container(
             width: 46,
-            height: 36,
+            height: 40,
             alignment: Alignment.center,
             child: Text(
               label,

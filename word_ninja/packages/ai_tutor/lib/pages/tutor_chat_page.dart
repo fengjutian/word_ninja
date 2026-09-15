@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
+import 'package:ui_kit/app_theme/design_tokens.dart';
 import 'package:ai/ai.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
@@ -158,9 +159,24 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     String? word;
     for (int j = index - 1; j >= 0; j--) {
       if (messages[j].isUser) {
-        final match =
-            RegExp(r"[a-zA-Z]{2,}(?:-[a-zA-Z]+)*").firstMatch(messages[j].text);
-        if (match != null) word = match.group(0);
+        final matches =
+            RegExp(r"[a-zA-Z]{3,}(?:-[a-zA-Z]+)*").allMatches(messages[j].text);
+        const ignored = {
+          'nan',
+          'null',
+          'undefined',
+          'out',
+          'the',
+          'and',
+          'you'
+        };
+        for (final match in matches) {
+          final candidate = match.group(0)!.toLowerCase();
+          if (!ignored.contains(candidate)) {
+            word = candidate;
+            break;
+          }
+        }
         break;
       }
     }
@@ -274,6 +290,8 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   Widget build(BuildContext context) {
     final sessionsState = ref.watch(chatHistoryProvider);
     final messages = sessionsState.current.messages;
+    final colors = context.appColors;
+    final scheme = Theme.of(context).colorScheme;
 
     return Scaffold(
       key: _drawerKey,
@@ -286,26 +304,23 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
         onNew: _newAndClose,
       ),
       appBar: AppBar(
+        toolbarHeight: 62,
         leading: IconButton(
-          icon: const Icon(PhosphorIconsRegular.list, color: Colors.white),
+          icon: const Icon(PhosphorIconsRegular.sidebarSimple),
+          tooltip: '会话记录',
           onPressed: () => _drawerKey.currentState?.openDrawer(),
         ),
         title: Row(
           children: [
             Container(
-              width: 36,
-              height: 36,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [AppColors.primary, AppColors.accentPurple],
-                ),
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: scheme.primaryContainer,
+                borderRadius: BorderRadius.circular(9),
               ),
-              child: const Center(
-                child: Text('S',
-                    style: TextStyle(
-                        color: Colors.white, fontWeight: FontWeight.bold)),
-              ),
+              child: Icon(PhosphorIconsRegular.sparkle,
+                  size: 17, color: scheme.primary),
             ),
             const SizedBox(width: 8),
             Expanded(
@@ -314,117 +329,115 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                 children: [
                   Text(
                     sessionsState.current.title,
-                    style:
-                        AppTextStyles.titleMedium.copyWith(color: Colors.white),
+                    style: Theme.of(context).textTheme.titleSmall,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  Text(_isLoading ? '输入中...' : '在线',
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: _isLoading
-                              ? AppColors.warning
-                              : AppColors.textOnDark.withValues(alpha: 0.7))),
+                  Text(_isLoading ? '正在思考…' : 'AI 英语学习导师',
+                      style: TextStyle(fontSize: 11, color: colors.mutedText)),
                 ],
               ),
             ),
             if (_lastError != null)
               IconButton(
-                icon: Icon(PhosphorIconsRegular.arrowsClockwise,
-                    size: 18,
-                    color: AppColors.textOnDark.withValues(alpha: 0.7)),
+                icon:
+                    const Icon(PhosphorIconsRegular.arrowsClockwise, size: 18),
                 tooltip: '重试',
                 onPressed: _retry,
               ),
             IconButton(
-              icon: Icon(PhosphorIconsRegular.chartBar,
-                  size: 18, color: AppColors.textOnDark.withValues(alpha: 0.7)),
+              icon: const Icon(PhosphorIconsRegular.chartBar, size: 18),
               tooltip: '学习分析',
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const AnalysisPage()),
               ),
             ),
             IconButton(
-              icon: Icon(PhosphorIconsRegular.copy,
-                  size: 18, color: AppColors.textOnDark.withValues(alpha: 0.7)),
+              icon: const Icon(PhosphorIconsRegular.copy, size: 18),
               tooltip: '复制对话',
               onPressed: () => _copyConversation(messages),
             ),
           ],
         ),
       ),
+      backgroundColor: colors.canvas,
       body: Column(
         children: [
           Expanded(
             child: ListView.builder(
               controller: _scrollCtrl,
-              padding: const EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.fromLTRB(28, 24, 28, 24),
               itemCount: messages.length,
               itemBuilder: (ctx, i) {
                 final msg = messages[i];
-                return _MessageBubble(
-                  msg,
-                  onTap: msg.isUser
-                      ? () {
-                          _msgCtrl.text = msg.text;
-                          _msgCtrl.selection =
-                              TextSelection.collapsed(offset: msg.text.length);
-                        }
-                      : null,
-                  onDelete: msg.isLoading ? null : () => _deleteMessage(i),
-                  onAddToVocab: !msg.isUser && !msg.isLoading && !msg.isError
-                      ? () => _addAiResponseToVocabulary(i, messages)
-                      : null,
+                return Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 920),
+                    child: _MessageBubble(
+                      msg,
+                      onTap: msg.isUser
+                          ? () {
+                              _msgCtrl.text = msg.text;
+                              _msgCtrl.selection = TextSelection.collapsed(
+                                  offset: msg.text.length);
+                            }
+                          : null,
+                      onDelete: msg.isLoading ? null : () => _deleteMessage(i),
+                      onAddToVocab:
+                          !msg.isUser && !msg.isLoading && !msg.isError
+                              ? () => _addAiResponseToVocabulary(i, messages)
+                              : null,
+                    ),
+                  ),
                 );
               },
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.fromLTRB(24, 12, 24, 16),
             decoration: BoxDecoration(
-              color: AppColors.surface,
-              boxShadow: [
-                BoxShadow(
-                  color: AppColors.divider.withValues(alpha: 0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, -2),
-                ),
-              ],
+              color: colors.sidebar,
+              border: Border(top: BorderSide(color: colors.border)),
             ),
             child: SafeArea(
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(PhosphorIconsRegular.microphone,
-                        color: AppColors.primary),
-                    tooltip: '语音输入（即将上线）',
-                    onPressed: () {},
-                  ),
-                  Expanded(
-                    child: TextField(
-                      controller: _msgCtrl,
-                      decoration: InputDecoration(
-                        hintText: '输入你的英语问题...',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 10),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 920),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(PhosphorIconsRegular.microphone,
+                            color: AppColors.primary),
+                        tooltip: '语音输入（即将上线）',
+                        onPressed: () {},
                       ),
-                      onSubmitted: (_) => _sendMessage(),
-                    ),
+                      Expanded(
+                        child: TextField(
+                          controller: _msgCtrl,
+                          decoration: InputDecoration(
+                            hintText: '询问单词、语法、写作或口语问题…',
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 10),
+                          ),
+                          onSubmitted: (_) => _sendMessage(),
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.sm),
+                      CircleAvatar(
+                        backgroundColor: _isLoading
+                            ? AppColors.textSecondary
+                            : AppColors.primary,
+                        child: IconButton(
+                          icon: Icon(PhosphorIconsRegular.paperPlaneTilt,
+                              color: Colors.white, size: 18),
+                          onPressed: _isLoading ? null : _sendMessage,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: AppSpacing.sm),
-                  CircleAvatar(
-                    backgroundColor: _isLoading
-                        ? AppColors.textSecondary
-                        : AppColors.primary,
-                    child: IconButton(
-                      icon: Icon(PhosphorIconsRegular.paperPlaneTilt,
-                          color: Colors.white, size: 18),
-                      onPressed: _isLoading ? null : _sendMessage,
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

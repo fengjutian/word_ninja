@@ -50,7 +50,7 @@ class AppColors {
 class AppTextStyles {
   AppTextStyles._();
 
-  static const String _fontFamily = 'SawarabiGothic'; // 清晰易读字体
+  static const String _fontFamily = 'Microsoft YaHei UI';
 
   static const TextStyle displayLarge = TextStyle(
     fontFamily: _fontFamily,
