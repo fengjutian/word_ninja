@@ -1,6 +1,7 @@
 import '../../data/datasource/vocabulary_local_datasource.dart';
 import '../../data/datasource/vocabulary_remote_datasource.dart';
 import '../../data/model/word.dart';
+import '../../data/model/review.dart';
 import '../../data/model/vocabulary_stats.dart';
 import '../../domain/repository/vocabulary_repository.dart';
 import 'package:uuid/uuid.dart';

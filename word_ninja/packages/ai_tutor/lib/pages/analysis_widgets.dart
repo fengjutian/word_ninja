@@ -246,7 +246,7 @@ class _EmptyState extends StatelessWidget {
 /// 重点强化词卡片
 class _FocusWordCard extends StatelessWidget {
   final FocusWord focusWord;
-  const _FocusWordCard({super.key, required this.focusWord});
+  const _FocusWordCard({required this.focusWord});
 
   @override
   Widget build(BuildContext context) {

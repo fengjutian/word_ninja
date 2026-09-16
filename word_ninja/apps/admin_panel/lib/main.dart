@@ -41,8 +41,6 @@ class _AdminDashboardState extends State<AdminDashboard> {
   int _memberCount = 0;
   bool _isRefreshing = false;
 
-  final _pages = <Widget>[];
-
   @override
   void initState() {
     super.initState();
