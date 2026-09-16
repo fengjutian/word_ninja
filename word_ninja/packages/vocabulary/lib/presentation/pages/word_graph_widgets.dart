@@ -76,12 +76,21 @@ class _GraphCanvasState extends State<_GraphCanvas> {
     final cx = size.width / 2, cy = size.height / 2;
     // Center node
     widget.nodes[0].pos = Offset(cx, cy);
-    // Surrounding nodes in a circle
+    // Surrounding nodes in concentric circles so a larger vocabulary does not
+    // collapse into one crowded ring.
     final count = widget.nodes.length - 1;
     if (count <= 0) return;
-    final radius = math.min(size.width, size.height) * 0.32;
+    const nodesPerRing = 10;
+    final shortestSide = math.min(size.width, size.height);
+    final ringGap = math.max(76.0, shortestSide * 0.13);
+    final firstRadius = math.min(shortestSide * 0.25, 190.0);
     for (int i = 0; i < count; i++) {
-      final angle = (2 * math.pi * i / count) - math.pi / 2;
+      final ring = i ~/ nodesPerRing;
+      final indexInRing = i % nodesPerRing;
+      final itemsInRing = math.min(nodesPerRing, count - ring * nodesPerRing);
+      final angle =
+          (2 * math.pi * indexInRing / itemsInRing) - math.pi / 2 + ring * 0.2;
+      final radius = firstRadius + ring * ringGap;
       widget.nodes[i + 1].pos =
           Offset(cx + math.cos(angle) * radius, cy + math.sin(angle) * radius);
     }

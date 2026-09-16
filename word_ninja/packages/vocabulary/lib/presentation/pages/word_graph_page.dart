@@ -112,20 +112,17 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
       }
     }
 
-    // If not enough, add random words
-    if (related.length < 4) {
-      final remaining = all.where((w) => !seen.contains(w.word)).toList()
-        ..shuffle();
-      for (final w in remaining.take(6 - related.length)) {
-        if (seen.add(w.word)) {
-          _edges.add(_GraphEdge(from: 0, to: _nodes.length, label: '随机'));
-          _nodes.add(_GraphNode(
-              word: w.word,
-              meaning: w.meaning,
-              difficulty: w.difficulty,
-              source: w.source,
-              tags: w.tags));
-        }
+    // Keep every word visible. Words without a detected relationship still
+    // belong to the vocabulary graph and can be selected as a new center.
+    for (final w in all.where((word) => !seen.contains(word.word))) {
+      if (seen.add(w.word)) {
+        _edges.add(_GraphEdge(from: 0, to: _nodes.length, label: '词库'));
+        _nodes.add(_GraphNode(
+            word: w.word,
+            meaning: w.meaning,
+            difficulty: w.difficulty,
+            source: w.source,
+            tags: w.tags));
       }
     }
   }

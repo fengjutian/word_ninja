@@ -28,4 +28,28 @@ void main() {
     expect(find.text('0'), findsNWidgets(2));
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('shows every vocabulary item as a graph node', (tester) async {
+    final words = List.generate(
+      9,
+      (index) => Word(
+        id: '$index',
+        userId: 'local',
+        word: 'word$index',
+        meaning: 'meaning $index',
+        difficulty: index % 5 + 1,
+        source: 'source-$index',
+      ),
+    );
+
+    await tester.pumpWidget(MaterialApp(
+      theme: AppTheme.light,
+      home: WordGraphPage(words: words),
+    ));
+
+    expect(find.text('8'), findsNWidgets(2));
+    expect(find.text('关联节点'), findsOneWidget);
+    expect(find.text('关系数量'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }

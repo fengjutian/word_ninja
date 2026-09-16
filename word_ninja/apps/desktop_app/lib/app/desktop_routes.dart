@@ -47,6 +47,12 @@ GoRouter createDesktopRouter() {
                         .read(wordListProvider.notifier)
                         .loadWords(refresh: true);
                   });
+                } else if (words.hasMore && !words.isLoading) {
+                  // The graph represents the complete vocabulary, not only the
+                  // first paginated page shown by the vocabulary list.
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    ref.read(wordListProvider.notifier).loadWords();
+                  });
                 }
                 if (words.isLoading && words.words.isEmpty) {
                   return const Center(child: mt.CircularProgressIndicator());
