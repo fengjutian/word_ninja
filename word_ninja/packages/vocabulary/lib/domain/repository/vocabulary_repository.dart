@@ -17,6 +17,9 @@ abstract class VocabularyRepository {
   /// 统计
   Future<VocabularyStats> getStats();
 
+  /// Portable, complete JSON backup of words and their review history.
+  Future<String> exportJson();
+
   /// 同步
   Future<void> syncWithRemote();
 }

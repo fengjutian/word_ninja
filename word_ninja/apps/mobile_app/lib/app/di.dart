@@ -6,7 +6,7 @@ import 'package:auth/data/datasource/auth_remote_datasource.dart';
 import 'package:auth/data/repository/auth_repository_impl.dart';
 import 'package:auth/domain/repository/auth_repository.dart';
 import 'package:auth/presentation/providers/auth_provider.dart';
-import 'package:vocabulary/data/datasource/isar_local_datasource.dart';
+import 'package:vocabulary/data/datasource/sqlite_local_datasource.dart';
 import 'package:vocabulary/data/datasource/api_vocabulary_remote_datasource.dart';
 import 'package:vocabulary/data/datasource/vocabulary_local_datasource.dart';
 import 'package:vocabulary/data/datasource/vocabulary_remote_datasource.dart';
@@ -45,7 +45,7 @@ final authRepositoryOverride = Provider<AuthRepository>((ref) {
 // ─── Vocabulary ───
 
 final _vocabLocalDSProvider = Provider<VocabularyLocalDataSource>((ref) {
-  return IsarVocabularyLocalDataSource();
+  return SqliteVocabularyLocalDataSource();
 });
 
 final _vocabRemoteDSProvider = Provider<VocabularyRemoteDataSource>((ref) {

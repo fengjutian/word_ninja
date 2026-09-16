@@ -5,6 +5,7 @@ import '../../data/model/review.dart';
 import '../../data/model/vocabulary_stats.dart';
 import '../../domain/repository/vocabulary_repository.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:convert';
 
 /// 单词仓库实现（本地优先）
 class VocabularyRepositoryImpl implements VocabularyRepository {
@@ -62,6 +63,27 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
 
   @override
   Future<VocabularyStats> getStats() => _local.getStats();
+
+  @override
+  Future<String> exportJson() async {
+    final words = <Word>[];
+    for (var page = 1;; page++) {
+      final batch = await _local.getWords(page: page, size: 200);
+      words.addAll(batch);
+      if (batch.length < 200) break;
+    }
+    final reviews = <Review>[];
+    for (final word in words) {
+      reviews.addAll(await _local.getReviewsForWord(word.id));
+    }
+    return const JsonEncoder.withIndent('  ').convert({
+      'format': 'wordflow-vocabulary-backup',
+      'version': 1,
+      'exportedAt': DateTime.now().toUtc().toIso8601String(),
+      'words': words.map((word) => word.toJson()).toList(),
+      'reviews': reviews.map((review) => review.toJson()).toList(),
+    });
+  }
 
   @override
   Future<void> syncWithRemote() async {

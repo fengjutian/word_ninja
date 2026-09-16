@@ -16,8 +16,9 @@ class ChatDatabase {
     final path = p.join(dir.path, 'word_flow_chat.sqlite');
     _db = await openDatabase(
       path,
-      version: 1,
+      version: 2,
       onCreate: _onCreate,
+      onUpgrade: _onUpgrade,
       onConfigure: (db) async {
         await db.execute('PRAGMA foreign_keys = ON');
       },
@@ -61,6 +62,63 @@ class ChatDatabase {
         session_count INTEGER NOT NULL DEFAULT 0
       )
     ''');
+
+    await _createVocabularyTables(db);
+  }
+
+  static Future<void> _onUpgrade(
+      Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 2) {
+      await _createVocabularyTables(db);
+    }
+  }
+
+  /// The vocabulary tables live in the same durable SQLite file as chat data.
+  /// `IF NOT EXISTS` makes upgrades retry-safe after an interrupted launch.
+  static Future<void> _createVocabularyTables(Database db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS words (
+        id               TEXT PRIMARY KEY,
+        user_id          TEXT NOT NULL,
+        word             TEXT NOT NULL,
+        normalized_word  TEXT NOT NULL,
+        meaning          TEXT NOT NULL,
+        phonetic         TEXT NOT NULL DEFAULT '',
+        example          TEXT NOT NULL DEFAULT '',
+        difficulty       INTEGER NOT NULL DEFAULT 1,
+        mastery          INTEGER NOT NULL DEFAULT 0,
+        source           TEXT NOT NULL DEFAULT 'manual',
+        tags_json        TEXT NOT NULL DEFAULT '[]',
+        created_at       INTEGER,
+        updated_at       INTEGER,
+        next_review_date INTEGER,
+        review_count     INTEGER NOT NULL DEFAULT 0,
+        focus_score      INTEGER NOT NULL DEFAULT 0
+      )
+    ''');
+    await db.execute(
+      'CREATE UNIQUE INDEX IF NOT EXISTS idx_words_normalized '
+      'ON words(normalized_word)',
+    );
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_words_updated ON words(updated_at DESC)',
+    );
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS word_reviews (
+        id            TEXT PRIMARY KEY,
+        word_id       TEXT NOT NULL,
+        review_time   INTEGER NOT NULL,
+        score         INTEGER NOT NULL DEFAULT 0,
+        is_completed  INTEGER NOT NULL DEFAULT 0,
+        interval_days INTEGER NOT NULL DEFAULT 0,
+        scheduled_for INTEGER,
+        FOREIGN KEY (word_id) REFERENCES words(id) ON DELETE CASCADE
+      )
+    ''');
+    await db.execute(
+      'CREATE INDEX IF NOT EXISTS idx_reviews_word_time '
+      'ON word_reviews(word_id, review_time DESC)',
+    );
   }
 
   static Future<void> close() async {

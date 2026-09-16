@@ -1,7 +1,9 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/cards/word_card.dart';
 import 'package:ui_kit/loading/app_loading.dart';
@@ -83,6 +85,39 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
     );
   }
 
+  Future<void> _exportVocabulary() async {
+    try {
+      final now = DateTime.now();
+      final date = '${now.year.toString().padLeft(4, '0')}-'
+          '${now.month.toString().padLeft(2, '0')}-'
+          '${now.day.toString().padLeft(2, '0')}';
+      final path = await FilePicker.platform.saveFile(
+        dialogTitle: '导出单词备份',
+        fileName: 'wordflow-vocabulary-$date.json',
+        type: FileType.custom,
+        allowedExtensions: const ['json'],
+      );
+      if (path == null) return;
+      final json = await ref.read(vocabularyRepositoryProvider).exportJson();
+      final target = File(path);
+      final temp = File('$path.tmp');
+      await temp.writeAsString(json, flush: true);
+      if (await target.exists()) await target.delete();
+      await temp.rename(path);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('单词已导出到 $path')),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('导出失败：$e')),
+        );
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = ref.watch(wordListProvider);
@@ -103,6 +138,11 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
               )
             : const Text('词汇学习'),
         actions: [
+          IconButton(
+            icon: const Icon(PhosphorIconsRegular.downloadSimple),
+            tooltip: '导出单词备份',
+            onPressed: state.words.isEmpty ? null : _exportVocabulary,
+          ),
           if (state.words.isNotEmpty)
             IconButton(
               icon: const Icon(PhosphorIconsRegular.shareNetwork),

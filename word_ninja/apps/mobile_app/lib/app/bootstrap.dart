@@ -3,6 +3,8 @@ import 'package:core/storage/preferences.dart';
 import 'package:core/storage/isar_db.dart';
 import 'package:core/storage/sqlite/sqlite_init.dart';
 import 'package:core/logger/logger.dart';
+import 'package:vocabulary/data/datasource/isar_local_datasource.dart';
+import 'package:vocabulary/data/datasource/sqlite_local_datasource.dart';
 
 /// App 初始化引导
 class AppBootstrap {
@@ -24,11 +26,25 @@ class AppBootstrap {
     try {
       await SqliteDb.init();
       log.i('SQLite chat database initialized');
+      await _migrateVocabulary();
     } catch (e) {
       log.w('SQLite init skipped: $e');
     }
 
     // 4. 其他初始化
     log.i('WordFlow bootstrapped');
+  }
+
+  static Future<void> _migrateVocabulary() async {
+    const key = 'vocabulary_sqlite_migration_v1';
+    if (Preferences.getBool(key)) return;
+    try {
+      await SqliteVocabularyLocalDataSource()
+          .importLegacy(IsarVocabularyLocalDataSource());
+      await Preferences.setBool(key, true);
+      log.i('Vocabulary migrated to SQLite');
+    } catch (e) {
+      log.w('Vocabulary migration deferred: $e');
+    }
   }
 }

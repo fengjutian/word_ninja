@@ -5,6 +5,8 @@ import 'package:core/storage/preferences.dart';
 import 'package:core/storage/isar_db.dart';
 import 'package:core/storage/sqlite/sqlite_init.dart';
 import 'package:core/logger/logger.dart';
+import 'package:vocabulary/data/datasource/isar_local_datasource.dart';
+import 'package:vocabulary/data/datasource/sqlite_local_datasource.dart';
 
 /// App initialization bootstrap
 class AppBootstrap {
@@ -30,11 +32,26 @@ class AppBootstrap {
     try {
       await SqliteDb.init();
       log.i('SQLite chat database initialized');
+      await _migrateVocabulary();
     } catch (e) {
       log.w('SQLite init skipped: $e');
     }
 
     // 4. Other initialization
     log.i('WordFlow Desktop bootstrapped');
+  }
+
+  static Future<void> _migrateVocabulary() async {
+    const key = 'vocabulary_sqlite_migration_v1';
+    if (Preferences.getBool(key)) return;
+    try {
+      await SqliteVocabularyLocalDataSource()
+          .importLegacy(IsarVocabularyLocalDataSource());
+      await Preferences.setBool(key, true);
+      log.i('Vocabulary migrated to SQLite');
+    } catch (e) {
+      // Do not set the flag: the idempotent migration retries next launch.
+      log.w('Vocabulary migration deferred: $e');
+    }
   }
 }
