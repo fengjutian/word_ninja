@@ -74,8 +74,8 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
     context.push('/vocabulary/review');
   }
 
-  void _showWordDetail(Word word) {
-    showModalBottomSheet(
+  Future<void> _showWordDetail(Word word) async {
+    final action = await showModalBottomSheet<String>(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
@@ -83,6 +83,143 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
       ),
       builder: (ctx) => _WordDetailSheet(word: word),
     );
+    if (!mounted) return;
+    if (action == 'edit') await _editWord(word);
+    if (action == 'delete') await _deleteWord(word);
+  }
+
+  Future<void> _editWord(Word word) async {
+    final wordCtrl = TextEditingController(text: word.word);
+    final meaningCtrl = TextEditingController(text: word.meaning);
+    final phoneticCtrl = TextEditingController(text: word.phonetic);
+    final exampleCtrl = TextEditingController(text: word.example);
+    final tagsCtrl = TextEditingController(text: word.tags.join(', '));
+    final formKey = GlobalKey<FormState>();
+    final updated = await showDialog<Word>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('编辑单词'),
+        content: SizedBox(
+          width: 520,
+          child: Form(
+            key: formKey,
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextFormField(
+                    controller: wordCtrl,
+                    decoration: const InputDecoration(labelText: '单词'),
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? '请输入单词'
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextFormField(
+                    controller: meaningCtrl,
+                    minLines: 2,
+                    maxLines: 5,
+                    decoration: const InputDecoration(
+                      labelText: '具体释义',
+                      hintText: '词性、常用含义及语境说明',
+                      alignLabelWithHint: true,
+                    ),
+                    validator: (value) => value == null || value.trim().isEmpty
+                        ? '请输入具体释义'
+                        : null,
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: phoneticCtrl,
+                    decoration: const InputDecoration(labelText: '音标'),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: exampleCtrl,
+                    minLines: 2,
+                    maxLines: 4,
+                    decoration: const InputDecoration(
+                      labelText: '例句',
+                      alignLabelWithHint: true,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  TextField(
+                    controller: tagsCtrl,
+                    decoration: const InputDecoration(
+                      labelText: '标签',
+                      hintText: '多个标签用逗号分隔',
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            onPressed: () {
+              if (!formKey.currentState!.validate()) return;
+              Navigator.of(dialogContext).pop(word.copyWith(
+                word: wordCtrl.text.trim(),
+                meaning: meaningCtrl.text.trim(),
+                phonetic: phoneticCtrl.text.trim(),
+                example: exampleCtrl.text.trim(),
+                tags: tagsCtrl.text
+                    .split(RegExp(r'[,，]'))
+                    .map((tag) => tag.trim())
+                    .where((tag) => tag.isNotEmpty)
+                    .toSet()
+                    .toList(),
+              ));
+            },
+            child: const Text('保存'),
+          ),
+        ],
+      ),
+    );
+    wordCtrl.dispose();
+    meaningCtrl.dispose();
+    phoneticCtrl.dispose();
+    exampleCtrl.dispose();
+    tagsCtrl.dispose();
+    if (updated == null || !mounted) return;
+    await ref.read(wordListProvider.notifier).updateWord(updated);
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('单词已更新')));
+    }
+  }
+
+  Future<void> _deleteWord(Word word) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: const Text('删除单词'),
+        content: Text('确定要删除“${word.word}”吗？相关复习记录也会被删除。'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(false),
+            child: const Text('取消'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: AppColors.error),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
+            child: const Text('删除'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+    await ref.read(wordListProvider.notifier).deleteWord(word.id);
+    if (mounted) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text('单词已删除')));
+    }
   }
 
   Future<void> _exportVocabulary() async {
@@ -308,6 +445,8 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
         phonetic: word.phonetic.isNotEmpty ? '/${word.phonetic}/' : null,
         mastery: word.mastery,
         onTap: () => _showWordDetail(word),
+        onEdit: () => _editWord(word),
+        onDelete: () => _deleteWord(word),
       ));
       // Loading indicator at the end
       if (i == state.words.length - 1 && state.hasMore) {

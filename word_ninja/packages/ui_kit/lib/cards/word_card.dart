@@ -9,6 +9,8 @@ class WordCard extends StatelessWidget {
   final String? phonetic;
   final int mastery;
   final VoidCallback? onTap;
+  final VoidCallback? onEdit;
+  final VoidCallback? onDelete;
 
   const WordCard({
     super.key,
@@ -17,6 +19,8 @@ class WordCard extends StatelessWidget {
     this.phonetic,
     required this.mastery,
     this.onTap,
+    this.onEdit,
+    this.onDelete,
   });
 
   Color _masteryColor(int value) {
@@ -79,7 +83,20 @@ class WordCard extends StatelessWidget {
                   ],
                 ),
               ),
-              // 箭头
+              if (onEdit != null)
+                IconButton(
+                  tooltip: '编辑',
+                  onPressed: onEdit,
+                  icon: const Icon(PhosphorIconsRegular.pencilSimple,
+                      size: 19),
+                ),
+              if (onDelete != null)
+                IconButton(
+                  tooltip: '删除',
+                  onPressed: onDelete,
+                  color: AppColors.error,
+                  icon: const Icon(PhosphorIconsRegular.trash, size: 19),
+                ),
               const Icon(PhosphorIconsRegular.caretRight,
                   color: AppColors.textSecondary),
             ],

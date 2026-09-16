@@ -130,6 +130,12 @@ class WordListNotifier extends StateNotifier<WordListState> {
     _onDataChanged();
   }
 
+  Future<void> updateWord(Word word) async {
+    await _repo.updateWord(word);
+    await loadWords(refresh: true);
+    _onDataChanged();
+  }
+
   Future<void> search(String query) async {
     if (query.isEmpty) {
       await loadWords(refresh: true);
