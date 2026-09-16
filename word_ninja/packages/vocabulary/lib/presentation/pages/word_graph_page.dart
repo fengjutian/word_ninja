@@ -172,13 +172,12 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
       _centerWord = word;
       _selectedWord = null;
     });
-    Navigator.of(context).pop();
     _loadGraph();
   }
 
   Future<void> _showWordPicker() async {
     var query = '';
-    await showDialog<void>(
+    final selectedWord = await showDialog<Word>(
       context: context,
       builder: (dialogContext) => StatefulBuilder(
         builder: (context, setDialogState) {
@@ -226,7 +225,8 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                 ),
-                                onTap: () => _focusWord(word),
+                                onTap: () =>
+                                    Navigator.of(dialogContext).pop(word),
                               );
                             },
                           ),
@@ -244,6 +244,9 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
         },
       ),
     );
+    if (selectedWord != null && mounted) {
+      _focusWord(selectedWord);
+    }
   }
 
   @override
@@ -273,7 +276,13 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
         word: _selectedWord ?? center,
         isCenter: (_selectedWord ?? center).word.toLowerCase() ==
             center.word.toLowerCase(),
-        onFocus: () => _focusWord(_selectedWord ?? center),
+        onFocus: () {
+          final selected = _selectedWord ?? center;
+          Navigator.of(context).pop();
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _focusWord(selected);
+          });
+        },
       ),
       appBar: AppBar(
         title: const Text('知识图谱'),
