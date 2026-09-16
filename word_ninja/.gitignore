@@ -1,5 +1,7 @@
 # Flutter
 .dart_tool/
+.dart-localappdata/
+.dartServer/
 .packages
 .pub/
 build/

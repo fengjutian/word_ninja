@@ -58,9 +58,14 @@ class SqliteVocabularyLocalDataSource implements VocabularyLocalDataSource {
 
   @override
   Future<List<Word>> searchWords(String query) async {
-    final escaped = query.toLowerCase().replaceAll(r'\', r'\\').replaceAll('%', r'\%').replaceAll('_', r'\_');
+    final escaped = query
+        .toLowerCase()
+        .replaceAll(r'\', r'\\')
+        .replaceAll('%', r'\%')
+        .replaceAll('_', r'\_');
     final rows = await _db.query('words',
-        where: "normalized_word LIKE ? ESCAPE '\\' OR lower(meaning) LIKE ? ESCAPE '\\'",
+        where:
+            "normalized_word LIKE ? ESCAPE '\\' OR lower(meaning) LIKE ? ESCAPE '\\'",
         whereArgs: ['%$escaped%', '%$escaped%'],
         orderBy: 'updated_at DESC');
     return rows.map(_wordFromRow).toList();
@@ -68,8 +73,35 @@ class SqliteVocabularyLocalDataSource implements VocabularyLocalDataSource {
 
   @override
   Future<void> saveWord(Word word) async {
-    await _db.insert('words', _wordToRow(word),
-        conflictAlgorithm: ConflictAlgorithm.replace);
+    await _db.transaction((txn) async {
+      final byId = await txn.query('words',
+          columns: ['id'], where: 'id = ?', whereArgs: [word.id], limit: 1);
+      if (byId.isNotEmpty) {
+        await txn.update('words', _wordToRow(word),
+            where: 'id = ?', whereArgs: [word.id]);
+        return;
+      }
+
+      // A word may already exist outside the currently loaded UI page. Update
+      // it in place so its ID and review-history foreign keys remain intact.
+      final normalized = word.word.trim().toLowerCase();
+      final duplicate = await txn.query('words',
+          columns: ['id', 'created_at'],
+          where: 'normalized_word = ?',
+          whereArgs: [normalized],
+          limit: 1);
+      if (duplicate.isNotEmpty) {
+        final existingId = duplicate.first['id']! as String;
+        final values = _wordToRow(word)
+          ..remove('id')
+          ..['created_at'] = duplicate.first['created_at'];
+        await txn.update('words', values,
+            where: 'id = ?', whereArgs: [existingId]);
+        return;
+      }
+      await txn.insert('words', _wordToRow(word),
+          conflictAlgorithm: ConflictAlgorithm.abort);
+    });
   }
 
   @override
@@ -103,11 +135,16 @@ class SqliteVocabularyLocalDataSource implements VocabularyLocalDataSource {
       final rows = await txn.query('words',
           where: 'id = ?', whereArgs: [review.wordId], limit: 1);
       if (rows.isEmpty) {
-        throw StateError('Cannot save a review for missing word ${review.wordId}');
+        throw StateError(
+            'Cannot save a review for missing word ${review.wordId}');
       }
       final word = _wordFromRow(rows.first);
       final level = word.reviewCount.clamp(0, _intervals.length - 1);
-      final nextLevel = review.score >= 5 ? (level + 1).clamp(0, _intervals.length - 1) : review.score >= 3 ? level : 0;
+      final nextLevel = review.score >= 5
+          ? (level + 1).clamp(0, _intervals.length - 1)
+          : review.score >= 3
+              ? level
+              : 0;
       var days = _intervals[nextLevel];
       if (word.focusScore > 0) days = (days ~/ 2).clamp(1, 120);
       final now = DateTime.now();
@@ -115,7 +152,9 @@ class SqliteVocabularyLocalDataSource implements VocabularyLocalDataSource {
         mastery: (word.mastery + review.score * 5).clamp(0, 100),
         reviewCount: review.score >= 5
             ? (word.reviewCount + 1).clamp(1, _intervals.length)
-            : review.score >= 3 ? word.reviewCount : 1,
+            : review.score >= 3
+                ? word.reviewCount
+                : 1,
         nextReviewDate: now.add(Duration(days: days)),
         updatedAt: now,
       );
@@ -137,15 +176,19 @@ class SqliteVocabularyLocalDataSource implements VocabularyLocalDataSource {
   Future<VocabularyStats> getStats() async {
     final now = DateTime.now();
     final start = DateTime(now.year, now.month, now.day).millisecondsSinceEpoch;
-    Future<int> count(String table, {String? where, List<Object?>? args}) async {
+    Future<int> count(String table,
+        {String? where, List<Object?>? args}) async {
       final result = await _db.rawQuery(
-          'SELECT COUNT(*) AS count FROM $table${where == null ? '' : ' WHERE $where'}', args);
+          'SELECT COUNT(*) AS count FROM $table${where == null ? '' : ' WHERE $where'}',
+          args);
       return Sqflite.firstIntValue(result) ?? 0;
     }
+
     return VocabularyStats(
       totalWords: await count('words'),
       masteredWords: await count('words', where: 'mastery >= 80'),
-      todayReview: await count('word_reviews', where: 'review_time >= ?', args: [start]),
+      todayReview:
+          await count('word_reviews', where: 'review_time >= ?', args: [start]),
       todayNew: await count('words', where: 'created_at >= ?', args: [start]),
       learningWords: await count('words',
           where: 'next_review_date IS NULL OR next_review_date <= ?',

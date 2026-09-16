@@ -91,7 +91,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
       final date = '${now.year.toString().padLeft(4, '0')}-'
           '${now.month.toString().padLeft(2, '0')}-'
           '${now.day.toString().padLeft(2, '0')}';
-      final path = await FilePicker.platform.saveFile(
+      final path = await FilePicker.saveFile(
         dialogTitle: '导出单词备份',
         fileName: 'wordflow-vocabulary-$date.json',
         type: FileType.custom,

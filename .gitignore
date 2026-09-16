@@ -1,0 +1,3 @@
+# Dart analysis server local cache
+.dart-localappdata/
+.dartServer/

@@ -45,8 +45,9 @@ class AppBootstrap {
     const key = 'vocabulary_sqlite_migration_v1';
     if (Preferences.getBool(key)) return;
     try {
-      await SqliteVocabularyLocalDataSource()
-          .importLegacy(IsarVocabularyLocalDataSource());
+      await SqliteVocabularyLocalDataSource().importLegacy(
+        IsarVocabularyLocalDataSource(),
+      );
       await Preferences.setBool(key, true);
       log.i('Vocabulary migrated to SQLite');
     } catch (e) {
