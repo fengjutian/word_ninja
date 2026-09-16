@@ -19,7 +19,9 @@ class WordGraphPage extends ConsumerStatefulWidget {
 }
 
 class _WordGraphPageState extends ConsumerState<WordGraphPage> {
+  final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _centerIndex = 0;
+  Word? _selectedWord;
   List<_GraphNode> _nodes = [];
   List<_GraphEdge> _edges = [];
 
@@ -104,13 +106,21 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
     }
   }
 
-  void _selectNode(int index) {
+  void _openNodeDetails(int index) {
+    final wordIndex =
+        widget.words.indexWhere((word) => word.word == _nodes[index].word);
+    if (wordIndex < 0) return;
+    setState(() => _selectedWord = widget.words[wordIndex]);
+    _scaffoldKey.currentState?.openEndDrawer();
+  }
+
+  void _focusWord(Word word) {
     setState(() {
-      _centerIndex =
-          widget.words.indexWhere((w) => w.word == _nodes[index].word);
+      _centerIndex = widget.words.indexWhere((item) => item.id == word.id);
       if (_centerIndex < 0) _centerIndex = 0;
       _buildGraph();
     });
+    Navigator.of(context).pop();
   }
 
   @override
@@ -134,7 +144,13 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
     }
     final center = widget.words[_centerIndex];
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: colors.canvas,
+      endDrawer: _WordInfoDrawer(
+        word: _selectedWord ?? center,
+        isCenter: (_selectedWord ?? center).id == center.id,
+        onFocus: () => _focusWord(_selectedWord ?? center),
+      ),
       appBar: AppBar(
         title: const Text('知识图谱'),
         actions: widget.words.length > 1
@@ -205,7 +221,9 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
             child: Stack(children: [
               Positioned.fill(
                   child: _GraphCanvas(
-                      nodes: _nodes, edges: _edges, onNodeTap: _selectNode)),
+                      nodes: _nodes,
+                      edges: _edges,
+                      onNodeTap: _openNodeDetails)),
               Positioned(left: 14, bottom: 12, child: _NodeLegend()),
               Positioned(
                   right: 14,
@@ -248,4 +266,170 @@ class _GraphMetric extends StatelessWidget {
         const SizedBox(width: 6),
         Text(label, style: TextStyle(fontSize: 11, color: colors.mutedText))
       ]));
+}
+
+class _WordInfoDrawer extends StatelessWidget {
+  const _WordInfoDrawer({
+    required this.word,
+    required this.isCenter,
+    required this.onFocus,
+  });
+
+  final Word word;
+  final bool isCenter;
+  final VoidCallback onFocus;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = context.appColors;
+    final scheme = Theme.of(context).colorScheme;
+    final meaning = word.meaning.trim() == '解析失败' || word.meaning.isEmpty
+        ? '暂无释义'
+        : word.meaning;
+
+    return Drawer(
+      width: 360,
+      backgroundColor: colors.sidebar,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.horizontal(left: Radius.circular(18)),
+      ),
+      child: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 14, 16),
+              child: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: scheme.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(Icons.hub_outlined, color: scheme.primary),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(word.word,
+                            style: Theme.of(context).textTheme.titleLarge),
+                        if (word.phonetic.isNotEmpty)
+                          Text(
+                            word.phonetic,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: colors.mutedText,
+                            ),
+                          ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    tooltip: '关闭',
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close, size: 20),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 1, color: colors.border),
+            Expanded(
+              child: ListView(
+                padding: const EdgeInsets.all(24),
+                children: [
+                  _WordInfoSection(title: '释义', content: meaning),
+                  if (word.example.trim().isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    _WordInfoSection(title: '例句', content: word.example),
+                  ],
+                  const SizedBox(height: 24),
+                  Text('学习信息', style: Theme.of(context).textTheme.titleSmall),
+                  const SizedBox(height: 12),
+                  _WordInfoRow(label: '来源', value: _sourceLabel(word.source)),
+                  _WordInfoRow(label: '难度', value: '${word.difficulty} / 5'),
+                  _WordInfoRow(label: '掌握度', value: '${word.mastery}%'),
+                  _WordInfoRow(label: '复习次数', value: '${word.reviewCount}'),
+                  if (word.tags.isNotEmpty) ...[
+                    const SizedBox(height: 24),
+                    Text('标签', style: Theme.of(context).textTheme.titleSmall),
+                    const SizedBox(height: 10),
+                    Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: word.tags
+                          .map((tag) => Chip(
+                                label: Text(tag),
+                                visualDensity: VisualDensity.compact,
+                              ))
+                          .toList(),
+                    ),
+                  ],
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
+              child: SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: isCenter ? null : onFocus,
+                  icon: const Icon(Icons.center_focus_strong, size: 18),
+                  label: Text(isCenter ? '当前中心词' : '设为中心词'),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _sourceLabel(String source) => switch (source) {
+        'reading' => '阅读收集',
+        'ai' || 'ai_tutor' => 'AI 生成',
+        'manual' => '手动添加',
+        _ => '其他',
+      };
+}
+
+class _WordInfoSection extends StatelessWidget {
+  const _WordInfoSection({required this.title, required this.content});
+  final String title;
+  final String content;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: Theme.of(context).textTheme.titleSmall),
+          const SizedBox(height: 8),
+          Text(content, style: const TextStyle(fontSize: 14, height: 1.65)),
+        ],
+      );
+}
+
+class _WordInfoRow extends StatelessWidget {
+  const _WordInfoRow({required this.label, required this.value});
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 7),
+        child: Row(
+          children: [
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(color: context.appColors.mutedText),
+              ),
+            ),
+            Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
+          ],
+        ),
+      );
 }

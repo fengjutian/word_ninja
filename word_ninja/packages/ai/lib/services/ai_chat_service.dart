@@ -8,11 +8,13 @@ class AiChatService {
   final Dio _dio;
   final String _apiKey;
   final String _modelName;
+  final ModelProvider _provider;
   final double _temperature;
   final int _maxTokens;
 
   AiChatService(this._apiKey, {ModelConfig? config})
       : _modelName = config?.modelName ?? 'gpt-4o-mini',
+        _provider = config?.provider ?? ModelProvider.openAI,
         _temperature = config?.temperature ?? 0.7,
         _maxTokens = config?.maxTokens ?? 4096,
         _dio = Dio(BaseOptions(
@@ -32,7 +34,7 @@ class AiChatService {
         'messages': [
           {'role': 'user', 'content': 'Hi'},
         ],
-        'max_tokens': 5,
+        ..._tokenLimit(5),
       });
       final content = res.data['choices'][0]['message']['content'] as String;
       return (true, content);
@@ -59,7 +61,7 @@ class AiChatService {
         'model': _modelName,
         'messages': messages,
         'temperature': _temperature,
-        'max_tokens': _maxTokens,
+        ..._tokenLimit(_maxTokens),
       });
       return res.data['choices'][0]['message']['content'] as String;
     } on DioException catch (e) {
@@ -89,7 +91,7 @@ class AiChatService {
           'model': _modelName,
           'messages': messages,
           'temperature': _temperature,
-          'max_tokens': _maxTokens,
+          ..._tokenLimit(_maxTokens),
           'stream': true,
         },
         options: Options(responseType: ResponseType.stream),
@@ -123,6 +125,13 @@ class AiChatService {
       // 流式中断：已经 yield 了部分内容，现在抛出异常让调用方处理
       throw Exception(_dioErrorToUserMessage(e));
     }
+  }
+
+  Map<String, int> _tokenLimit(int value) {
+    if (_provider == ModelProvider.miniMax) {
+      return {'max_completion_tokens': value.clamp(1, 2048)};
+    }
+    return {'max_tokens': value};
   }
 
   /// 将 Dio 异常转为用户可读的错误信息

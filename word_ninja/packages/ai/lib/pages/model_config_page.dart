@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
-import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/app_theme/design_tokens.dart';
 
 import '../config/config_provider.dart';
@@ -139,6 +138,14 @@ class _ProviderPanel extends StatelessWidget {
             subtitle: '兼容性与工具调用',
             selected: config.provider == ModelProvider.openAI,
             onTap: () => notifier.selectProvider(ModelProvider.openAI),
+          ),
+          const SizedBox(height: 10),
+          _ProviderCard(
+            icon: PhosphorIconsRegular.sparkle,
+            title: 'MiniMax M2.7',
+            subtitle: '中国大陆节点 · OpenAI 兼容',
+            selected: config.provider == ModelProvider.miniMax,
+            onTap: () => notifier.selectProvider(ModelProvider.miniMax),
           ),
           const SizedBox(height: 10),
           _ProviderCard(

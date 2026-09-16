@@ -85,6 +85,10 @@ class ModelConfigNotifier extends StateNotifier<ModelConfig> {
         await updateConfig(ModelConfig.openAI.copyWith(
           apiKey: state.apiKey,
         ));
+      case ModelProvider.miniMax:
+        await updateConfig(ModelConfig.miniMax.copyWith(
+          apiKey: state.apiKey,
+        ));
       case ModelProvider.custom:
         // 保留当前自定义值
         await updateConfig(state.copyWith(provider: ModelProvider.custom));

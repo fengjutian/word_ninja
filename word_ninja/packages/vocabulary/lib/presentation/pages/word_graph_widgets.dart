@@ -29,7 +29,15 @@ class _GraphNode {
 
   double get radius => isCenter ? 40 : 28 + difficulty * 3.0;
 
-  String get label => isCenter ? '$word\n$meaning' : word;
+  String get label {
+    if (!isCenter) return word;
+    final cleanMeaning = meaning.trim() == '解析失败' ? '暂无释义' : meaning.trim();
+    if (cleanMeaning.isEmpty) return word;
+    final shortMeaning = cleanMeaning.length > 12
+        ? '${cleanMeaning.substring(0, 12)}…'
+        : cleanMeaning;
+    return '$word\n$shortMeaning';
+  }
 }
 
 class _GraphEdge {
@@ -101,7 +109,7 @@ class _GraphCanvasState extends State<_GraphCanvas> {
           behavior: HitTestBehavior.opaque,
           onTapDown: (d) {
             final hit = _hitNode(d.localPosition);
-            if (hit >= 0 && hit != 0) widget.onNodeTap(hit);
+            if (hit >= 0) widget.onNodeTap(hit);
           },
           child: MouseRegion(
             onHover: (e) {

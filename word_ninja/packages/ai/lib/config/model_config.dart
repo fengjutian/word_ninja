@@ -2,6 +2,7 @@
 enum ModelProvider {
   openAI,
   deepSeek,
+  miniMax,
   custom;
 
   String get label {
@@ -10,6 +11,8 @@ enum ModelProvider {
         return 'OpenAI';
       case ModelProvider.deepSeek:
         return 'DeepSeek';
+      case ModelProvider.miniMax:
+        return 'MiniMax';
       case ModelProvider.custom:
         return '自定义';
     }
@@ -59,6 +62,15 @@ class ModelConfig {
     baseUrl: 'https://api.openai.com/v1',
     temperature: 0.7,
     maxTokens: 4096,
+  );
+
+  /// MiniMax 中国大陆 OpenAI 兼容接口
+  static const miniMax = ModelConfig(
+    provider: ModelProvider.miniMax,
+    modelName: 'MiniMax-M2.7',
+    baseUrl: 'https://api.minimaxi.com/v1',
+    temperature: 0.7,
+    maxTokens: 2048,
   );
 
   ModelConfig copyWith({
