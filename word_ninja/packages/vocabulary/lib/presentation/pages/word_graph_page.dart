@@ -3,15 +3,25 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/app_theme/design_tokens.dart';
 import 'package:vocabulary/data/model/word.dart';
+import 'package:ai/providers/ai_providers.dart';
 import 'dart:math' as math;
 
 part 'word_graph_widgets.dart';
+
+typedef WordRelationLoader = Future<Map<String, List<Map<String, String>>>>
+    Function(String word);
 
 /// 单词关系图谱页 — 展示单词之间的关联
 class WordGraphPage extends ConsumerStatefulWidget {
   final List<Word> words;
   final int initialIndex;
-  const WordGraphPage({super.key, required this.words, this.initialIndex = 0});
+  final WordRelationLoader? relationLoader;
+  const WordGraphPage({
+    super.key,
+    required this.words,
+    this.initialIndex = 0,
+    this.relationLoader,
+  });
 
   @override
   ConsumerState<WordGraphPage> createState() => _WordGraphPageState();
@@ -20,15 +30,21 @@ class WordGraphPage extends ConsumerStatefulWidget {
 class _WordGraphPageState extends ConsumerState<WordGraphPage> {
   final _scaffoldKey = GlobalKey<ScaffoldState>();
   int _centerIndex = 0;
+  Word? _centerWord;
   Word? _selectedWord;
   List<_GraphNode> _nodes = [];
   List<_GraphEdge> _edges = [];
+  bool _isLoading = false;
+  String? _loadError;
+  int _requestId = 0;
+  final Map<String, Map<String, List<Map<String, String>>>> _relationCache = {};
 
   @override
   void initState() {
     super.initState();
     _syncCenterIndex(widget.initialIndex);
-    _buildGraph();
+    if (widget.words.isNotEmpty) _centerWord = widget.words[_centerIndex];
+    Future.microtask(_loadGraph);
   }
 
   @override
@@ -47,8 +63,9 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
       _syncCenterIndex(
         retainedIndex >= 0 ? retainedIndex : widget.initialIndex,
       );
+      _centerWord = widget.words.isEmpty ? null : widget.words[_centerIndex];
       _selectedWord = null;
-      _buildGraph();
+      _loadGraph();
     }
   }
 
@@ -58,90 +75,105 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
         : preferredIndex.clamp(0, widget.words.length - 1);
   }
 
-  void _buildGraph() {
-    _nodes = [];
-    _edges = [];
-    if (widget.words.isEmpty) return;
-    _syncCenterIndex(_centerIndex);
-    final all = widget.words;
-    final center = all[_centerIndex];
+  Future<void> _loadGraph({bool forceRefresh = false}) async {
+    final center = _centerWord;
+    if (center == null) return;
+    final requestId = ++_requestId;
+    final cacheKey = center.word.trim().toLowerCase();
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+      _nodes = [_nodeFromWord(center, isCenter: true)];
+      _edges = [];
+    });
 
-    // Central node
-    _nodes.add(_GraphNode(
-        word: center.word,
-        meaning: center.meaning,
-        difficulty: center.difficulty,
-        source: center.source,
-        tags: center.tags,
-        isCenter: true));
-
-    // Related nodes: words sharing tags or similar difficulty
-    final related = <Word>[];
-    final seen = {center.word};
-    for (final w in all) {
-      if (w.word == center.word) continue;
-      final tagOverlap = center.tags.toSet().intersection(w.tags.toSet());
-      final difficultyClose = (center.difficulty - w.difficulty).abs() <= 1;
-      final sourceMatch = center.source == w.source;
-
-      if (tagOverlap.isNotEmpty || difficultyClose || sourceMatch) {
-        if (seen.add(w.word)) {
-          related.add(w);
-          // Build edge
-          String relation;
-          if (tagOverlap.isNotEmpty) {
-            relation = tagOverlap.first;
-          } else if (sourceMatch) {
-            relation = '同来源';
-          } else {
-            relation = '难度相近';
-          }
-          _edges.add(_GraphEdge(
-            from: 0,
-            to: _nodes.length,
-            label: relation,
-            strength: tagOverlap.length * 0.3 + (sourceMatch ? 0.2 : 0),
-          ));
-          _nodes.add(_GraphNode(
-              word: w.word,
-              meaning: w.meaning,
-              difficulty: w.difficulty,
-              source: w.source,
-              tags: w.tags));
-        }
-      }
+    try {
+      var relations = forceRefresh ? null : _relationCache[cacheKey];
+      relations ??= await (widget.relationLoader != null
+          ? widget.relationLoader!(center.word)
+          : ref.read(aiWordServiceProvider).getWordRelations(center.word));
+      _relationCache[cacheKey] = relations;
+      if (!mounted || requestId != _requestId) return;
+      setState(() {
+        _buildSemanticGraph(center, relations!);
+        _isLoading = false;
+      });
+    } catch (error) {
+      if (!mounted || requestId != _requestId) return;
+      setState(() {
+        _isLoading = false;
+        _loadError = error.toString();
+      });
     }
+  }
 
-    // Keep every word visible. Words without a detected relationship still
-    // belong to the vocabulary graph and can be selected as a new center.
-    for (final w in all.where((word) => !seen.contains(word.word))) {
-      if (seen.add(w.word)) {
-        _edges.add(_GraphEdge(from: 0, to: _nodes.length, label: '词库'));
+  void _buildSemanticGraph(
+    Word center,
+    Map<String, List<Map<String, String>>> relations,
+  ) {
+    _nodes = [_nodeFromWord(center, isCenter: true)];
+    _edges = [];
+    const relationLabels = {
+      'synonyms': '近义词',
+      'antonyms': '反义词',
+      'related': '相关词',
+      'derivatives': '派生词',
+    };
+    final seen = <String>{center.word.trim().toLowerCase()};
+    for (final entry in relationLabels.entries) {
+      for (final item in relations[entry.key] ?? const []) {
+        final value = (item['word'] ?? '').trim();
+        final normalized = value.toLowerCase();
+        if (value.isEmpty ||
+            normalized == 'nan' ||
+            normalized == 'null' ||
+            !seen.add(normalized)) {
+          continue;
+        }
+        final nodeIndex = _nodes.length;
         _nodes.add(_GraphNode(
-            word: w.word,
-            meaning: w.meaning,
-            difficulty: w.difficulty,
-            source: w.source,
-            tags: w.tags));
+          word: value,
+          meaning: (item['meaning'] ?? '').trim(),
+          relationType: entry.key,
+        ));
+        _edges.add(_GraphEdge(
+          from: 0,
+          to: nodeIndex,
+          label: entry.value,
+          relationType: entry.key,
+          strength: entry.key == 'synonyms' || entry.key == 'antonyms' ? 0.8 : 0.5,
+        ));
       }
     }
   }
 
+  _GraphNode _nodeFromWord(Word word, {bool isCenter = false}) {
+    return _GraphNode(
+      word: word.word,
+      meaning: word.meaning,
+      isCenter: isCenter,
+    );
+  }
+
   void _openNodeDetails(int index) {
-    final wordIndex =
-        widget.words.indexWhere((word) => word.word == _nodes[index].word);
-    if (wordIndex < 0) return;
-    setState(() => _selectedWord = widget.words[wordIndex]);
+    final node = _nodes[index];
+    final savedIndex = widget.words.indexWhere(
+      (word) => word.word.toLowerCase() == node.word.toLowerCase(),
+    );
+    setState(() => _selectedWord = savedIndex >= 0
+        ? widget.words[savedIndex]
+        : Word(id: '', userId: '', word: node.word, meaning: node.meaning));
     _scaffoldKey.currentState?.openEndDrawer();
   }
 
   void _focusWord(Word word) {
     setState(() {
       _centerIndex = widget.words.indexWhere((item) => item.id == word.id);
-      if (_centerIndex < 0) _centerIndex = 0;
-      _buildGraph();
+      _centerWord = word;
+      _selectedWord = null;
     });
     Navigator.of(context).pop();
+    _loadGraph();
   }
 
   @override
@@ -163,41 +195,48 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
         ),
       );
     }
-    final center = widget.words[_centerIndex];
+    final center = _centerWord ?? widget.words[_centerIndex];
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: colors.canvas,
       endDrawer: _WordInfoDrawer(
         word: _selectedWord ?? center,
-        isCenter: (_selectedWord ?? center).id == center.id,
+        isCenter: (_selectedWord ?? center).word.toLowerCase() ==
+            center.word.toLowerCase(),
         onFocus: () => _focusWord(_selectedWord ?? center),
       ),
       appBar: AppBar(
         title: const Text('知识图谱'),
-        actions: widget.words.length > 1
-            ? [
-                if (_centerIndex > 0)
+        actions: [
+                if (widget.words.length > 1 && _centerIndex > 0)
                   IconButton(
                       icon: const Icon(Icons.arrow_left),
                       tooltip: '上一个',
                       onPressed: () {
                         setState(() {
                           _centerIndex--;
-                          _buildGraph();
+                          _centerWord = widget.words[_centerIndex];
                         });
+                        _loadGraph();
                       }),
-                if (_centerIndex < widget.words.length - 1)
+                if (_centerIndex >= 0 &&
+                    _centerIndex < widget.words.length - 1)
                   IconButton(
                       icon: const Icon(Icons.arrow_right),
                       tooltip: '下一个',
                       onPressed: () {
                         setState(() {
                           _centerIndex++;
-                          _buildGraph();
+                          _centerWord = widget.words[_centerIndex];
                         });
+                        _loadGraph();
                       }),
-              ]
-            : null,
+                IconButton(
+                  tooltip: '重新生成',
+                  onPressed: _isLoading ? null : () => _loadGraph(forceRefresh: true),
+                  icon: const Icon(Icons.refresh),
+                ),
+              ],
       ),
       body: Padding(
         padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
@@ -246,6 +285,53 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
                       edges: _edges,
                       onNodeTap: _openNodeDetails)),
               Positioned(left: 14, bottom: 12, child: _NodeLegend()),
+              if (_isLoading)
+                const Positioned.fill(
+                  child: ColoredBox(
+                    color: Color(0x33FFFFFF),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                ),
+              if (!_isLoading && _loadError != null)
+                Positioned.fill(
+                  child: Center(
+                    child: Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.error_outline,
+                                color: AppColors.error),
+                            const SizedBox(height: 8),
+                            const Text('语义关系加载失败'),
+                            const SizedBox(height: 4),
+                            Text(
+                              _loadError!,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  fontSize: 11, color: colors.mutedText),
+                            ),
+                            const SizedBox(height: 12),
+                            FilledButton(
+                              onPressed: _loadGraph,
+                              child: const Text('重试'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              if (!_isLoading && _loadError == null && _nodes.length == 1)
+                Positioned.fill(
+                  child: Center(
+                    child: Text(
+                      '暂未找到可靠的语义关系',
+                      style: TextStyle(color: colors.mutedText),
+                    ),
+                  ),
+                ),
               Positioned(
                   right: 14,
                   bottom: 12,

@@ -38,6 +38,51 @@ class AiWordService {
     };
   }
 
+  /// 生成以目标单词为中心的语义关系。
+  Future<Map<String, List<Map<String, String>>>> getWordRelations(
+      String word) async {
+    final prompt = '''
+分析英语单词 "$word" 的语义关系，只返回下列 JSON：
+{
+  "synonyms": [{"word": "近义词", "meaning": "简短中文释义"}],
+  "antonyms": [{"word": "反义词", "meaning": "简短中文释义"}],
+  "related": [{"word": "语义相关词", "meaning": "简短中文释义"}],
+  "derivatives": [{"word": "派生词", "meaning": "简短中文释义"}]
+}
+每类最多 5 个，只给出真实、常用的关系。没有合适的词时返回空数组，不得使用 null、nan 或目标词本身。
+''';
+    final response = await _chat.chat(message: prompt);
+    final parsed = AiChatService.parseJsonMap(response, const {});
+    const keys = ['synonyms', 'antonyms', 'related', 'derivatives'];
+    final result = <String, List<Map<String, String>>>{};
+    final seen = <String>{word.trim().toLowerCase()};
+
+    for (final key in keys) {
+      final items = <Map<String, String>>[];
+      final rawItems = parsed[key];
+      if (rawItems is List) {
+        for (final raw in rawItems) {
+          if (raw is! Map) continue;
+          final value = (raw['word'] ?? '').toString().trim();
+          final normalized = value.toLowerCase();
+          if (value.isEmpty ||
+              normalized == 'nan' ||
+              normalized == 'null' ||
+              !seen.add(normalized)) {
+            continue;
+          }
+          items.add({
+            'word': value,
+            'meaning': (raw['meaning'] ?? '').toString().trim(),
+          });
+          if (items.length == 5) break;
+        }
+      }
+      result[key] = items;
+    }
+    return result;
+  }
+
   /// 生成单词测试（选择题）
   Future<List<Map<String, dynamic>>> generateQuiz(List<String> words) async {
     if (words.isEmpty) return [];

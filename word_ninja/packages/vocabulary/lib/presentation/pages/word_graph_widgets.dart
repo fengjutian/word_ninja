@@ -2,32 +2,29 @@ part of 'word_graph_page.dart';
 
 class _GraphNode {
   final String word, meaning;
-  final int difficulty;
-  final String source;
-  final List<String> tags;
+  final String relationType;
   final bool isCenter;
   Offset pos = Offset.zero;
 
   _GraphNode({
     required this.word,
     required this.meaning,
-    required this.difficulty,
-    required this.source,
-    required this.tags,
+    this.relationType = 'center',
     this.isCenter = false,
   });
 
   Color get color {
     if (isCenter) return AppColors.primary;
-    return switch (source) {
-      'reading' => AppColors.success,
-      'ai' => AppColors.accentPurple,
-      'manual' => AppColors.secondary,
-      _ => AppColors.info,
+    return switch (relationType) {
+      'synonyms' => AppColors.success,
+      'antonyms' => AppColors.error,
+      'derivatives' => AppColors.accentPurple,
+      'related' => AppColors.info,
+      _ => AppColors.secondary,
     };
   }
 
-  double get radius => isCenter ? 40 : 28 + difficulty * 3.0;
+  double get radius => isCenter ? 40 : 32;
 
   String get label {
     if (!isCenter) return word;
@@ -43,12 +40,14 @@ class _GraphNode {
 class _GraphEdge {
   final int from, to;
   final String label;
+  final String relationType;
   final double strength;
 
   _GraphEdge({
     required this.from,
     required this.to,
     required this.label,
+    required this.relationType,
     this.strength = 0.3,
   });
 }
@@ -182,8 +181,9 @@ class _GraphPainter extends CustomPainter {
       }
       final from = nodes[e.from].pos;
       final to = nodes[e.to].pos;
+      final relationColor = _relationColor(e.relationType);
       final linePaint = Paint()
-        ..color = border.withValues(alpha: 0.8)
+        ..color = relationColor.withValues(alpha: 0.55)
         ..strokeWidth = 1.5 + e.strength * 2;
       canvas.drawLine(from, to, linePaint);
 
@@ -191,7 +191,8 @@ class _GraphPainter extends CustomPainter {
       final mid = Offset((from.dx + to.dx) / 2, (from.dy + to.dy) / 2);
       final tp = TextPainter(
           text: TextSpan(
-              text: e.label, style: TextStyle(fontSize: 10, color: mutedText)),
+              text: e.label,
+              style: TextStyle(fontSize: 10, color: relationColor)),
           textDirection: TextDirection.ltr)
         ..layout();
       tp.paint(canvas, mid - Offset(tp.width / 2, tp.height / 2));
@@ -203,6 +204,14 @@ class _GraphPainter extends CustomPainter {
       _drawNode(canvas, n, isHovered: i == hoveredIndex);
     }
   }
+
+  Color _relationColor(String type) => switch (type) {
+        'synonyms' => AppColors.success,
+        'antonyms' => AppColors.error,
+        'derivatives' => AppColors.accentPurple,
+        'related' => AppColors.info,
+        _ => mutedText,
+      };
 
   void _drawGrid(Canvas canvas, Size size) {
     final paint = Paint()
@@ -281,10 +290,10 @@ class _NodeLegend extends StatelessWidget {
         runSpacing: 8,
         children: const [
           _LegendDot(AppColors.primary, '中心词'),
-          _LegendDot(AppColors.secondary, '手动添加'),
-          _LegendDot(AppColors.success, '阅读收集'),
-          _LegendDot(AppColors.accentPurple, 'AI 生成'),
-          _LegendDot(AppColors.info, '其他'),
+          _LegendDot(AppColors.success, '近义词'),
+          _LegendDot(AppColors.error, '反义词'),
+          _LegendDot(AppColors.info, '相关词'),
+          _LegendDot(AppColors.accentPurple, '派生词'),
         ],
       ),
     );
