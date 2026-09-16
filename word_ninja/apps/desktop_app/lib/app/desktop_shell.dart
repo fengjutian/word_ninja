@@ -12,20 +12,20 @@ class _DesktopShellState extends State<DesktopShell> {
   bool _expanded = false;
 
   static const _items = <({IconData icon, String label})>[
-    (icon: FluentIcons.home, label: '首页'),
-    (icon: FluentIcons.bookmarks, label: '单词'),
-    (icon: FluentIcons.share, label: '知识图谱'),
-    (icon: FluentIcons.reading_mode, label: '阅读'),
-    (icon: FluentIcons.headset, label: '听力'),
-    (icon: FluentIcons.microphone, label: '口语'),
-    (icon: FluentIcons.chat, label: 'AI 导师'),
-    (icon: FluentIcons.design, label: '写作'),
-    (icon: FluentIcons.task_list, label: '学习计划'),
+    (icon: PhosphorIconsRegular.house, label: '首页'),
+    (icon: PhosphorIconsRegular.bookOpen, label: '单词'),
+    (icon: PhosphorIconsRegular.shareNetwork, label: '知识图谱'),
+    (icon: PhosphorIconsRegular.article, label: '阅读'),
+    (icon: PhosphorIconsRegular.headphones, label: '听力'),
+    (icon: PhosphorIconsRegular.microphone, label: '口语'),
+    (icon: PhosphorIconsRegular.chats, label: 'AI 导师'),
+    (icon: PhosphorIconsRegular.pencilSimple, label: '写作'),
+    (icon: PhosphorIconsRegular.calendar, label: '学习计划'),
   ];
 
   static const _footerItems = <({IconData icon, String label})>[
-    (icon: FluentIcons.settings, label: '模型配置'),
-    (icon: FluentIcons.contact, label: '我的'),
+    (icon: PhosphorIconsRegular.gear, label: '模型配置'),
+    (icon: PhosphorIconsRegular.user, label: '我的'),
   ];
 
   @override
@@ -52,7 +52,7 @@ class _DesktopShellState extends State<DesktopShell> {
               child: Row(
                 children: [
                   Container(
-                    width: _expanded ? 220 : 58,
+                    width: _expanded ? 220 : 64,
                     decoration: BoxDecoration(
                       color: tokens.sidebar,
                       border: Border(right: BorderSide(color: tokens.border)),
@@ -137,8 +137,10 @@ class _DesktopShellState extends State<DesktopShell> {
               tooltip: _expanded ? '折叠导航' : '展开导航',
               onPressed: () => setState(() => _expanded = !_expanded),
               icon: Icon(
-                _expanded ? FluentIcons.back : FluentIcons.global_nav_button,
-                size: 17,
+                _expanded
+                    ? PhosphorIconsRegular.caretLeft
+                    : PhosphorIconsRegular.sidebarSimple,
+                size: 20,
               ),
             ),
             Container(
@@ -168,9 +170,14 @@ class _DesktopShellState extends State<DesktopShell> {
               ),
             ),
             const Spacer(),
-            _windowButton('—', '最小化', dark, () => windowManager.minimize()),
             _windowButton(
-              '□',
+              PhosphorIconsRegular.minus,
+              '最小化',
+              dark,
+              () => windowManager.minimize(),
+            ),
+            _windowButton(
+              PhosphorIconsRegular.square,
               '最大化',
               dark,
               () => windowManager.isMaximized().then(
@@ -180,7 +187,7 @@ class _DesktopShellState extends State<DesktopShell> {
               ),
             ),
             _windowButton(
-              '×',
+              PhosphorIconsRegular.x,
               '关闭',
               dark,
               () => windowManager.close(),
@@ -193,7 +200,7 @@ class _DesktopShellState extends State<DesktopShell> {
   }
 
   Widget _windowButton(
-    String label,
+    IconData icon,
     String tooltip,
     bool dark,
     VoidCallback onTap, {
@@ -210,12 +217,10 @@ class _DesktopShellState extends State<DesktopShell> {
           width: 46,
           height: 46,
           child: Center(
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                color: dark ? AppColors.textOnDark : AppColors.textPrimary,
-              ),
+            child: Icon(
+              icon,
+              size: 16,
+              color: dark ? AppColors.textOnDark : AppColors.textPrimary,
             ),
           ),
         ),
@@ -278,8 +283,10 @@ class _NavButton extends StatelessWidget {
     final content = mt.InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(8),
-      child: Container(
-        height: 42,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCubic,
+        height: 44,
         padding: EdgeInsets.symmetric(horizontal: expanded ? 11 : 0),
         decoration: BoxDecoration(
           color: selected
@@ -292,7 +299,23 @@ class _NavButton extends StatelessWidget {
               ? MainAxisAlignment.start
               : MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 17, color: selected ? primary : tokens.mutedText),
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              width: 32,
+              height: 32,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: selected
+                    ? primary.withValues(alpha: 0.10)
+                    : mt.Colors.transparent,
+                borderRadius: BorderRadius.circular(9),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: selected ? primary : tokens.mutedText,
+              ),
+            ),
             if (expanded) ...[
               const SizedBox(width: 12),
               Expanded(
@@ -313,6 +336,9 @@ class _NavButton extends StatelessWidget {
         ),
       ),
     );
-    return Padding(padding: const EdgeInsets.only(bottom: 3), child: content);
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 3),
+      child: expanded ? content : mt.Tooltip(message: label, child: content),
+    );
   }
 }

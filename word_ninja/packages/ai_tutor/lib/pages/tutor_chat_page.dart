@@ -358,8 +358,11 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
         surfaceTintColor: Colors.transparent,
         shape: Border(bottom: BorderSide(color: colors.border)),
         leading: IconButton(
-          icon: const Icon(PhosphorIconsRegular.sidebarSimple),
+          icon: const Icon(PhosphorIconsRegular.sidebarSimple, size: 20),
           tooltip: '会话记录',
+          style: IconButton.styleFrom(
+            minimumSize: const Size.square(40),
+          ),
           onPressed: () => _drawerKey.currentState?.openDrawer(),
         ),
         title: Row(
@@ -392,20 +395,31 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
             if (_lastError != null)
               IconButton(
                 icon:
-                    const Icon(PhosphorIconsRegular.arrowsClockwise, size: 18),
+                    const Icon(PhosphorIconsRegular.arrowsClockwise, size: 20),
                 tooltip: '重试',
+                style: IconButton.styleFrom(
+                  minimumSize: const Size.square(40),
+                  backgroundColor: scheme.errorContainer,
+                  foregroundColor: scheme.onErrorContainer,
+                ),
                 onPressed: _retry,
               ),
             IconButton(
-              icon: const Icon(PhosphorIconsRegular.chartBar, size: 18),
+              icon: const Icon(PhosphorIconsRegular.chartBar, size: 20),
               tooltip: '学习分析',
+              style: IconButton.styleFrom(
+                minimumSize: const Size.square(40),
+              ),
               onPressed: () => Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const AnalysisPage()),
               ),
             ),
             IconButton(
-              icon: const Icon(PhosphorIconsRegular.copy, size: 18),
+              icon: const Icon(PhosphorIconsRegular.copy, size: 20),
               tooltip: '复制对话',
+              style: IconButton.styleFrom(
+                minimumSize: const Size.square(40),
+              ),
               onPressed: () => _copyConversation(messages),
             ),
           ],
@@ -516,7 +530,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                           icon: Icon(PhosphorIconsRegular.microphone,
                               size: 19, color: colors.mutedText),
                           tooltip: '语音输入（即将上线）',
-                          onPressed: () {},
+                          onPressed: null,
                         ),
                         suffixIcon: Padding(
                           padding: const EdgeInsets.all(5),
