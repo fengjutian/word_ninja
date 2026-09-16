@@ -1,5 +1,4 @@
 name: vocabulary
-resolution: workspace
 description: WordFlow vocabulary training module
 version: 1.0.0
 publish_to: none

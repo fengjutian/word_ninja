@@ -1,5 +1,4 @@
 name: auth
-resolution: workspace
 description: WordFlow authentication module
 version: 1.0.0
 publish_to: none

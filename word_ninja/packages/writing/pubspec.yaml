@@ -1,5 +1,4 @@
 name: writing
-resolution: workspace
 description: WordFlow writing training module
 version: 1.0.0
 publish_to: none

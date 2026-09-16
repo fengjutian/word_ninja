@@ -1,5 +1,4 @@
 name: listening
-resolution: workspace
 description: WordFlow listening training module
 version: 1.0.0
 publish_to: none

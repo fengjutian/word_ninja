@@ -1,5 +1,4 @@
 name: reading
-resolution: workspace
 description: WordFlow reading training module
 version: 1.0.0
 publish_to: none

@@ -1,0 +1,28 @@
+# melos_managed_dependency_overrides: ai,ai_tutor,auth,core,listening,profile,reading,speaking,study_plan,sync,ui_kit,vocabulary,writing
+dependency_overrides:
+  ai:
+    path: ..\\..\\packages\\ai
+  ai_tutor:
+    path: ..\\..\\packages\\ai_tutor
+  auth:
+    path: ..\\..\\packages\\auth
+  core:
+    path: ..\\..\\packages\\core
+  listening:
+    path: ..\\..\\packages\\listening
+  profile:
+    path: ..\\..\\packages\\profile
+  reading:
+    path: ..\\..\\packages\\reading
+  speaking:
+    path: ..\\..\\packages\\speaking
+  study_plan:
+    path: ..\\..\\packages\\study_plan
+  sync:
+    path: ..\\..\\packages\\sync
+  ui_kit:
+    path: ..\\..\\packages\\ui_kit
+  vocabulary:
+    path: ..\\..\\packages\\vocabulary
+  writing:
+    path: ..\\..\\packages\\writing

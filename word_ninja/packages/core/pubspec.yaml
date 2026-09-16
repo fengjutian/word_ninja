@@ -1,5 +1,4 @@
 name: core
-resolution: workspace
 description: WordFlow core foundation package
 version: 1.0.0
 publish_to: none

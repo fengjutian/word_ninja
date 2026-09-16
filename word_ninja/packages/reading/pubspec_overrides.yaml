@@ -1,0 +1,10 @@
+# melos_managed_dependency_overrides: ai,core,ui_kit,vocabulary
+dependency_overrides:
+  ai:
+    path: ..\\ai
+  core:
+    path: ..\\core
+  ui_kit:
+    path: ..\\ui_kit
+  vocabulary:
+    path: ..\\vocabulary

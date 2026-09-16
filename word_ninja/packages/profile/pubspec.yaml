@@ -1,5 +1,4 @@
 name: profile
-resolution: workspace
 description: WordFlow user profile & settings
 version: 1.0.0
 publish_to: none

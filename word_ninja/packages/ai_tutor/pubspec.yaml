@@ -1,5 +1,4 @@
 name: ai_tutor
-resolution: workspace
 description: WordFlow AI tutor (AI Tutor)
 version: 1.0.0
 publish_to: none

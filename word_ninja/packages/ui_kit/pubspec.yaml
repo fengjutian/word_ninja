@@ -1,5 +1,4 @@
 name: ui_kit
-resolution: workspace
 description: WordFlow UI component library
 version: 1.0.0
 publish_to: none

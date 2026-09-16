@@ -1,5 +1,4 @@
 name: desktop_app
-resolution: workspace
 description: WordFlow Desktop App (Windows/macOS/Linux)
 publish_to: none
 version: 1.0.0+1

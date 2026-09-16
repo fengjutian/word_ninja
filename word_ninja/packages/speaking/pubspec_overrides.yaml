@@ -1,0 +1,10 @@
+# melos_managed_dependency_overrides: ai,core,listening,ui_kit
+dependency_overrides:
+  ai:
+    path: ..\\ai
+  core:
+    path: ..\\core
+  listening:
+    path: ..\\listening
+  ui_kit:
+    path: ..\\ui_kit

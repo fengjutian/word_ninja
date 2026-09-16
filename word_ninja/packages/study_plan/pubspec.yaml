@@ -1,5 +1,4 @@
 name: study_plan
-resolution: workspace
 description: WordFlow study plan module
 version: 1.0.0
 publish_to: none
