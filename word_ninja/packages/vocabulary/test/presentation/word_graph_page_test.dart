@@ -77,4 +77,26 @@ void main() {
     expect(find.text('派生词'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
+
+  testWidgets('switches center word after the picker closes', (tester) async {
+    const words = [
+      Word(id: '1', userId: 'local', word: 'week', meaning: '周'),
+      Word(id: '2', userId: 'local', word: 'month', meaning: '月'),
+    ];
+    await tester.pumpWidget(ProviderScope(
+      child: MaterialApp(
+        theme: AppTheme.light,
+        home: WordGraphPage(words: words, relationLoader: emptyRelations),
+      ),
+    ));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.text('单词本 2'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('month').last);
+    await tester.pumpAndSettle();
+
+    expect(find.text('month'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
 }
