@@ -39,6 +39,7 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
   String? _loadError;
   int _requestId = 0;
   final Map<String, Map<String, List<Map<String, String>>>> _relationCache = {};
+  final Set<String> _persistedRelationKeys = {};
 
   @override
   void initState() {
@@ -81,6 +82,7 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
     if (center == null) return;
     final requestId = ++_requestId;
     final cacheKey = center.word.trim().toLowerCase();
+    if (forceRefresh) _persistedRelationKeys.remove(cacheKey);
     setState(() {
       _isLoading = true;
       _loadError = null;
@@ -99,7 +101,8 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
         _buildSemanticGraph(center, relations!);
         _isLoading = false;
       });
-      if (widget.relationLoader == null) {
+      if (widget.relationLoader == null &&
+          _persistedRelationKeys.add(cacheKey)) {
         await _persistDiscoveredWords(center, relations);
       }
     } catch (error) {
@@ -617,7 +620,7 @@ class _WordInfoDrawer extends StatelessWidget {
 
   static String _sourceLabel(String source) => switch (source) {
         'reading' => '阅读收集',
-        'ai' || 'ai_tutor' => 'AI 生成',
+        'ai' || 'ai_tutor' || 'ai_graph' => 'AI 生成',
         'manual' => '手动添加',
         _ => '其他',
       };

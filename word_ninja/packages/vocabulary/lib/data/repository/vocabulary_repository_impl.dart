@@ -39,13 +39,23 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
   Future<void> addWords(List<Word> words) async {
     if (words.isEmpty) return;
     final now = DateTime.now();
-    await _local.saveWords(words
-        .map((word) => word.copyWith(
-              id: word.id.isEmpty ? _uuid.v4() : word.id,
-              createdAt: word.createdAt ?? now,
-              updatedAt: now,
-            ))
-        .toList());
+    final newWords = <Word>[];
+    final pending = <String>{};
+    for (final word in words) {
+      final normalized = word.word.trim().toLowerCase();
+      if (normalized.isEmpty || !pending.add(normalized)) continue;
+      final matches = await _local.searchWords(normalized);
+      final exists = matches.any(
+        (item) => item.word.trim().toLowerCase() == normalized,
+      );
+      if (exists) continue;
+      newWords.add(word.copyWith(
+        id: word.id.isEmpty ? _uuid.v4() : word.id,
+        createdAt: word.createdAt ?? now,
+        updatedAt: now,
+      ));
+    }
+    await _local.saveWords(newWords);
   }
 
   @override

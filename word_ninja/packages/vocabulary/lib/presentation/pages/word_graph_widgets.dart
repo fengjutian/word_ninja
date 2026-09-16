@@ -69,29 +69,39 @@ class _GraphCanvas extends StatefulWidget {
 
 class _GraphCanvasState extends State<_GraphCanvas> {
   int? _hoveredIndex;
+  int? _selectedIndex;
 
   void _layout(Size size) {
     if (widget.nodes.isEmpty) return;
     final cx = size.width / 2, cy = size.height / 2;
     // Center node
     widget.nodes[0].pos = Offset(cx, cy);
-    // Surrounding nodes in concentric circles so a larger vocabulary does not
-    // collapse into one crowded ring.
-    final count = widget.nodes.length - 1;
-    if (count <= 0) return;
-    const nodesPerRing = 10;
+    // Group semantic relations into stable sectors, similar to an ECharts
+    // category graph, so colors and meanings are visually scannable.
+    if (widget.nodes.length <= 1) return;
     final shortestSide = math.min(size.width, size.height);
-    final ringGap = math.max(76.0, shortestSide * 0.13);
-    final firstRadius = math.min(shortestSide * 0.25, 190.0);
-    for (int i = 0; i < count; i++) {
-      final ring = i ~/ nodesPerRing;
-      final indexInRing = i % nodesPerRing;
-      final itemsInRing = math.min(nodesPerRing, count - ring * nodesPerRing);
-      final angle =
-          (2 * math.pi * indexInRing / itemsInRing) - math.pi / 2 + ring * 0.2;
-      final radius = firstRadius + ring * ringGap;
-      widget.nodes[i + 1].pos =
-          Offset(cx + math.cos(angle) * radius, cy + math.sin(angle) * radius);
+    final firstRadius = math.min(shortestSide * 0.30, 220.0);
+    const sectorAngles = <String, double>{
+      'synonyms': -0.35,
+      'related': 0.35,
+      'antonyms': 2.8,
+      'derivatives': -2.8,
+    };
+    for (final relation in sectorAngles.keys) {
+      final indices = <int>[
+        for (var i = 1; i < widget.nodes.length; i++)
+          if (widget.nodes[i].relationType == relation) i,
+      ];
+      for (var position = 0; position < indices.length; position++) {
+        final centered = position - (indices.length - 1) / 2;
+        final ring = position ~/ 6;
+        final angle = sectorAngles[relation]! + centered * 0.22;
+        final radius = firstRadius + ring * 92 + (position.isOdd ? 18 : 0);
+        widget.nodes[indices[position]].pos = Offset(
+          cx + math.cos(angle) * radius,
+          cy + math.sin(angle) * radius,
+        );
+      }
     }
   }
 
@@ -118,7 +128,10 @@ class _GraphCanvasState extends State<_GraphCanvas> {
           behavior: HitTestBehavior.opaque,
           onTapDown: (d) {
             final hit = _hitNode(d.localPosition);
-            if (hit >= 0) widget.onNodeTap(hit);
+            if (hit >= 0) {
+              setState(() => _selectedIndex = hit);
+              widget.onNodeTap(hit);
+            }
           },
           child: MouseRegion(
             onHover: (e) {
@@ -137,6 +150,7 @@ class _GraphCanvasState extends State<_GraphCanvas> {
                 mutedText: colors.mutedText,
                 primary: primary,
                 hoveredIndex: _hoveredIndex,
+                selectedIndex: _selectedIndex,
               ),
             ),
           ),
@@ -152,6 +166,7 @@ class _GraphPainter extends CustomPainter {
   final bool isDark;
   final Color background, border, mutedText, primary;
   final int? hoveredIndex;
+  final int? selectedIndex;
 
   _GraphPainter({
     required this.nodes,
@@ -162,6 +177,7 @@ class _GraphPainter extends CustomPainter {
     required this.mutedText,
     required this.primary,
     this.hoveredIndex,
+    this.selectedIndex,
   });
 
   @override
@@ -182,13 +198,32 @@ class _GraphPainter extends CustomPainter {
       final from = nodes[e.from].pos;
       final to = nodes[e.to].pos;
       final relationColor = _relationColor(e.relationType);
+      final direction = to - from;
+      final normal = Offset(-direction.dy, direction.dx);
+      final normalLength = normal.distance;
+      final bend = e.to.isEven ? 13.0 : -13.0;
+      final control = (from + to) / 2 +
+          (normalLength == 0 ? Offset.zero : normal / normalLength * bend);
+      final path = Path()
+        ..moveTo(from.dx, from.dy)
+        ..quadraticBezierTo(control.dx, control.dy, to.dx, to.dy);
+      canvas.drawPath(
+          path,
+          Paint()
+            ..color = relationColor.withValues(alpha: 0.10)
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 7);
       final linePaint = Paint()
         ..color = relationColor.withValues(alpha: 0.55)
+        ..style = PaintingStyle.stroke
         ..strokeWidth = 1.5 + e.strength * 2;
-      canvas.drawLine(from, to, linePaint);
+      canvas.drawPath(path, linePaint);
 
       // Label at midpoint
-      final mid = Offset((from.dx + to.dx) / 2, (from.dy + to.dy) / 2);
+      final mid = Offset(
+        0.25 * from.dx + 0.5 * control.dx + 0.25 * to.dx,
+        0.25 * from.dy + 0.5 * control.dy + 0.25 * to.dy,
+      );
       final tp = TextPainter(
           text: TextSpan(
               text: e.label,
@@ -203,6 +238,50 @@ class _GraphPainter extends CustomPainter {
       final n = nodes[i];
       _drawNode(canvas, n, isHovered: i == hoveredIndex);
     }
+    final detailIndex = selectedIndex ?? hoveredIndex;
+    if (detailIndex != null &&
+        detailIndex >= 0 &&
+        detailIndex < nodes.length) {
+      _drawTooltip(canvas, size, nodes[detailIndex]);
+    }
+  }
+
+  void _drawTooltip(Canvas canvas, Size size, _GraphNode node) {
+    final meaning = node.meaning.trim();
+    if (meaning.isEmpty) return;
+    final text = '${node.word}\n$meaning';
+    final painter = TextPainter(
+      text: TextSpan(
+        text: text,
+        style: TextStyle(
+          color: isDark ? AppColors.textOnDark : AppColors.textPrimary,
+          fontSize: 12,
+          height: 1.45,
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+      maxLines: 4,
+      ellipsis: '…',
+    )..layout(maxWidth: 210);
+    var origin = node.pos + Offset(node.radius + 14, -painter.height / 2 - 10);
+    if (origin.dx + painter.width + 24 > size.width) {
+      origin = Offset(node.pos.dx - node.radius - painter.width - 38, origin.dy);
+    }
+    origin = Offset(origin.dx.clamp(10, size.width - painter.width - 30),
+        origin.dy.clamp(10, size.height - painter.height - 30));
+    final rect = RRect.fromRectAndRadius(
+      Rect.fromLTWH(origin.dx, origin.dy, painter.width + 24, painter.height + 20),
+      const Radius.circular(10),
+    );
+    canvas.drawRRect(rect, Paint()..color = background.withValues(alpha: 0.97));
+    canvas.drawRRect(
+        rect,
+        Paint()
+          ..color = node.color.withValues(alpha: 0.55)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.2);
+    painter.paint(canvas, origin + const Offset(12, 10));
   }
 
   Color _relationColor(String type) => switch (type) {
@@ -270,6 +349,7 @@ class _GraphPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _GraphPainter old) =>
       old.hoveredIndex != hoveredIndex ||
+      old.selectedIndex != selectedIndex ||
       old.nodes != nodes ||
       old.edges != edges ||
       old.background != background ||
