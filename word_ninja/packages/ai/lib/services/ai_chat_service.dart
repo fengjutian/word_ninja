@@ -32,17 +32,63 @@ class AiChatService {
       final res = await _dio.post(_completionPath, data: {
         'model': _modelName,
         'messages': [
-          {'role': 'user', 'content': 'Hi'},
+          {'role': 'user', 'content': 'Reply with exactly: OK'},
         ],
-        ..._tokenLimit(5),
+        // Reasoning models may spend the first tokens on internal reasoning.
+        // Five tokens can therefore produce a valid HTTP response with empty
+        // visible content, which is not a successful connection test.
+        ..._tokenLimit(256),
       });
-      final content = res.data['choices'][0]['message']['content'] as String;
-      return (true, content);
+      return connectionResultFromResponse(res.data);
     } on DioException catch (e) {
       log.e(
           'Connection test failed: status=${e.response?.statusCode}, message=${e.message}');
       return (false, _dioErrorToUserMessage(e));
+    } catch (e) {
+      log.e('Connection test response parse failed', e);
+      return (false, '服务已响应，但返回格式无法识别，请检查模型名称和接口地址。');
     }
+  }
+
+  /// Validates an OpenAI-compatible connection-test response.
+  static (bool, String) connectionResultFromResponse(dynamic data) {
+    if (data is! Map) {
+      return (false, '服务已响应，但返回格式无法识别。');
+    }
+
+    final baseResponse = data['base_resp'];
+    if (baseResponse is Map) {
+      final statusCode = baseResponse['status_code'];
+      if (statusCode is num && statusCode != 0) {
+        final statusMessage = baseResponse['status_msg']?.toString().trim();
+        return (
+          false,
+          statusMessage?.isNotEmpty == true
+              ? '连接失败：$statusMessage（$statusCode）'
+              : '连接失败，服务错误码：$statusCode',
+        );
+      }
+    }
+
+    final choices = data['choices'];
+    if (choices is! List || choices.isEmpty || choices.first is! Map) {
+      return (false, '服务已响应，但没有返回有效的模型回复。');
+    }
+    final message = (choices.first as Map)['message'];
+    final rawContent = message is Map ? message['content'] : null;
+    final content = switch (rawContent) {
+      String value => value.trim(),
+      List blocks => blocks
+          .whereType<Map>()
+          .map((block) => block['text']?.toString() ?? '')
+          .join()
+          .trim(),
+      _ => '',
+    };
+    if (content.isEmpty) {
+      return (false, '连接已建立，但模型没有返回文本。请检查模型名称或稍后重试。');
+    }
+    return (true, '连接成功，模型回复：$content');
   }
 
   /// 普通聊天（非流式）

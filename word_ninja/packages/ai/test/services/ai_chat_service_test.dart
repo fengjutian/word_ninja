@@ -5,6 +5,44 @@ import 'package:ai/services/ai_chat_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  group('AiChatService.connectionResultFromResponse', () {
+    test('accepts a non-empty model reply', () {
+      final result = AiChatService.connectionResultFromResponse({
+        'choices': [
+          {
+            'message': {'content': 'OK'}
+          }
+        ]
+      });
+
+      expect(result.$1, isTrue);
+      expect(result.$2, contains('OK'));
+    });
+
+    test('rejects an empty reasoning-model reply', () {
+      final result = AiChatService.connectionResultFromResponse({
+        'choices': [
+          {
+            'message': {'content': ''},
+            'finish_reason': 'length',
+          }
+        ]
+      });
+
+      expect(result.$1, isFalse);
+      expect(result.$2, contains('没有返回文本'));
+    });
+
+    test('reports a MiniMax error carried in an HTTP 200 response', () {
+      final result = AiChatService.connectionResultFromResponse({
+        'base_resp': {'status_code': 1008, 'status_msg': 'insufficient balance'}
+      });
+
+      expect(result.$1, isFalse);
+      expect(result.$2, contains('1008'));
+    });
+  });
+
   group('AiChatService.decodeSse', () {
     test('accepts Dio-style Uint8List chunks', () async {
       final stream = Stream<Uint8List>.value(
