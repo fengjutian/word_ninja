@@ -1,7 +1,6 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:auth/presentation/providers/auth_provider.dart';
 

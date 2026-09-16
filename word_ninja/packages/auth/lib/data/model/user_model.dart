@@ -6,6 +6,7 @@ class UserModel {
   final String? avatar;
   final int level;
   final int exp;
+  final bool isPro;
 
   const UserModel({
     required this.id,
@@ -14,6 +15,7 @@ class UserModel {
     this.avatar,
     this.level = 1,
     this.exp = 0,
+    this.isPro = false,
   });
 
   factory UserModel.fromJson(Map<String, dynamic> json) => UserModel(
@@ -23,6 +25,7 @@ class UserModel {
         avatar: json['avatar'] as String?,
         level: (json['level'] as num?)?.toInt() ?? 1,
         exp: (json['exp'] as num?)?.toInt() ?? 0,
+        isPro: json['isPro'] as bool? ?? false,
       );
 
   Map<String, dynamic> toJson() => {
@@ -32,5 +35,6 @@ class UserModel {
         'avatar': avatar,
         'level': level,
         'exp': exp,
+        'isPro': isPro,
       };
 }

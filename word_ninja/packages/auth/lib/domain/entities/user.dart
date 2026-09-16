@@ -8,6 +8,7 @@ class User {
   final String? avatar;
   final int level;
   final int exp;
+  final bool isPro;
 
   const User({
     required this.id,
@@ -16,6 +17,7 @@ class User {
     this.avatar,
     this.level = 1,
     this.exp = 0,
+    this.isPro = false,
   });
 
   /// 升级所需经验
@@ -60,6 +62,7 @@ class User {
     String? avatar,
     int? level,
     int? exp,
+    bool? isPro,
   }) =>
       User(
         id: id ?? this.id,
@@ -68,5 +71,6 @@ class User {
         avatar: avatar ?? this.avatar,
         level: level ?? this.level,
         exp: exp ?? this.exp,
+        isPro: isPro ?? this.isPro,
       );
 }
