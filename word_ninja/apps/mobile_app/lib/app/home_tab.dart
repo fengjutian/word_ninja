@@ -1,11 +1,12 @@
 part of 'router.dart';
 
 /// 首页 Tab（Dashboard）
-class _HomeTab extends StatelessWidget {
+class _HomeTab extends ConsumerWidget {
   const _HomeTab();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final stats = ref.watch(vocabularyStatsProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
@@ -20,7 +21,37 @@ class _HomeTab extends StatelessWidget {
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           // 等级卡片 — 带有渐变背景
-          _LevelCard(),
+          stats.when(
+            data: (value) => _LearningOverviewCard(
+              totalWords: value.totalWords,
+              masteredWords: value.masteredWords,
+              dueWords: value.dueReviewCount,
+              todayReviews: value.todayReview,
+            ),
+            loading: () => const Card(
+              child: Padding(
+                padding: EdgeInsets.all(AppSpacing.xl),
+                child: Center(child: CircularProgressIndicator()),
+              ),
+            ),
+            error: (error, _) => Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Row(
+                  children: [
+                    const Icon(PhosphorIconsRegular.warningCircle,
+                        color: AppColors.error),
+                    const SizedBox(width: AppSpacing.sm),
+                    Expanded(child: Text('统计加载失败：$error')),
+                    TextButton(
+                      onPressed: () => ref.invalidate(vocabularyStatsProvider),
+                      child: const Text('重试'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: AppSpacing.lg),
 
           // 今日任务
@@ -29,20 +60,24 @@ class _HomeTab extends StatelessWidget {
               icon: const Icon(PhosphorIconsRegular.checkSquare,
                   size: 18, color: AppColors.primary)),
           const SizedBox(height: AppSpacing.sm),
-          _TaskItem(
-            icon: AppIcon.scroll(size: 20, color: AppColors.primary),
-            title: '学习 20 个单词',
-            route: AppRoutes.vocabulary,
-          ),
-          _TaskItem(
-            icon: AppIcon.scroll(size: 20, color: AppColors.primary),
-            title: '阅读 1 篇文章',
-            route: AppRoutes.reading,
-          ),
-          _TaskItem(
-            icon: AppIcon.chatBubble(size: 20, color: AppColors.primary),
-            title: 'AI 对话 10 分钟',
-            route: AppRoutes.aiTutor,
+          stats.when(
+            data: (value) => value.totalWords == 0
+                ? _TaskItem(
+                    icon: AppIcon.scroll(size: 20, color: AppColors.primary),
+                    title: '添加第一个单词',
+                    route: AppRoutes.vocabulary,
+                  )
+                : _TaskItem(
+                    icon: AppIcon.practice(size: 20, color: AppColors.primary),
+                    title: value.dueReviewCount > 0
+                        ? '复习 ${value.dueReviewCount} 个到期单词'
+                        : '今日复习已完成',
+                    route: value.dueReviewCount > 0
+                        ? AppRoutes.review
+                        : AppRoutes.vocabulary,
+                  ),
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
           ),
 
           const SizedBox(height: AppSpacing.lg),
@@ -94,16 +129,22 @@ class _HomeTab extends StatelessWidget {
 }
 
 /// 等级卡片 — 带渐变背景、动画经验条
-class _LevelCard extends StatelessWidget {
-  // 模拟数据，后续接入真实数据
-  static const _level = 18;
-  static const _rank = '入门';
-  static const _currentExp = 1250;
-  static const _maxExp = 1500;
+class _LearningOverviewCard extends StatelessWidget {
+  final int totalWords;
+  final int masteredWords;
+  final int dueWords;
+  final int todayReviews;
+
+  const _LearningOverviewCard({
+    required this.totalWords,
+    required this.masteredWords,
+    required this.dueWords,
+    required this.todayReviews,
+  });
 
   @override
   Widget build(BuildContext context) {
-    final progress = _currentExp / _maxExp;
+    final progress = totalWords == 0 ? 0.0 : masteredWords / totalWords;
     return Card(
       margin: EdgeInsets.zero,
       color: AppColors.surface,
@@ -150,7 +191,7 @@ class _LevelCard extends StatelessWidget {
                   ),
                   child: const Center(
                     child: Text(
-                      '$_level',
+                      '$masteredWords',
                       style: TextStyle(
                         color: Colors.white,
                         fontSize: 20,
@@ -166,12 +207,12 @@ class _LevelCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Lv.$_level · $_rank',
+                        '词汇学习进度',
                         style: AppTextStyles.titleMedium,
                       ),
                       const SizedBox(height: AppSpacing.xxs),
                       Text(
-                        '距离升级还需 ${_maxExp - _currentExp} EXP',
+                        '已掌握 $masteredWords / $totalWords · 待复习 $dueWords',
                         style: AppTextStyles.caption,
                       ),
                     ],
@@ -202,10 +243,11 @@ class _LevelCard extends StatelessWidget {
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  AppIcon.coin(size: 14, color: AppColors.accentGold),
+                  const Icon(PhosphorIconsRegular.checkCircle,
+                      size: 14, color: AppColors.accentGold),
                   const SizedBox(width: AppSpacing.xxs),
                   Text(
-                    '$_currentExp / $_maxExp',
+                    '今日已复习 $todayReviews 次',
                     style: AppTextStyles.caption.copyWith(
                       color: AppColors.accentGold,
                       fontWeight: FontWeight.w600,

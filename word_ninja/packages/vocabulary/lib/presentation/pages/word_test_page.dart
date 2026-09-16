@@ -48,8 +48,8 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
     }).toList();
   }
 
-  void _selectAnswer(String answer) {
-    if (_showResult) return;
+  Future<void> _selectAnswer(String answer) async {
+    if (_showResult || _isSaving) return;
     final question = _questions[_currentIndex];
     final isCorrect = answer == question.correctAnswer;
     setState(() {
@@ -57,16 +57,23 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
       _showResult = true;
       _totalAnswered++;
       if (isCorrect) _correctCount++;
+      _isSaving = true;
     });
-    // 提交复习记录
-    _submitReview(question.wordId, isCorrect ? 5 : 1);
-  }
-
-  Future<void> _submitReview(String wordId, int score) async {
     try {
-      await ref.read(vocabularyRepositoryProvider).submitReview(wordId, score);
-    } catch (_) {
-      // 静默失败，不影响测验体验
+      await ref
+          .read(vocabularyRepositoryProvider)
+          .submitReview(question.wordId, isCorrect ? 5 : 1);
+      ref.invalidate(vocabularyStatsProvider);
+      ref.invalidate(dueReviewProvider);
+      await ref.read(wordListProvider.notifier).loadWords(refresh: true);
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('结果保存失败：$e')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
     }
   }
 
@@ -82,27 +89,7 @@ class _WordTestPageState extends ConsumerState<WordTestPage> {
     }
   }
 
-  Future<void> _saveResults() async {
-    // 将测试结果持久化
-    setState(() => _isSaving = true);
-    try {
-      final stats = await ref.read(vocabularyRepositoryProvider).getStats();
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text(
-                  '已同步 · 总词汇 ${stats.totalWords} · 掌握 ${stats.masteredWords}')),
-        );
-      }
-    } catch (_) {
-      // 静默失败
-    } finally {
-      if (mounted) setState(() => _isSaving = false);
-    }
-  }
-
   void _showSummary() {
-    _saveResults();
     showDialog(
       context: context,
       barrierDismissible: false,

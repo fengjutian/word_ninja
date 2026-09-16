@@ -143,6 +143,8 @@ class _AddWordPageState extends ConsumerState<AddWordPage> {
         example: _exampleCtrl.text.trim(),
       );
       await ref.read(wordListProvider.notifier).addWord(word);
+      ref.invalidate(vocabularyStatsProvider);
+      ref.invalidate(dueReviewProvider);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('单词已添加')),

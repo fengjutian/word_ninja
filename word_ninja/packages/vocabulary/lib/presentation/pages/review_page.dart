@@ -25,6 +25,8 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
   bool _showMeaning = false;
   int _currentIndex = 0;
   bool _isSubmitting = false;
+  bool _isLoading = false;
+  String? _loadError;
   List<Word> _words = [];
 
   @override
@@ -51,9 +53,17 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
   }
 
   Future<void> _loadDueReviews() async {
-    final words = await ref.read(dueReviewProvider.future);
-    if (mounted) {
-      setState(() => _words = words);
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
+    try {
+      final words = await ref.read(dueReviewProvider.future);
+      if (mounted) setState(() => _words = words);
+    } catch (e) {
+      if (mounted) setState(() => _loadError = e.toString());
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -80,6 +90,9 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
     setState(() => _isSubmitting = true);
     try {
       await ref.read(vocabularyRepositoryProvider).submitReview(word.id, score);
+      ref.invalidate(vocabularyStatsProvider);
+      ref.invalidate(dueReviewProvider);
+      await ref.read(wordListProvider.notifier).loadWords(refresh: true);
       if (!mounted) return;
       if (_currentIndex < _words.length - 1) {
         final nextIdx = _currentIndex + 1;
@@ -109,6 +122,29 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('复习')),
+        body: const Center(child: CircularProgressIndicator()),
+      );
+    }
+
+    if (_loadError != null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('复习')),
+        body: Center(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text('加载失败：$_loadError'),
+              const SizedBox(height: 12),
+              FilledButton(onPressed: _loadDueReviews, child: const Text('重试')),
+            ],
+          ),
+        ),
+      );
+    }
+
     if (_words.isEmpty && widget.words.isEmpty) {
       return Scaffold(
         appBar: AppBar(title: const Text('复习')),
@@ -123,14 +159,6 @@ class _ReviewPageState extends ConsumerState<ReviewPage>
             ],
           ),
         ),
-      );
-    }
-
-    // 如果 _words 为空但正在加载，显示加载中
-    if (_words.isEmpty) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('复习')),
-        body: const Center(child: CircularProgressIndicator()),
       );
     }
 

@@ -251,6 +251,10 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
       totalWords: words.length,
       masteredWords: words.where((s) => s.mastery >= 80).length,
       todayReview: todayReviews,
+      todayNew: words.where((s) {
+        final createdAt = s.createdAt;
+        return createdAt != null && !createdAt.isBefore(todayStart);
+      }).length,
       learningWords: due,
     );
   }

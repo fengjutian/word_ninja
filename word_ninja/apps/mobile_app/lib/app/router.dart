@@ -1,5 +1,6 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:auth/presentation/login/login_page.dart';
 import 'package:auth/presentation/register/register_page.dart';
@@ -9,6 +10,8 @@ import 'package:vocabulary/presentation/pages/word_detail_page.dart';
 import 'package:vocabulary/presentation/pages/add_word_page.dart';
 import 'package:vocabulary/presentation/pages/review_page.dart';
 import 'package:vocabulary/presentation/pages/word_test_page.dart';
+import 'package:vocabulary/presentation/pages/word_graph_page.dart';
+import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:reading/presentation/pages/reader_page.dart';
 import 'package:web_reader/pages/web_reader_page.dart';
@@ -37,6 +40,7 @@ class AppRoutes {
   static const String addWord = '/vocabulary/add';
   static const String review = '/vocabulary/review';
   static const String wordTest = '/vocabulary/test';
+  static const String wordGraph = '/vocabulary/graph';
   static const String reading = '/reading';
   static const String webReader = '/web-reader';
   static const String listening = '/listening';
@@ -203,17 +207,39 @@ GoRouter createRouter() {
       ),
       GoRoute(
         path: AppRoutes.review,
-        pageBuilder: (ctx, state) => _slideInFromRight(
-          key: state.pageKey,
-          child: ReviewPage(words: []),
-        ),
+        pageBuilder: (ctx, state) {
+          final words = state.extra is List<Word>
+              ? state.extra! as List<Word>
+              : const <Word>[];
+          return _slideInFromRight(
+            key: state.pageKey,
+            child: ReviewPage(words: words),
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.wordTest,
-        pageBuilder: (ctx, state) => _slideInFromRight(
-          key: state.pageKey,
-          child: WordTestPage(words: []),
-        ),
+        pageBuilder: (ctx, state) {
+          final words = state.extra is List<Word>
+              ? state.extra! as List<Word>
+              : const <Word>[];
+          return _slideInFromRight(
+            key: state.pageKey,
+            child: WordTestPage(words: words),
+          );
+        },
+      ),
+      GoRoute(
+        path: AppRoutes.wordGraph,
+        pageBuilder: (ctx, state) {
+          final words = state.extra is List<Word>
+              ? state.extra! as List<Word>
+              : const <Word>[];
+          return _slideInFromRight(
+            key: state.pageKey,
+            child: WordGraphPage(words: words),
+          );
+        },
       ),
       GoRoute(
         path: AppRoutes.listening,

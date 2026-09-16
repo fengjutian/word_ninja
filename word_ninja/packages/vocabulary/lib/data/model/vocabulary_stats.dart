@@ -18,7 +18,7 @@ class VocabularyStats {
   double get masteryRate => totalWords > 0 ? masteredWords / totalWords : 0.0;
 
   /// 待复习数
-  int get dueReviewCount => todayReview;
+  int get dueReviewCount => learningWords;
 
   factory VocabularyStats.fromJson(Map<String, dynamic> json) =>
       VocabularyStats(
