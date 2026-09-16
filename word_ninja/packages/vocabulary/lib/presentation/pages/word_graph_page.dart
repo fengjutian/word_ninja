@@ -176,6 +176,76 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
     _loadGraph();
   }
 
+  Future<void> _showWordPicker() async {
+    var query = '';
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => StatefulBuilder(
+        builder: (context, setDialogState) {
+          final normalized = query.trim().toLowerCase();
+          final matches = normalized.isEmpty
+              ? widget.words
+              : widget.words
+                  .where((word) =>
+                      word.word.toLowerCase().contains(normalized) ||
+                      word.meaning.toLowerCase().contains(normalized))
+                  .toList();
+          return AlertDialog(
+            title: Text('选择中心词（${widget.words.length}）'),
+            content: SizedBox(
+              width: 420,
+              height: 460,
+              child: Column(
+                children: [
+                  TextField(
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      prefixIcon: Icon(Icons.search),
+                      hintText: '搜索单词或释义',
+                    ),
+                    onChanged: (value) =>
+                        setDialogState(() => query = value),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: matches.isEmpty
+                        ? const Center(child: Text('没有匹配的单词'))
+                        : ListView.builder(
+                            itemCount: matches.length,
+                            itemBuilder: (context, index) {
+                              final word = matches[index];
+                              final selected = word.id == _centerWord?.id;
+                              return ListTile(
+                                selected: selected,
+                                leading: Icon(selected
+                                    ? Icons.radio_button_checked
+                                    : Icons.radio_button_unchecked),
+                                title: Text(word.word),
+                                subtitle: Text(
+                                  word.meaning,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                                onTap: () => _focusWord(word),
+                              );
+                            },
+                          ),
+                  ),
+                ],
+              ),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(dialogContext).pop(),
+                child: const Text('关闭'),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final colors = context.appColors;
@@ -263,7 +333,13 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(fontSize: 12, color: colors.mutedText))
-                ])),
+                    ])),
+            OutlinedButton.icon(
+              onPressed: _showWordPicker,
+              icon: const Icon(Icons.menu_book_outlined, size: 17),
+              label: Text('单词本 ${widget.words.length}'),
+            ),
+            const SizedBox(width: 10),
             _GraphMetric(
                 label: '关联节点', value: '${_nodes.length - 1}', colors: colors),
             const SizedBox(width: 10),
