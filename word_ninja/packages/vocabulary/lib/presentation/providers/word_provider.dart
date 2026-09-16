@@ -41,7 +41,13 @@ final vocabularyRepositoryProvider = Provider<VocabularyRepository>((ref) {
 final wordListProvider =
     StateNotifierProvider<WordListNotifier, WordListState>((ref) {
   final repo = ref.read(vocabularyRepositoryProvider);
-  return WordListNotifier(repo);
+  return WordListNotifier(
+    repo,
+    onDataChanged: () {
+      ref.invalidate(vocabularyStatsProvider);
+      ref.invalidate(dueReviewProvider);
+    },
+  );
 });
 
 /// 单词统计 Provider
@@ -58,8 +64,15 @@ final dueReviewProvider = FutureProvider<List<Word>>((ref) async {
 
 class WordListNotifier extends StateNotifier<WordListState> {
   final VocabularyRepository _repo;
+  final void Function() _onDataChanged;
 
-  WordListNotifier(this._repo) : super(const WordListState());
+  WordListNotifier(
+    this._repo, {
+    void Function()? onDataChanged,
+  })  : _onDataChanged = onDataChanged ?? _noop,
+        super(const WordListState());
+
+  static void _noop() {}
 
   int _page = 1;
 
@@ -100,6 +113,7 @@ class WordListNotifier extends StateNotifier<WordListState> {
       );
     }
     await loadWords(refresh: true);
+    _onDataChanged();
   }
 
   Future<void> deleteWord(String id) async {
@@ -107,6 +121,7 @@ class WordListNotifier extends StateNotifier<WordListState> {
     state = state.copyWith(
       words: state.words.where((w) => w.id != id).toList(),
     );
+    _onDataChanged();
   }
 
   Future<void> search(String query) async {

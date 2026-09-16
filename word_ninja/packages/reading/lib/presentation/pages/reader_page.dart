@@ -26,25 +26,8 @@ class ReaderPage extends ConsumerStatefulWidget {
 
 class _ReaderPageState extends ConsumerState<ReaderPage> {
   _ReadingCategory _selectedCategory = _ReadingCategory.all;
-  List<_Article> _articles = _defaultArticles;
+  List<_Article> _articles = [];
   bool _isLoading = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadArticles();
-  }
-
-  Future<void> _loadArticles() async {
-    setState(() => _isLoading = true);
-    try {
-      // 尝试从 AI 服务获取推荐文章（离线时使用本地数据）
-      await Future.delayed(const Duration(milliseconds: 500)); // 模拟网络延迟
-      if (mounted) setState(() => _isLoading = false);
-    } catch (_) {
-      if (mounted) setState(() => _isLoading = false);
-    }
-  }
 
   List<_Article> get _filteredArticles {
     if (_selectedCategory == _ReadingCategory.all) return _articles;
