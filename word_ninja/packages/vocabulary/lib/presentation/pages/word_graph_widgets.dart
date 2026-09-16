@@ -72,6 +72,7 @@ class _GraphCanvasState extends State<_GraphCanvas> {
   int? _hoveredIndex;
 
   void _layout(Size size) {
+    if (widget.nodes.isEmpty) return;
     final cx = size.width / 2, cy = size.height / 2;
     // Center node
     widget.nodes[0].pos = Offset(cx, cy);
@@ -160,8 +161,16 @@ class _GraphPainter extends CustomPainter {
     canvas.drawRect(Offset.zero & size, Paint()..color = background);
     _drawGrid(canvas, size);
 
+    if (nodes.isEmpty) return;
+
     // Edges
     for (final e in edges) {
+      if (e.from < 0 ||
+          e.to < 0 ||
+          e.from >= nodes.length ||
+          e.to >= nodes.length) {
+        continue;
+      }
       final from = nodes[e.from].pos;
       final to = nodes[e.to].pos;
       final linePaint = Paint()

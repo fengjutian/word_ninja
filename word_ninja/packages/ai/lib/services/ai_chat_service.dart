@@ -113,7 +113,13 @@ class AiChatService {
   /// UTF-8 decoding must happen across byte chunks because a multi-byte
   /// character is allowed to be split between two network packets.
   static Stream<String> decodeSse(Stream<List<int>> stream) async* {
-    final lines = stream.transform(utf8.decoder).transform(const LineSplitter());
+    // Dio's ResponseBody exposes Stream<Uint8List> on desktop. Although
+    // Uint8List implements List<int>, Stream's reified generic type can make
+    // Converter.bind reject Utf8Decoder at runtime. The cast wrapper gives the
+    // transformer a stable Stream<List<int>> boundary while preserving chunks.
+    final byteStream = stream.cast<List<int>>();
+    final lines =
+        byteStream.transform(utf8.decoder).transform(const LineSplitter());
     await for (final rawLine in lines) {
       final line = rawLine.trim();
       if (!line.startsWith('data:')) continue;

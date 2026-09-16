@@ -27,19 +27,44 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
   @override
   void initState() {
     super.initState();
-    if (widget.words.isNotEmpty) {
-      _centerIndex = widget.initialIndex.clamp(0, widget.words.length - 1);
-    }
+    _syncCenterIndex(widget.initialIndex);
     _buildGraph();
   }
 
-  void _buildGraph() {
-    if (widget.words.isEmpty) return;
-    final all = widget.words;
-    final center = all[_centerIndex];
+  @override
+  void didUpdateWidget(covariant WordGraphPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.words != widget.words ||
+        oldWidget.initialIndex != widget.initialIndex) {
+      final previousCenterId = oldWidget.words.isNotEmpty &&
+              _centerIndex >= 0 &&
+              _centerIndex < oldWidget.words.length
+          ? oldWidget.words[_centerIndex].id
+          : null;
+      final retainedIndex = previousCenterId == null
+          ? -1
+          : widget.words.indexWhere((word) => word.id == previousCenterId);
+      _syncCenterIndex(
+        retainedIndex >= 0 ? retainedIndex : widget.initialIndex,
+      );
+      _selectedWord = null;
+      _buildGraph();
+    }
+  }
 
+  void _syncCenterIndex(int preferredIndex) {
+    _centerIndex = widget.words.isEmpty
+        ? 0
+        : preferredIndex.clamp(0, widget.words.length - 1);
+  }
+
+  void _buildGraph() {
     _nodes = [];
     _edges = [];
+    if (widget.words.isEmpty) return;
+    _syncCenterIndex(_centerIndex);
+    final all = widget.words;
+    final center = all[_centerIndex];
 
     // Central node
     _nodes.add(_GraphNode(

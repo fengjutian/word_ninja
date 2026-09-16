@@ -1,11 +1,26 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import 'package:ai/services/ai_chat_service.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
   group('AiChatService.decodeSse', () {
-    test('decodes a multi-byte character split across network chunks', () async {
+    test('accepts Dio-style Uint8List chunks', () async {
+      final stream = Stream<Uint8List>.value(
+        Uint8List.fromList(
+          utf8.encode(
+            'data: {"choices":[{"delta":{"content":"ok"}}]}\n\n'
+            'data: [DONE]\n\n',
+          ),
+        ),
+      );
+
+      expect(await AiChatService.decodeSse(stream).toList(), ['ok']);
+    });
+
+    test('decodes a multi-byte character split across network chunks',
+        () async {
       final bytes = utf8.encode(
         'data: {"choices":[{"delta":{"content":"\u4f60\u597d"}}]}\n\n'
         'data: [DONE]\n\n',
