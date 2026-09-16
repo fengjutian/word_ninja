@@ -9,11 +9,19 @@ void main() {
       '反义词',
       '常用搭配',
       '场景例句',
-      '图形记忆',
+      '四格漫画记忆',
       '马上练一下',
     ]) {
       expect(aiTutorSystemPrompt, contains(section));
     }
+  });
+
+  test('word teaching prompt makes commonly omitted sections mandatory', () {
+    expect(aiTutorSystemPrompt, contains('标题、顺序都不要省略'));
+    expect(aiTutorSystemPrompt, contains('不能跳过近义词、反义词或漫画记忆'));
+    expect(aiTutorSystemPrompt, contains('> ①'));
+    expect(aiTutorSystemPrompt, contains('> ④'));
+    expect(aiTutorSystemPrompt, contains('没有自然的反义词'));
   });
 
   test('prompt prevents reasoning traces from leaking into the answer', () {

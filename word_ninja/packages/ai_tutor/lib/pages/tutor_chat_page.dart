@@ -78,6 +78,9 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
       final state = ref.read(chatHistoryProvider);
       final messages = state.current.messages;
       final history = messages
+          // The current user message is supplied separately below. Excluding it
+          // here avoids sending the same question to the model twice.
+          .take(messages.length - 1)
           .where((m) => !m.isLoading)
           .map((m) =>
               {'role': m.isUser ? 'user' : 'assistant', 'content': m.text})
