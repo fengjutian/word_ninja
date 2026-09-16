@@ -9,6 +9,7 @@ import 'package:ai/ai.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
 import '../providers/chat_history_provider.dart';
+import '../prompts/tutor_prompt.dart';
 import 'analysis_page.dart';
 
 part 'tutor_chat_widgets.dart';
@@ -86,7 +87,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
       notifier.addMessage(ChatMessage('', isUser: false)); // 空消息，流式填充
       final stream = aiService.chatStream(
         message: text,
-        systemPrompt: '你是英语学习导师 AI Tutor，用友好有趣的方式回答英语学习问题。用中文回复。',
+        systemPrompt: aiTutorSystemPrompt,
         history: history,
       );
       await for (final chunk in stream) {

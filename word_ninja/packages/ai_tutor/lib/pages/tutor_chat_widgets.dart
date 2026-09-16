@@ -256,6 +256,46 @@ class _MessageBubble extends StatelessWidget {
                                 color: AppColors.background,
                                 borderRadius: BorderRadius.circular(8),
                               ),
+                              h2: TextStyle(
+                                color: textColor,
+                                fontSize: 20,
+                                height: 1.45,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              h3: TextStyle(
+                                color: textColor,
+                                fontSize: 16,
+                                height: 1.5,
+                                fontWeight: FontWeight.w700,
+                              ),
+                              blockquote: TextStyle(
+                                color: textColor,
+                                fontSize: 15,
+                                height: 1.7,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              blockquotePadding: const EdgeInsets.all(14),
+                              blockquoteDecoration: BoxDecoration(
+                                color: scheme.primaryContainer
+                                    .withValues(alpha: 0.45),
+                                border: Border(
+                                  left: BorderSide(
+                                    color: scheme.primary,
+                                    width: 4,
+                                  ),
+                                ),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              listBullet: TextStyle(
+                                color: scheme.primary,
+                                fontSize: 15,
+                                height: 1.7,
+                              ),
+                              horizontalRuleDecoration: BoxDecoration(
+                                border: Border(
+                                  top: BorderSide(color: colors.border),
+                                ),
+                              ),
                             ),
                           ),
                           if (onAddToVocab != null) ...[
