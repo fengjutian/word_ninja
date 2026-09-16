@@ -44,12 +44,12 @@ class AiWordService {
     final prompt = '''
 分析英语单词 "$word" 的语义关系，只返回下列 JSON：
 {
-  "synonyms": [{"word": "近义词", "meaning": "简短中文释义"}],
-  "antonyms": [{"word": "反义词", "meaning": "简短中文释义"}],
-  "related": [{"word": "语义相关词", "meaning": "简短中文释义"}],
-  "derivatives": [{"word": "派生词", "meaning": "简短中文释义"}]
+  "synonyms": [{"word": "近义词", "meaning": "词性 + 具体中文含义及常用语境"}],
+  "antonyms": [{"word": "反义词", "meaning": "词性 + 具体中文含义及常用语境"}],
+  "related": [{"word": "语义相关词", "meaning": "词性 + 具体中文含义及常用语境"}],
+  "derivatives": [{"word": "派生词", "meaning": "词性 + 具体中文含义及常用语境"}]
 }
-每类最多 5 个，只给出真实、常用的关系。没有合适的词时返回空数组，不得使用 null、nan 或目标词本身。
+每类最多 5 个，meaning 要具体，不能只返回单个模糊中文词。只给出真实、常用的关系。没有合适的词时返回空数组，不得使用 null、nan 或目标词本身。
 ''';
     final response = await _chat.chat(message: prompt);
     final parsed = AiChatService.parseJsonMap(response, const {});
