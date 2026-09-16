@@ -29,7 +29,7 @@ class AiChatService {
   /// 测试连接 — 返回 (成功, 消息)
   Future<(bool, String)> testConnection() async {
     try {
-      final res = await _dio.post('/chat/completions', data: {
+      final res = await _dio.post(_completionPath, data: {
         'model': _modelName,
         'messages': [
           {'role': 'user', 'content': 'Hi'},
@@ -57,7 +57,7 @@ class AiChatService {
     if (history != null) messages.addAll(history);
     messages.add({'role': 'user', 'content': message});
     try {
-      final res = await _dio.post('/chat/completions', data: {
+      final res = await _dio.post(_completionPath, data: {
         'model': _modelName,
         'messages': messages,
         'temperature': _temperature,
@@ -67,7 +67,7 @@ class AiChatService {
     } on DioException catch (e) {
       log.e(
           'AI chat error: status=${e.response?.statusCode}, message=${e.message}');
-      log.e('  Request URL: ${_dio.options.baseUrl}/chat/completions');
+      log.e('  Request URL: $_requestUrl');
       log.e('  Model: $_modelName, Key length: ${_apiKey.length}');
       return _dioErrorToUserMessage(e);
     }
@@ -86,7 +86,7 @@ class AiChatService {
     messages.add({'role': 'user', 'content': message});
     try {
       final response = await _dio.post(
-        '/chat/completions',
+        _completionPath,
         data: {
           'model': _modelName,
           'messages': messages,
@@ -120,7 +120,7 @@ class AiChatService {
     } on DioException catch (e) {
       log.e(
           'AI stream error: status=${e.response?.statusCode}, message=${e.message}');
-      log.e('  Request URL: ${_dio.options.baseUrl}/chat/completions');
+      log.e('  Request URL: $_requestUrl');
       log.e('  Model: $_modelName, Key length: ${_apiKey.length}');
       // 流式中断：已经 yield 了部分内容，现在抛出异常让调用方处理
       throw Exception(_dioErrorToUserMessage(e));
@@ -129,10 +129,20 @@ class AiChatService {
 
   Map<String, int> _tokenLimit(int value) {
     if (_provider == ModelProvider.miniMax) {
-      return {'max_completion_tokens': value.clamp(1, 2048)};
+      final maximum =
+          _modelName == ModelConfig.miniMaxM3.modelName ? 16384 : 2048;
+      return {'max_completion_tokens': value.clamp(1, maximum)};
     }
     return {'max_tokens': value};
   }
+
+  String get _completionPath => _provider == ModelProvider.miniMax &&
+          _modelName == ModelConfig.miniMaxM3.modelName
+      ? '/text/chatcompletion_v2'
+      : '/chat/completions';
+
+  String get _requestUrl =>
+      '${_dio.options.baseUrl.replaceFirst(RegExp(r'/+$'), '')}$_completionPath';
 
   /// 将 Dio 异常转为用户可读的错误信息
   String _dioErrorToUserMessage(DioException e) {

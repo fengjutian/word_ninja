@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/app_theme/design_tokens.dart';
 import 'package:vocabulary/data/model/word.dart';
-import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'dart:math' as math;
 
 part 'word_graph_widgets.dart';

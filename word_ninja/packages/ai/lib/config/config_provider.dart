@@ -86,7 +86,7 @@ class ModelConfigNotifier extends StateNotifier<ModelConfig> {
           apiKey: state.apiKey,
         ));
       case ModelProvider.miniMax:
-        await updateConfig(ModelConfig.miniMax.copyWith(
+        await updateConfig(ModelConfig.miniMaxM3.copyWith(
           apiKey: state.apiKey,
         ));
       case ModelProvider.custom:
@@ -100,5 +100,9 @@ class ModelConfigNotifier extends StateNotifier<ModelConfig> {
     await updateConfig(ModelConfig.deepSeekV4Flash.copyWith(
       apiKey: state.apiKey,
     ));
+  }
+
+  Future<void> selectMiniMaxM27() async {
+    await updateConfig(ModelConfig.miniMax.copyWith(apiKey: state.apiKey));
   }
 }

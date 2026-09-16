@@ -64,13 +64,22 @@ class ModelConfig {
     maxTokens: 4096,
   );
 
-  /// MiniMax 中国大陆 OpenAI 兼容接口
+  /// MiniMax M2.7 中国大陆 OpenAI 兼容接口
   static const miniMax = ModelConfig(
     provider: ModelProvider.miniMax,
     modelName: 'MiniMax-M2.7',
     baseUrl: 'https://api.minimaxi.com/v1',
     temperature: 0.7,
     maxTokens: 2048,
+  );
+
+  /// MiniMax M3 中国大陆接口
+  static const miniMaxM3 = ModelConfig(
+    provider: ModelProvider.miniMax,
+    modelName: 'MiniMax-M3',
+    baseUrl: 'https://api.minimaxi.com/v1',
+    temperature: 0.7,
+    maxTokens: 8192,
   );
 
   ModelConfig copyWith({

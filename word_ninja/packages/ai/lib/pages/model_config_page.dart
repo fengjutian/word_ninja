@@ -142,10 +142,20 @@ class _ProviderPanel extends StatelessWidget {
           const SizedBox(height: 10),
           _ProviderCard(
             icon: PhosphorIconsRegular.sparkle,
-            title: 'MiniMax M2.7',
-            subtitle: '中国大陆节点 · OpenAI 兼容',
-            selected: config.provider == ModelProvider.miniMax,
+            title: 'MiniMax M3',
+            subtitle: '最新旗舰 · 1M 上下文 · 国内节点',
+            selected: config.provider == ModelProvider.miniMax &&
+                config.modelName == ModelConfig.miniMaxM3.modelName,
             onTap: () => notifier.selectProvider(ModelProvider.miniMax),
+          ),
+          const SizedBox(height: 10),
+          _ProviderCard(
+            icon: PhosphorIconsRegular.sparkle,
+            title: 'MiniMax M2.7',
+            subtitle: '稳定文本模型 · OpenAI 兼容',
+            selected: config.provider == ModelProvider.miniMax &&
+                config.modelName == ModelConfig.miniMax.modelName,
+            onTap: notifier.selectMiniMaxM27,
           ),
           const SizedBox(height: 10),
           _ProviderCard(
