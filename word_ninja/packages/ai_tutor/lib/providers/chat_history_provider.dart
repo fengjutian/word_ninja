@@ -14,7 +14,10 @@ class ChatHistoryNotifier extends StateNotifier<ChatSessionsState> {
   bool _loaded = false;
 
   ChatHistoryNotifier()
-      : super(const ChatSessionsState(sessions: [], currentIndex: 0)) {
+      : super(ChatSessionsState(
+          sessions: [_newSession('initial')],
+          currentIndex: 0,
+        )) {
     _load();
   }
 

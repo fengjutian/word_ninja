@@ -64,7 +64,8 @@ class ChatSessionsState {
   const ChatSessionsState({
     required this.sessions,
     required this.currentIndex,
-  });
+  })  : assert(sessions.length > 0),
+        assert(currentIndex >= 0 && currentIndex < sessions.length);
 
   ChatSession get current => sessions[currentIndex];
 }
