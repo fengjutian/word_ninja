@@ -97,26 +97,7 @@ class AiChatService {
         options: Options(responseType: ResponseType.stream),
       );
       final body = response.data as ResponseBody;
-      String buffer = '';
-      await for (final chunk in body.stream) {
-        buffer += utf8.decode(chunk);
-        while (buffer.contains('\n')) {
-          final newlineIdx = buffer.indexOf('\n');
-          final line = buffer.substring(0, newlineIdx).trim();
-          buffer = buffer.substring(newlineIdx + 1);
-          if (line.startsWith('data: ')) {
-            final data = line.substring(6);
-            if (data == '[DONE]') continue;
-            try {
-              final json = jsonDecode(data) as Map<String, dynamic>;
-              final delta = json['choices']?[0]?['delta']?['content'];
-              if (delta is String && delta.isNotEmpty) yield delta;
-            } catch (e) {
-              log.w('SSE chunk parse failed', e);
-            }
-          }
-        }
-      }
+      yield* decodeSse(body.stream);
     } on DioException catch (e) {
       log.e(
           'AI stream error: status=${e.response?.statusCode}, message=${e.message}');
@@ -124,6 +105,30 @@ class AiChatService {
       log.e('  Model: $_modelName, Key length: ${_apiKey.length}');
       // 流式中断：已经 yield 了部分内容，现在抛出异常让调用方处理
       throw Exception(_dioErrorToUserMessage(e));
+    }
+  }
+
+  /// Decode an OpenAI-compatible SSE response.
+  ///
+  /// UTF-8 decoding must happen across byte chunks because a multi-byte
+  /// character is allowed to be split between two network packets.
+  static Stream<String> decodeSse(Stream<List<int>> stream) async* {
+    final lines = stream.transform(utf8.decoder).transform(const LineSplitter());
+    await for (final rawLine in lines) {
+      final line = rawLine.trim();
+      if (!line.startsWith('data:')) continue;
+
+      final data = line.substring(5).trimLeft();
+      if (data == '[DONE]') return;
+      if (data.isEmpty) continue;
+
+      try {
+        final json = jsonDecode(data) as Map<String, dynamic>;
+        final delta = json['choices']?[0]?['delta']?['content'];
+        if (delta is String && delta.isNotEmpty) yield delta;
+      } catch (e) {
+        log.w('SSE chunk parse failed', e);
+      }
     }
   }
 
