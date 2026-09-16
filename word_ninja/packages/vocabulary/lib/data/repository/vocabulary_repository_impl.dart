@@ -45,10 +45,31 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
       final normalized = word.word.trim().toLowerCase();
       if (normalized.isEmpty || !pending.add(normalized)) continue;
       final matches = await _local.searchWords(normalized);
-      final exists = matches.any(
-        (item) => item.word.trim().toLowerCase() == normalized,
-      );
-      if (exists) continue;
+      Word? existing;
+      for (final item in matches) {
+        if (item.word.trim().toLowerCase() == normalized) {
+          existing = item;
+          break;
+        }
+      }
+      if (existing != null) {
+        // AI graph discoveries may initially contain only a morphological
+        // description. A later refresh is allowed to enrich those records,
+        // while preserving all study progress and review scheduling.
+        if (existing.source == 'ai_graph' && word.meaning.trim().isNotEmpty) {
+          await _local.saveWord(existing.copyWith(
+            meaning: word.meaning.trim(),
+            phonetic: word.phonetic.isNotEmpty
+                ? word.phonetic
+                : existing.phonetic,
+            example:
+                word.example.isNotEmpty ? word.example : existing.example,
+            tags: {...existing.tags, ...word.tags}.toList(),
+            updatedAt: now,
+          ));
+        }
+        continue;
+      }
       newWords.add(word.copyWith(
         id: word.id.isEmpty ? _uuid.v4() : word.id,
         createdAt: word.createdAt ?? now,

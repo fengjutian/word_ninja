@@ -95,21 +95,6 @@ class _WordDetailSheet extends ConsumerWidget {
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            const Text('具体释义', style: AppTextStyles.heading3),
-            const SizedBox(height: AppSpacing.sm),
-            Card(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: Text(
-                    word.meaning.trim().isEmpty ? '暂无释义' : word.meaning,
-                    style: AppTextStyles.bodyLarge.copyWith(height: 1.65),
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: AppSpacing.lg),
             Card(
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.xl),
@@ -128,6 +113,21 @@ class _WordDetailSheet extends ConsumerWidget {
                       children: [_buildMasteryBadge(word.mastery)],
                     ),
                   ],
+                ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            const Text('具体释义', style: AppTextStyles.heading3),
+            const SizedBox(height: AppSpacing.sm),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Text(
+                    word.meaning.trim().isEmpty ? '暂无释义' : word.meaning,
+                    style: AppTextStyles.bodyLarge.copyWith(height: 1.65),
+                  ),
                 ),
               ),
             ),
