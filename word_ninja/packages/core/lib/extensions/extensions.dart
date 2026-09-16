@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 extension StringExtension on String {
   /// 首字母大写
   String get capitalized =>
@@ -32,4 +34,3 @@ extension DateTimeExtension on DateTime {
   String get yyyyMmDd =>
       '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
 }
-import 'dart:math' as math;

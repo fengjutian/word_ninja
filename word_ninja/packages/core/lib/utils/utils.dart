@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 /// 计算升到指定等级所需的总经验
 int expForLevel(int level) {
   if (level <= 1) return 0;
@@ -45,4 +47,3 @@ int masteryColor(int mastery) {
   if (mastery < 85) return 0xFF43A047; // 绿
   return 0xFF1E88E5; // 蓝
 }
-import 'dart:math' as math;

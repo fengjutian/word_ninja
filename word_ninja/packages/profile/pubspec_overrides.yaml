@@ -1,6 +1,10 @@
-# melos_managed_dependency_overrides: core,ui_kit
+# melos_managed_dependency_overrides: core,ui_kit,auth,sync
 dependency_overrides:
+  auth:
+    path: ..\\auth
   core:
     path: ..\\core
+  sync:
+    path: ..\\sync
   ui_kit:
     path: ..\\ui_kit

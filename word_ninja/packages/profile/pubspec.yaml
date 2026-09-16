@@ -17,6 +17,11 @@ dependencies:
     path: ../core
   ui_kit:
     path: ../ui_kit
+  auth:
+    path: ../auth
+  sync:
+    path: ../sync
+  go_router: ^14.8.1
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
   image_picker: ^1.1.2

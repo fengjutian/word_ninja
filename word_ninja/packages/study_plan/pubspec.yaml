@@ -19,6 +19,8 @@ dependencies:
     path: ../ai
   ui_kit:
     path: ../ui_kit
+  auth:
+    path: ../auth
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
 
