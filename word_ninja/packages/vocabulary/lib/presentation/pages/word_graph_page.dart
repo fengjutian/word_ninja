@@ -4,6 +4,7 @@ import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/app_theme/design_tokens.dart';
 import 'package:vocabulary/data/model/word.dart';
 import 'package:ai/providers/ai_providers.dart';
+import '../providers/word_provider.dart';
 import 'dart:math' as math;
 
 part 'word_graph_widgets.dart';
@@ -98,12 +99,39 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
         _buildSemanticGraph(center, relations!);
         _isLoading = false;
       });
+      if (widget.relationLoader == null) {
+        await _persistDiscoveredWords(center, relations);
+      }
     } catch (error) {
       if (!mounted || requestId != _requestId) return;
       setState(() {
         _isLoading = false;
         _loadError = error.toString();
       });
+    }
+  }
+
+  Future<void> _persistDiscoveredWords(
+    Word center,
+    Map<String, List<Map<String, String>>> relations,
+  ) async {
+    final discovered = <Word>[];
+    for (final entry in relations.entries) {
+      for (final item in entry.value) {
+        final value = (item['word'] ?? '').trim();
+        if (value.isEmpty) continue;
+        discovered.add(Word(
+          id: '',
+          userId: center.userId,
+          word: value,
+          meaning: (item['meaning'] ?? '').trim(),
+          source: 'ai_graph',
+          tags: ['relation:${entry.key}', 'center:${center.word.toLowerCase()}'],
+        ));
+      }
+    }
+    if (discovered.isNotEmpty) {
+      await ref.read(wordListProvider.notifier).addWords(discovered);
     }
   }
 
@@ -162,7 +190,14 @@ class _WordGraphPageState extends ConsumerState<WordGraphPage> {
     );
     setState(() => _selectedWord = savedIndex >= 0
         ? widget.words[savedIndex]
-        : Word(id: '', userId: '', word: node.word, meaning: node.meaning));
+        : Word(
+            id: '',
+            userId: _centerWord?.userId ?? '',
+            word: node.word,
+            meaning: node.meaning,
+            source: 'ai_graph',
+            tags: ['relation:${node.relationType}'],
+          ));
     _scaffoldKey.currentState?.openEndDrawer();
   }
 

@@ -7,6 +7,7 @@ abstract class VocabularyRepository {
   Future<Word?> getWord(String id);
   Future<List<Word>> searchWords(String query);
   Future<void> addWord(Word word);
+  Future<void> addWords(List<Word> words);
   Future<void> updateWord(Word word);
   Future<void> deleteWord(String id);
 

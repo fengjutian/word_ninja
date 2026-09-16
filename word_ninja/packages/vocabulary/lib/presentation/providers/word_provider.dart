@@ -116,6 +116,12 @@ class WordListNotifier extends StateNotifier<WordListState> {
     _onDataChanged();
   }
 
+  Future<void> addWords(List<Word> words) async {
+    await _repo.addWords(words);
+    await loadWords(refresh: true);
+    _onDataChanged();
+  }
+
   Future<void> deleteWord(String id) async {
     await _repo.deleteWord(id);
     state = state.copyWith(

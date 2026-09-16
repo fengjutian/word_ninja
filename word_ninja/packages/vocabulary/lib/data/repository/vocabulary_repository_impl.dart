@@ -36,6 +36,19 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
   }
 
   @override
+  Future<void> addWords(List<Word> words) async {
+    if (words.isEmpty) return;
+    final now = DateTime.now();
+    await _local.saveWords(words
+        .map((word) => word.copyWith(
+              id: word.id.isEmpty ? _uuid.v4() : word.id,
+              createdAt: word.createdAt ?? now,
+              updatedAt: now,
+            ))
+        .toList());
+  }
+
+  @override
   Future<void> updateWord(Word word) async {
     await _local.saveWord(word.copyWith(updatedAt: DateTime.now()));
   }

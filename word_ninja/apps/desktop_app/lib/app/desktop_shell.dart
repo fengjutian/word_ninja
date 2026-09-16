@@ -13,12 +13,12 @@ class _DesktopShellState extends State<DesktopShell> {
 
   static const _items = <({IconData icon, String label})>[
     (icon: PhosphorIconsRegular.house, label: '首页'),
+    (icon: PhosphorIconsRegular.chats, label: 'AI 导师'),
     (icon: PhosphorIconsRegular.bookOpen, label: '单词'),
     (icon: PhosphorIconsRegular.shareNetwork, label: '知识图谱'),
     (icon: PhosphorIconsRegular.article, label: '阅读'),
     (icon: PhosphorIconsRegular.headphones, label: '听力'),
     (icon: PhosphorIconsRegular.microphone, label: '口语'),
-    (icon: PhosphorIconsRegular.chats, label: 'AI 导师'),
     (icon: PhosphorIconsRegular.pencilSimple, label: '写作'),
     (icon: PhosphorIconsRegular.calendar, label: '学习计划'),
   ];
@@ -230,12 +230,12 @@ class _DesktopShellState extends State<DesktopShell> {
 
   int _calcIndex(BuildContext context) {
     final uri = GoRouterState.of(context).uri.toString();
-    if (uri.startsWith(DesktopRoutes.wordGraph)) return 2;
-    if (uri.startsWith(DesktopRoutes.vocabulary)) return 1;
-    if (uri.startsWith(DesktopRoutes.reading)) return 3;
-    if (uri.startsWith(DesktopRoutes.listening)) return 4;
-    if (uri.startsWith(DesktopRoutes.speaking)) return 5;
-    if (uri.startsWith(DesktopRoutes.aiTutor)) return 6;
+    if (uri.startsWith(DesktopRoutes.aiTutor)) return 1;
+    if (uri.startsWith(DesktopRoutes.wordGraph)) return 3;
+    if (uri.startsWith(DesktopRoutes.vocabulary)) return 2;
+    if (uri.startsWith(DesktopRoutes.reading)) return 4;
+    if (uri.startsWith(DesktopRoutes.listening)) return 5;
+    if (uri.startsWith(DesktopRoutes.speaking)) return 6;
     if (uri.startsWith(DesktopRoutes.writing)) return 7;
     if (uri.startsWith(DesktopRoutes.studyPlan)) return 8;
     if (uri.startsWith(DesktopRoutes.modelConfig)) return 9;
@@ -248,12 +248,12 @@ class _DesktopShellState extends State<DesktopShell> {
   void _navigate(BuildContext context, int index) {
     final routes = [
       DesktopRoutes.home,
+      DesktopRoutes.aiTutor,
       DesktopRoutes.vocabulary,
       DesktopRoutes.wordGraph,
       DesktopRoutes.reading,
       DesktopRoutes.listening,
       DesktopRoutes.speaking,
-      DesktopRoutes.aiTutor,
       DesktopRoutes.writing,
       DesktopRoutes.studyPlan,
       DesktopRoutes.modelConfig,
