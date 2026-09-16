@@ -119,3 +119,6 @@ List<String> _extractWords(String text) {
   }
   return words;
 }
+
+/// Returns likely vocabulary targets while excluding conversational filler.
+List<String> extractCandidateWords(String text) => _extractWords(text);

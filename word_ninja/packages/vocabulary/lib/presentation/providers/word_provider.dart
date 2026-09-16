@@ -67,7 +67,9 @@ class WordListNotifier extends StateNotifier<WordListState> {
     if (refresh) {
       _page = 1;
       state = state.copyWith(isLoading: true, error: null);
-    } else if (state.isLoading) return;
+    } else if (state.isLoading || !state.hasMore) {
+      return;
+    }
 
     try {
       final words = await _repo.getWords(page: _page);

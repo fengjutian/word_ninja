@@ -53,11 +53,15 @@ class SyncService {
         }
       }
 
-      _lastSyncAt = DateTime.now();
       _isSyncing = false;
-      final msg = results.isEmpty ? '同步成功' : results.join(', ');
+      if (results.isEmpty) {
+        return const SyncResult(false, '没有可执行的同步任务');
+      }
+      final hasFailure = results.any((result) => result.endsWith('❌'));
+      if (!hasFailure) _lastSyncAt = DateTime.now();
+      final msg = results.join(', ');
       log.i('Sync: 完成 — $msg');
-      return SyncResult(true, msg);
+      return SyncResult(!hasFailure, msg);
     } catch (e) {
       _isSyncing = false;
       log.e('Sync failed', e);

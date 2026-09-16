@@ -1,4 +1,5 @@
 name: listening
+resolution: workspace
 description: WordFlow listening training module
 version: 1.0.0
 publish_to: none
@@ -17,6 +18,8 @@ dependencies:
     path: ../core
   ui_kit:
     path: ../ui_kit
+  ai:
+    path: ../ai
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
 

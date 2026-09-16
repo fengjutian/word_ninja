@@ -1,4 +1,5 @@
 name: common_widgets
+resolution: workspace
 description: WordFlow shared common widgets
 version: 1.0.0
 publish_to: none

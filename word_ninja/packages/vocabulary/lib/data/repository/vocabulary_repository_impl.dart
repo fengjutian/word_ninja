@@ -65,7 +65,13 @@ class VocabularyRepositoryImpl implements VocabularyRepository {
 
   @override
   Future<void> syncWithRemote() async {
-    final localWords = await _local.getWords();
+    const pageSize = 100;
+    final localWords = <Word>[];
+    for (var page = 1;; page++) {
+      final batch = await _local.getWords(page: page, size: pageSize);
+      localWords.addAll(batch);
+      if (batch.length < pageSize) break;
+    }
     if (localWords.isEmpty) return;
     await _remote.syncWords(localWords);
   }

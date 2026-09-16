@@ -1,5 +1,6 @@
 name: web_reader
-description: WordFlow web reader module — split-panel: WebView browser + AI chat
+resolution: workspace
+description: "WordFlow web reader module — split-panel: WebView browser + AI chat"
 version: 1.0.0
 publish_to: none
 

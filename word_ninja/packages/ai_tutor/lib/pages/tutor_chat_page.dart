@@ -28,6 +28,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
   final _drawerKey = GlobalKey<ScaffoldState>();
   bool _isLoading = false;
   String? _lastError;
+  String? _lastFailedPrompt;
 
   bool get _hasApiKey {
     final configuredKey = ref.read(modelConfigProvider).apiKey.trim();
@@ -100,20 +101,25 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
       }
       if (!mounted) return;
       ref.read(chatHistoryProvider.notifier).finishStream();
-      setState(() => _isLoading = false);
+      setState(() {
+        _isLoading = false;
+        _lastFailedPrompt = null;
+      });
     } catch (e) {
       if (!mounted) return;
       final notifier = ref.read(chatHistoryProvider.notifier);
       notifier.finishStream(); // 保存已接收的部分内容
       setState(() {
         _lastError = e.toString();
+        _lastFailedPrompt = text;
         _isLoading = false;
       });
     }
   }
 
   void _retry() {
-    if (_lastError == null) return;
+    final failedPrompt = _lastFailedPrompt;
+    if (_lastError == null || failedPrompt == null) return;
     final notifier = ref.read(chatHistoryProvider.notifier);
     notifier.removeLast();
     notifier.addMessage(ChatMessage('思考中...', isUser: false, isLoading: true));
@@ -121,8 +127,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
       _isLoading = true;
       _lastError = null;
     });
-    _callAiService(
-        _msgCtrl.text.trim().isNotEmpty ? _msgCtrl.text.trim() : '请重试');
+    _callAiService(failedPrompt);
   }
 
   void _selectAndClose(int index) {
@@ -187,16 +192,8 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     String? word;
     for (int j = index - 1; j >= 0; j--) {
       if (messages[j].isUser) {
-        final matches =
-            RegExp(r"[a-zA-Z]{3,}(?:-[a-zA-Z]+)*").allMatches(messages[j].text);
-        const ignored = {'null', 'undefined'};
-        for (final match in matches) {
-          final candidate = match.group(0)!.toLowerCase();
-          if (!ignored.contains(candidate)) {
-            word = candidate;
-            break;
-          }
-        }
+        final candidates = extractCandidateWords(messages[j].text);
+        if (candidates.isNotEmpty) word = candidates.last;
         break;
       }
     }

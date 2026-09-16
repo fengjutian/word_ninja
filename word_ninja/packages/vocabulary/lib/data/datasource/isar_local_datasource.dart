@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:core/storage/isar/isar_service.dart';
 import 'package:core/storage/isar/schemas/word_schema.dart';
 import 'package:core/storage/isar/schemas/review_schema.dart';
@@ -80,7 +79,7 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
   @override
   Future<List<Word>> searchWords(String query) async {
     final q = query.toLowerCase();
-    final all = await _isar.wordSchemas.where().limit(500).findAll();
+    final all = await _isar.wordSchemas.where().findAll();
     return all
         .where((s) =>
             s.word.toLowerCase().contains(q) ||
@@ -123,7 +122,7 @@ class IsarVocabularyLocalDataSource implements VocabularyLocalDataSource {
   @override
   Future<List<Word>> getDueReviews() async {
     final now = DateTime.now();
-    final all = await _isar.wordSchemas.where().limit(500).findAll();
+    final all = await _isar.wordSchemas.where().findAll();
     final due = all.where((s) {
       if (s.nextReviewDate == null) return true;
       return !s.nextReviewDate!.isAfter(now);

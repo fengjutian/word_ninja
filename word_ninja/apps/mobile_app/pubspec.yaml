@@ -1,4 +1,5 @@
 name: mobile_app
+resolution: workspace
 description: WordFlow Mobile App (Android/iOS)
 publish_to: none
 version: 1.0.0+1

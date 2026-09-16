@@ -1,4 +1,5 @@
 name: study_plan
+resolution: workspace
 description: WordFlow study plan module
 version: 1.0.0
 publish_to: none
@@ -17,6 +18,8 @@ dependencies:
     path: ../core
   ai:
     path: ../ai
+  ui_kit:
+    path: ../ui_kit
   flutter_riverpod: ^2.6.1
   riverpod_annotation: ^2.6.1
 

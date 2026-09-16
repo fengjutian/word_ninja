@@ -1,4 +1,5 @@
 name: sync
+resolution: workspace
 description: WordFlow cloud sync module
 version: 1.0.0
 publish_to: none

@@ -3,7 +3,7 @@ int expForLevel(int level) {
   if (level <= 1) return 0;
   double total = 0;
   for (int i = 1; i < level; i++) {
-    total += 1500 * (1.15).pow(i - 1);
+    total += 1500 * math.pow(1.15, i - 1);
   }
   return total.round();
 }
@@ -45,3 +45,4 @@ int masteryColor(int mastery) {
   if (mastery < 85) return 0xFF43A047; // 绿
   return 0xFF1E88E5; // 蓝
 }
+import 'dart:math' as math;

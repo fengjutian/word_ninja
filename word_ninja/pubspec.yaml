@@ -6,5 +6,30 @@ version: 1.0.0
 environment:
   sdk: ^3.5.0
 
+workspace:
+  - apps/desktop_app
+  - apps/mobile_app
+  - packages/ai
+  - packages/ai_tutor
+  - packages/auth
+  - packages/common_widgets
+  - packages/core
+  - packages/listening
+  - packages/profile
+  - packages/reading
+  - packages/speaking
+  - packages/study_plan
+  - packages/sync
+  - packages/ui_kit
+  - packages/vocabulary
+  - packages/web_reader
+  - packages/writing
+
 dev_dependencies:
   melos: ^7.8.2
+
+melos:
+  scripts:
+    analyze: melos exec -- flutter analyze
+    format: melos exec -- dart format .
+    test: melos exec --dir-exists=test -- flutter test

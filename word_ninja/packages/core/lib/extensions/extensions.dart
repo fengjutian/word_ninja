@@ -16,7 +16,7 @@ extension IntExtension on int {
   int get toEstimatedLevel {
     double exp = 0;
     for (int lv = 1; lv <= 100; lv++) {
-      exp += 1500 * (1.15).pow(lv - 1);
+      exp += 1500 * math.pow(1.15, lv - 1);
       if (exp > this) return lv;
     }
     return 100;
@@ -32,3 +32,4 @@ extension DateTimeExtension on DateTime {
   String get yyyyMmDd =>
       '$year-${month.toString().padLeft(2, '0')}-${day.toString().padLeft(2, '0')}';
 }
+import 'dart:math' as math;
