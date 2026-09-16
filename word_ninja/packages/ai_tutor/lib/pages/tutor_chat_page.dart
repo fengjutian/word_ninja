@@ -189,22 +189,24 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     int index,
     List<ChatMessage> messages,
   ) async {
-    String? word;
+    List<String> candidates = const [];
     for (int j = index - 1; j >= 0; j--) {
       if (messages[j].isUser) {
-        final candidates = extractCandidateWords(messages[j].text);
-        if (candidates.isNotEmpty) word = candidates.last;
+        candidates = extractCandidateWords(messages[j].text);
         break;
       }
     }
-    if (word == null || word.isEmpty) {
+    if (candidates.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('没有在上一条问题中识别到可添加的英文单词')),
       );
       return;
     }
 
-    final targetWord = word;
+    final targetWord = candidates.length == 1
+        ? candidates.single
+        : await _chooseVocabularyCandidate(candidates);
+    if (!mounted || targetWord == null) return;
     final aiAnswer = messages[index].text; // AI 的回答内容
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -258,6 +260,22 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
         SnackBar(content: Text('添加失败：$error')),
       );
     }
+  }
+
+  Future<String?> _chooseVocabularyCandidate(List<String> candidates) {
+    return showDialog<String>(
+      context: context,
+      builder: (context) => SimpleDialog(
+        title: const Text('选择要加入单词本的词'),
+        children: [
+          for (final candidate in candidates)
+            SimpleDialogOption(
+              onPressed: () => Navigator.of(context).pop(candidate),
+              child: Text(candidate),
+            ),
+        ],
+      ),
+    );
   }
 
   /// 提取文本第一段纯文字作为简要释义

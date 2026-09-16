@@ -1,6 +1,5 @@
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:flutter/material.dart';
-import 'package:core/network/api_client.dart' show ApiClient;
 
 part 'admin_tabs.dart';
 
@@ -36,10 +35,10 @@ class AdminDashboard extends StatefulWidget {
 
 class _AdminDashboardState extends State<AdminDashboard> {
   int _selectedIndex = 0;
-  int _userCount = 1234;
-  int _wordCount = 56789;
-  int _activeToday = 456;
-  int _memberCount = 234;
+  int _userCount = 0;
+  int _wordCount = 0;
+  int _activeToday = 0;
+  int _memberCount = 0;
   bool _isRefreshing = false;
 
   final _pages = <Widget>[];
@@ -47,23 +46,15 @@ class _AdminDashboardState extends State<AdminDashboard> {
   @override
   void initState() {
     super.initState();
-    _refreshStats();
   }
 
   Future<void> _refreshStats() async {
     setState(() => _isRefreshing = true);
-    // 模拟从 API 获取数据
-    await Future.delayed(const Duration(milliseconds: 800));
-    if (mounted) {
-      setState(() {
-        _isRefreshing = false;
-        // 使用递增数据展示刷新效果
-        _userCount = 1234 + (DateTime.now().second % 100);
-        _wordCount = 56789 + (DateTime.now().second * 10);
-        _activeToday = 456 + (DateTime.now().second % 50);
-        _memberCount = 234 + (DateTime.now().second % 20);
-      });
-    }
+    if (!mounted) return;
+    setState(() => _isRefreshing = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('管理统计接口尚未配置')),
+    );
   }
 
   @override

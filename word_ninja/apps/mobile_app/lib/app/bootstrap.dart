@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/storage/preferences.dart';
 import 'package:core/storage/isar_db.dart';
 import 'package:core/storage/sqlite/sqlite_init.dart';

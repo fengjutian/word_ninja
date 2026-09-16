@@ -23,7 +23,6 @@ class _WritingPageState extends ConsumerState<WritingPage> {
   bool _isScoring = false;
   String? _generatedComposition;
   String? _error;
-  Map<String, dynamic>? _correctionResult;
   Map<String, dynamic>? _ieltsResult;
 
   @override
@@ -62,7 +61,6 @@ class _WritingPageState extends ConsumerState<WritingPage> {
       final service = ref.read(aiWritingServiceProvider);
       final result = await service.correct(text);
       if (mounted) {
-        setState(() => _correctionResult = result);
         _showCorrectionDialog(result);
       }
     } catch (e) {

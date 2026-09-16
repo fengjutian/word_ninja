@@ -12,17 +12,6 @@ class LevelBadge extends StatelessWidget {
     this.size = 48,
   });
 
-  String get _rank {
-    if (level >= 100) return 'legend';
-    if (level >= 80) return 'kage';
-    if (level >= 50) return 'master';
-    if (level >= 40) return 'elite';
-    if (level >= 30) return 'jonin';
-    if (level >= 20) return 'chunin';
-    if (level >= 10) return 'genin';
-    return 'apprentice';
-  }
-
   Color get _color {
     if (level >= 100) return AppColors.levelLegend;
     if (level >= 80) return AppColors.levelMaster;

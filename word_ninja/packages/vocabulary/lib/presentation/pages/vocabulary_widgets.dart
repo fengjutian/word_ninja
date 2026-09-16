@@ -100,45 +100,45 @@ class _WordDetailSheet extends ConsumerWidget {
                 padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Column(
                   children: [
-                    Text(word.word as String,
+                    Text(word.word,
                         style: AppTextStyles.displayMedium),
-                    if ((word.phonetic as String).isNotEmpty) ...[
+                    if (word.phonetic.isNotEmpty) ...[
                       const SizedBox(height: AppSpacing.sm),
                       Text('/${word.phonetic}/',
                           style: AppTextStyles.bodyLarge),
                     ],
                     const SizedBox(height: AppSpacing.md),
-                    Text(word.meaning as String,
+                    Text(word.meaning,
                         style: AppTextStyles.heading3
                             .copyWith(color: AppColors.primary)),
                     const SizedBox(height: AppSpacing.lg),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: [_buildMasteryBadge(word.mastery as int)],
+                      children: [_buildMasteryBadge(word.mastery)],
                     ),
                   ],
                 ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            if ((word.example as String).isNotEmpty) ...[
+            if (word.example.isNotEmpty) ...[
               const Text('例句', style: AppTextStyles.heading3),
               const SizedBox(height: AppSpacing.sm),
               Card(
                 child: Padding(
                   padding: const EdgeInsets.all(AppSpacing.lg),
-                  child: Text(word.example as String,
+                  child: Text(word.example,
                       style: AppTextStyles.bodyLarge),
                 ),
               ),
               const SizedBox(height: AppSpacing.lg),
             ],
-            if ((word.tags as List).isNotEmpty) ...[
+            if (word.tags.isNotEmpty) ...[
               const Text('标签', style: AppTextStyles.heading3),
               const SizedBox(height: AppSpacing.sm),
               Wrap(
                 spacing: AppSpacing.sm,
-                children: (word.tags as List)
+                children: word.tags
                     .map((tag) => Chip(
                         label: Text(tag.toString()),
                         backgroundColor:

@@ -1,4 +1,3 @@
-import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:core/network/dio_client.dart';
 import 'package:core/network/api_client.dart';

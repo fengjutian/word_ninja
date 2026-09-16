@@ -19,7 +19,6 @@ class AppIcon extends StatelessWidget {
 
   const AppIcon._(
     this._assetName, {
-    super.key,
     this.size = 24,
     this.color,
     this.fit = BoxFit.contain,
@@ -84,10 +83,13 @@ class AppIcon extends StatelessWidget {
 
   /// 将 Color 转成 #RRGGBB hex 字符串
   static String _colorToHex(Color c) {
+    final red = (c.r * 255).round().clamp(0, 255);
+    final green = (c.g * 255).round().clamp(0, 255);
+    final blue = (c.b * 255).round().clamp(0, 255);
     return '#'
-        '${c.red.toRadixString(16).padLeft(2, '0')}'
-        '${c.green.toRadixString(16).padLeft(2, '0')}'
-        '${c.blue.toRadixString(16).padLeft(2, '0')}';
+        '${red.toRadixString(16).padLeft(2, '0')}'
+        '${green.toRadixString(16).padLeft(2, '0')}'
+        '${blue.toRadixString(16).padLeft(2, '0')}';
   }
 
   @override

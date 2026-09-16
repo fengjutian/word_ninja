@@ -8,7 +8,6 @@ import 'package:ai/ai.dart';
 import 'package:ai_tutor/ai_tutor.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
-import 'package:http/http.dart' as http;
 import 'package:core/logger/logger.dart';
 
 part 'web_reader_widgets.dart';
@@ -27,7 +26,6 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
   final _chatCtrl = TextEditingController();
   final _scrollCtrl = ScrollController();
   bool _isChatLoading = false;
-  String? _lastChatError;
 
   @override
   void initState() {
@@ -77,10 +75,7 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
     notifier.addMessage(ChatMessage(text, isUser: true));
     notifier.addMessage(ChatMessage('思考中...', isUser: false, isLoading: true));
     _chatCtrl.clear();
-    setState(() {
-      _lastChatError = null;
-      _isChatLoading = true;
-    });
+    setState(() => _isChatLoading = true);
     _scrollChatToBottom();
     _callAiService(text);
   }
@@ -91,6 +86,7 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
       final state = ref.read(chatHistoryProvider);
       final messages = state.current.messages;
       final history = messages
+          .take(messages.length - 1)
           .where((m) => !m.isLoading)
           .map((m) =>
               {'role': m.isUser ? 'user' : 'assistant', 'content': m.text})
@@ -116,10 +112,10 @@ class _WebReaderPageState extends ConsumerState<WebReaderPage> {
       if (!mounted) return;
       final notifier = ref.read(chatHistoryProvider.notifier);
       notifier.finishStream(); // 保存已接收的部分内容
-      setState(() {
-        _lastChatError = e.toString();
-        _isChatLoading = false;
-      });
+      setState(() => _isChatLoading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('AI 回复失败：$e')),
+      );
     }
   }
 

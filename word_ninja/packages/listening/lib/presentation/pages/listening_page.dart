@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/app_theme/design_tokens.dart';
-import 'package:ai/providers/ai_providers.dart' show aiReadingServiceProvider;
 import 'package:listening/providers/tts_provider.dart';
 
 /// 听力训练页面 - 课程选择 + 三种练习模式
