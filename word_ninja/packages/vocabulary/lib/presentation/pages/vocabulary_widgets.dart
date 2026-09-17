@@ -67,12 +67,51 @@ class _PracticeCard extends StatelessWidget {
 }
 
 /// 单词详情弹层
-class _WordDetailSheet extends ConsumerWidget {
+class _WordDetailSheet extends ConsumerStatefulWidget {
   final Word word;
-  _WordDetailSheet({required this.word});
+  const _WordDetailSheet({required this.word});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_WordDetailSheet> createState() => _WordDetailSheetState();
+}
+
+class _WordDetailSheetState extends ConsumerState<_WordDetailSheet> {
+  String _explanation = '';
+  String? _explanationError;
+  bool _isExplaining = false;
+
+  Word get word => widget.word;
+
+  @override
+  void initState() {
+    super.initState();
+    _explanation = Preferences.getString(_wordExplanationKey(word.word));
+    if (_explanation.isEmpty) Future.microtask(_generateExplanation);
+  }
+
+  Future<void> _generateExplanation() async {
+    if (_isExplaining) return;
+    setState(() {
+      _isExplaining = true;
+      _explanationError = null;
+    });
+    try {
+      final result =
+          await ref.read(aiWordServiceProvider).explainWord(word.word);
+      if (!result.contains('###')) {
+        throw StateError(result);
+      }
+      await Preferences.setString(_wordExplanationKey(word.word), result);
+      if (mounted) setState(() => _explanation = result);
+    } catch (error) {
+      if (mounted) setState(() => _explanationError = error.toString());
+    } finally {
+      if (mounted) setState(() => _isExplaining = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       initialChildSize: 0.7,
       maxChildSize: 0.95,
@@ -129,6 +168,69 @@ class _WordDetailSheet extends ConsumerWidget {
                     style: AppTextStyles.bodyLarge.copyWith(height: 1.65),
                   ),
                 ),
+              ),
+            ),
+            const SizedBox(height: AppSpacing.lg),
+            Row(
+              children: [
+                const Expanded(
+                  child: Text('AI 单词讲解', style: AppTextStyles.heading3),
+                ),
+                IconButton(
+                  tooltip: '重新生成并保存',
+                  onPressed: _isExplaining ? null : _generateExplanation,
+                  icon: const Icon(PhosphorIconsRegular.arrowsClockwise),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Card(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: _isExplaining && _explanation.isEmpty
+                    ? const Column(
+                        children: [
+                          CircularProgressIndicator(),
+                          SizedBox(height: 12),
+                          Text('正在生成完整单词讲解…'),
+                        ],
+                      )
+                    : _explanationError != null && _explanation.isEmpty
+                        ? Column(
+                            children: [
+                              Text(
+                                '暂时无法生成讲解：$_explanationError',
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: AppColors.error),
+                              ),
+                              const SizedBox(height: 10),
+                              FilledButton(
+                                onPressed: _generateExplanation,
+                                child: const Text('重试'),
+                              ),
+                            ],
+                          )
+                        : _explanation.isEmpty
+                            ? const Text('暂无 AI 讲解')
+                            : MarkdownBody(
+                                data: _explanation,
+                                selectable: true,
+                                styleSheet: MarkdownStyleSheet(
+                                  p: AppTextStyles.bodyLarge.copyWith(height: 1.65),
+                                  h2: AppTextStyles.heading2,
+                                  h3: AppTextStyles.heading3,
+                                  blockquotePadding: const EdgeInsets.all(12),
+                                  blockquoteDecoration: BoxDecoration(
+                                    color: AppColors.primary.withValues(alpha: 0.06),
+                                    border: const Border(
+                                      left: BorderSide(
+                                        color: AppColors.primary,
+                                        width: 3,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),

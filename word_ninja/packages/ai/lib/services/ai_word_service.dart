@@ -83,6 +83,28 @@ class AiWordService {
     return result;
   }
 
+  /// Generate the same structured teaching explanation used by the AI tutor.
+  Future<String> explainWord(String word) {
+    return _chat.chat(
+      message: '请详细讲解英语单词 "$word"。',
+      systemPrompt: '''
+你是 WordFlow 的英语学习导师。请用准确、自然的中文讲解单词，英文内容保留英文。
+必须使用 Markdown 并完整输出以下章节：
+## 单词 · 音标 · 词性
+### 核心感觉
+### 词义与用法
+### 词形变化
+### 近义词辨析
+### 反义词
+### 常用搭配
+### 场景例句
+### 记忆提示
+
+要求：按词性列出所有常用含义，说明语境和易错点；至少给出 4 个中英对照例句。如果是派生形式，同时解释词根与该形式自身的真实用法，不能只说“某词的现在分词/过去式”。
+''',
+    );
+  }
+
   /// 生成单词测试（选择题）
   Future<List<Map<String, dynamic>>> generateQuiz(List<String> words) async {
     if (words.isEmpty) return [];

@@ -4,6 +4,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:core/storage/preferences.dart';
+import 'package:ai/providers/ai_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ui_kit/cards/word_card.dart';
 import 'package:ui_kit/loading/app_loading.dart';
@@ -14,6 +17,9 @@ import '../../data/model/word.dart';
 import 'add_word_page.dart';
 
 part 'vocabulary_widgets.dart';
+
+String _wordExplanationKey(String word) =>
+    'word_explanation_${Uri.encodeComponent(word.trim().toLowerCase())}';
 
 /// 单词本主页面 — 词汇学习
 class VocabularyPage extends ConsumerStatefulWidget {
@@ -188,6 +194,10 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
     exampleCtrl.dispose();
     tagsCtrl.dispose();
     if (updated == null || !mounted) return;
+    if (updated.word.trim().toLowerCase() != word.word.trim().toLowerCase()) {
+      await Preferences.remove(_wordExplanationKey(word.word));
+      await Preferences.remove(_wordExplanationKey(updated.word));
+    }
     await ref.read(wordListProvider.notifier).updateWord(updated);
     if (mounted) {
       ScaffoldMessenger.of(context)
@@ -216,6 +226,7 @@ class _VocabularyPageState extends ConsumerState<VocabularyPage> {
     );
     if (confirmed != true || !mounted) return;
     await ref.read(wordListProvider.notifier).deleteWord(word.id);
+    await Preferences.remove(_wordExplanationKey(word.word));
     if (mounted) {
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text('单词已删除')));
