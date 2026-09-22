@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:core/storage/preferences.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/app_theme/design_tokens.dart';
 import 'package:ai/ai.dart';
@@ -207,44 +208,21 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
         ? candidates.single
         : await _chooseVocabularyCandidate(candidates);
     if (!mounted || targetWord == null) return;
-    final aiAnswer = messages[index].text; // AI 的回答内容
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-          content: Text('正在查询「$targetWord」的释义...'),
-          duration: const Duration(seconds: 1)),
-    );
-
-    Map<String, dynamic> data = const {};
-    try {
-      data = await ref.read(aiChatServiceProvider).explainWord(targetWord);
-    } catch (_) {
-      // AI enrichment is optional; the word can still be stored locally.
-    }
+    final aiAnswer = messages[index].text.trim();
 
     try {
-      final parsedMeaning = (data['meaning'] as String?)?.trim();
-      final meaning = parsedMeaning != null &&
-              parsedMeaning.isNotEmpty &&
-              parsedMeaning != '解析失败'
-          ? parsedMeaning
-          : _extractFirstLine(aiAnswer);
-      final example = (data['example'] as String?)?.trim().isNotEmpty == true
-          ? data['example'] as String
-          : aiAnswer;
       await ref.read(wordListProvider.notifier).addWord(
             Word(
               id: DateTime.now().millisecondsSinceEpoch.toString(),
               userId: 'local',
               word: targetWord,
-              meaning: meaning,
-              phonetic: (data['phonetic'] as String?) ?? '',
-              example: example,
-              tags: _parseCollocations(data['collocations']),
+              meaning: _extractFirstLine(aiAnswer),
+              example: aiAnswer,
               source: 'ai_tutor',
               createdAt: DateTime.now(),
             ),
           );
+      await Preferences.setString(_wordExplanationKey(targetWord), aiAnswer);
       ref.invalidate(vocabularyStatsProvider);
       ref.invalidate(dueReviewProvider);
       if (!mounted) return;
@@ -261,6 +239,9 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
       );
     }
   }
+
+  String _wordExplanationKey(String word) =>
+      'word_explanation_${Uri.encodeComponent(word.trim().toLowerCase())}';
 
   Future<String?> _chooseVocabularyCandidate(List<String> candidates) {
     return showDialog<String>(
@@ -291,24 +272,6 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
     return firstLine.length > 80
         ? '${firstLine.substring(0, 80)}...'
         : firstLine;
-  }
-
-  /// 解析 AI 返回的搭配为标签列表
-  List<String> _parseCollocations(dynamic raw) {
-    if (raw == null) return [];
-    if (raw is List)
-      return raw
-          .map((e) => e.toString().trim())
-          .where((e) => e.isNotEmpty)
-          .toList();
-    if (raw is String && raw.isNotEmpty) {
-      return raw
-          .split(',')
-          .map((e) => e.trim())
-          .where((e) => e.isNotEmpty)
-          .toList();
-    }
-    return [];
   }
 
   void _scrollToBottom() {
