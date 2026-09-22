@@ -524,6 +524,7 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                       controller: _msgCtrl,
                       minLines: 1,
                       maxLines: 4,
+                      textInputAction: TextInputAction.send,
                       decoration: InputDecoration(
                         hintText: '询问单词、语法、写作或口语问题…',
                         prefixIcon: IconButton(
@@ -535,8 +536,19 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                         suffixIcon: Padding(
                           padding: const EdgeInsets.all(5),
                           child: IconButton.filled(
-                            icon: const Icon(PhosphorIconsRegular.arrowUp,
-                                size: 17),
+                            icon: const Icon(
+                              PhosphorIconsFill.paperPlaneTilt,
+                              size: 18,
+                            ),
+                            tooltip: '发送',
+                            style: IconButton.styleFrom(
+                              backgroundColor: scheme.primary,
+                              foregroundColor: scheme.onPrimary,
+                              disabledBackgroundColor:
+                                  scheme.primary.withValues(alpha: 0.38),
+                              disabledForegroundColor:
+                                  scheme.onPrimary.withValues(alpha: 0.72),
+                            ),
                             onPressed: _isLoading ? null : _sendMessage,
                           ),
                         ),

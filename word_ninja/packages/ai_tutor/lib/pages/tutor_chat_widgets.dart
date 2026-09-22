@@ -198,13 +198,25 @@ class _MessageBubble extends StatelessWidget {
                     ],
                   )
                 : message.isUser
-                    ? Text(
-                        message.text,
-                        style: TextStyle(
-                          color: textColor,
-                          fontSize: 15,
-                          height: 1.5,
-                        ),
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              message.text,
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 15,
+                                height: 1.5,
+                              ),
+                            ),
+                          ),
+                          if (onDelete != null) ...[
+                            const SizedBox(width: 8),
+                            _MessageDeleteButton(onPressed: onDelete!),
+                          ],
+                        ],
                       )
                     : Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -235,6 +247,9 @@ class _MessageBubble extends StatelessWidget {
                                   color: colors.mutedText,
                                 ),
                               ),
+                              const Spacer(),
+                              if (onDelete != null)
+                                _MessageDeleteButton(onPressed: onDelete!),
                             ],
                           ),
                           const SizedBox(height: 12),
@@ -323,6 +338,27 @@ class _MessageBubble extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _MessageDeleteButton extends StatelessWidget {
+  final VoidCallback onPressed;
+
+  const _MessageDeleteButton({required this.onPressed});
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      onPressed: onPressed,
+      tooltip: '删除消息',
+      icon: const Icon(PhosphorIconsRegular.trash, size: 16),
+      color: context.appColors.mutedText,
+      hoverColor: AppColors.error.withValues(alpha: 0.08),
+      highlightColor: AppColors.error.withValues(alpha: 0.12),
+      constraints: const BoxConstraints.tightFor(width: 28, height: 28),
+      padding: EdgeInsets.zero,
+      visualDensity: VisualDensity.compact,
     );
   }
 }
