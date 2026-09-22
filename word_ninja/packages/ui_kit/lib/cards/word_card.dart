@@ -87,8 +87,7 @@ class WordCard extends StatelessWidget {
                 IconButton(
                   tooltip: '编辑',
                   onPressed: onEdit,
-                  icon: const Icon(PhosphorIconsRegular.pencilSimple,
-                      size: 19),
+                  icon: const Icon(PhosphorIconsRegular.pencilSimple, size: 19),
                 ),
               if (onDelete != null)
                 IconButton(

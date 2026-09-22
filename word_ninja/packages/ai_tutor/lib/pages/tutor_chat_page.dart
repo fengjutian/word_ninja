@@ -6,6 +6,7 @@ import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:core/storage/preferences.dart';
 import 'package:ui_kit/app_theme/app_theme.dart';
 import 'package:ui_kit/app_theme/design_tokens.dart';
+import 'package:ui_kit/motion/app_entrance.dart';
 import 'package:ai/ai.dart';
 import 'package:vocabulary/presentation/providers/word_provider.dart';
 import 'package:vocabulary/data/model/word.dart';
@@ -400,27 +401,29 @@ class _TutorChatPageState extends ConsumerState<TutorChatPage> {
                 final messageEntry = visibleMessages[i];
                 final messageIndex = messageEntry.$1;
                 final msg = messageEntry.$2;
-                return Center(
-                  child: ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 880),
-                    child: _MessageBubble(
-                      msg,
-                      onTap: msg.isUser
-                          ? () {
-                              _msgCtrl.text = msg.text;
-                              _msgCtrl.selection = TextSelection.collapsed(
-                                  offset: msg.text.length);
-                            }
-                          : null,
-                      onDelete: msg.isLoading
-                          ? null
-                          : () => _deleteMessage(messageIndex),
-                      onAddToVocab: !msg.isUser &&
-                              !msg.isLoading &&
-                              !msg.isError
-                          ? () =>
-                              _addAiResponseToVocabulary(messageIndex, messages)
-                          : null,
+                return AppEntrance(
+                  key: ValueKey('${sessionsState.current.id}:$messageIndex'),
+                  child: Center(
+                    child: ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 880),
+                      child: _MessageBubble(
+                        msg,
+                        onTap: msg.isUser
+                            ? () {
+                                _msgCtrl.text = msg.text;
+                                _msgCtrl.selection = TextSelection.collapsed(
+                                    offset: msg.text.length);
+                              }
+                            : null,
+                        onDelete: msg.isLoading
+                            ? null
+                            : () => _deleteMessage(messageIndex),
+                        onAddToVocab:
+                            !msg.isUser && !msg.isLoading && !msg.isError
+                                ? () => _addAiResponseToVocabulary(
+                                    messageIndex, messages)
+                                : null,
+                      ),
                     ),
                   ),
                 );
