@@ -9,6 +9,7 @@ class _HomeTab extends ConsumerWidget {
     final stats = ref.watch(vocabularyStatsProvider);
     return Scaffold(
       backgroundColor: AppColors.background,
+      extendBodyBehindAppBar: false,
       appBar: AppBar(
         title: const Row(
           mainAxisSize: MainAxisSize.min,

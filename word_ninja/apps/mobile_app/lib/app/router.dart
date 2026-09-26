@@ -108,7 +108,7 @@ Page<T> _slideInFromBottom<T>({
 /// 创建 GoRouter 实例
 GoRouter createRouter() {
   return GoRouter(
-    initialLocation: AppRoutes.login,
+    initialLocation: AppRoutes.home,
     routes: [
       // ─── 认证 ───
       GoRoute(
