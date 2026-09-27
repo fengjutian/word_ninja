@@ -4,6 +4,7 @@ import 'app/bootstrap.dart';
 import 'app/app.dart';
 import 'app/di.dart';
 import 'app/router.dart';
+import '../debug_overlay.dart';
 
 void main() async {
   // 初始化
